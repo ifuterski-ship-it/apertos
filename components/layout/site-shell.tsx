@@ -3,7 +3,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ShoppingBag } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import type { User } from "@supabase/supabase-js";
 import { useCart } from "@/components/cart/cart-provider";
+import { hasSupabaseEnv } from "@/lib/supabase/config";
+import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 
 const navLinks = [
@@ -14,6 +18,39 @@ const navLinks = [
 
 export function SiteShell({ children }: { children: React.ReactNode }) {
   const { totalItems, isHydrated } = useCart();
+  const supabase = useMemo(() => (hasSupabaseEnv ? createClient() : null), []);
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    if (!supabase) {
+      return;
+    }
+
+    let mounted = true;
+
+    const loadUser = async () => {
+      const {
+        data: { user: currentUser }
+      } = await supabase.auth.getUser();
+
+      if (mounted) {
+        setUser(currentUser);
+      }
+    };
+
+    loadUser();
+
+    const {
+      data: { subscription }
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, [supabase]);
 
   return (
     <div className="min-h-screen">
@@ -45,6 +82,12 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
                 ) : null}
               </Link>
             ))}
+            <Link
+              href={user ? "/account" : "/auth"}
+              className="text-xs uppercase tracking-[0.3em] text-neutral-300 transition hover:text-white"
+            >
+              {user ? "Account" : "Login"}
+            </Link>
           </nav>
         </div>
       </header>
