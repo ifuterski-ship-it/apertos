@@ -1,0 +1,18 @@
+import { Product } from "@/lib/products";
+import { ProductCard } from "@/components/products/product-card";
+
+export function ProductGrid({ products }: { products: Product[] }) {
+  return (
+    <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+      {products.map((product, index) => (
+        <div
+          key={product.id}
+          className="opacity-0 animate-float-in"
+          style={{ animationDelay: `${index * 120}ms`, animationFillMode: "forwards" }}
+        >
+          <ProductCard product={product} />
+        </div>
+      ))}
+    </div>
+  );
+}

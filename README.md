@@ -1,0 +1,25 @@
+# APERTOS
+
+Premium combat sports storefront built with Next.js App Router and Tailwind CSS.
+
+## Getting started
+
+1. Install dependencies:
+
+```bash
+npm install
+```
+
+2. Copy `.env.example` to `.env.local` if you want to prepare service credentials.
+
+3. Start the dev server:
+
+```bash
+npm run dev
+```
+
+## Notes
+
+- The cart is fully functional and persists in `localStorage`.
+- Product data is local and image files are served from `public/products`.
+- The app is kept intentionally simple so it runs locally without external services.
