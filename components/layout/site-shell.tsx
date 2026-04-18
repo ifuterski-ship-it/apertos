@@ -56,7 +56,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
           </div>
           <span>Premium Combat Sports</span>
         </div>
-        <span>Apertos</span>
+        <span>Apertos Est. 2026</span>
       </footer>
     </div>
   );
