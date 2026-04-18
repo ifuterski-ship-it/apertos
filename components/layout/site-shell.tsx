@@ -13,7 +13,8 @@ import { cn } from "@/lib/utils";
 const navLinks = [
   { href: "/", label: "Home" },
   { href: "/shop", label: "Shop" },
-  { href: "/cart", label: "Cart" }
+  { href: "/cart", label: "Cart" },
+  { href: "/contact", label: "Contact" }
 ];
 
 export function SiteShell({ children }: { children: React.ReactNode }) {

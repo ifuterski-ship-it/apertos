@@ -3,13 +3,62 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Minus, Plus, Trash2 } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
 import { useCart } from "@/components/cart/cart-provider";
+import { hasSupabaseEnv } from "@/lib/supabase/config";
 
 export function CartView() {
   const { items, updateQuantity, removeItem, subtotal, clearCart, isHydrated } = useCart();
+  const supabase = useMemo(() => (hasSupabaseEnv ? createClient() : null), []);
+  const [checkoutEmail, setCheckoutEmail] = useState("");
+  const [checkoutStatus, setCheckoutStatus] = useState<string | null>(null);
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
 
-  const handleCheckout = () => {
-    window.alert("Checkout is currently mocked for local development only.");
+  useEffect(() => {
+    if (!supabase) {
+      return;
+    }
+
+    supabase.auth.getUser().then(({ data }) => {
+      if (data.user?.email) {
+        setCheckoutEmail(data.user.email);
+      }
+    });
+  }, [supabase]);
+
+  const handleCheckout = async () => {
+    setCheckoutStatus(null);
+
+    if (!checkoutEmail) {
+      setCheckoutStatus("Add an email address to receive your order confirmation.");
+      return;
+    }
+
+    setIsCheckingOut(true);
+
+    const response = await fetch("/api/email/order", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        email: checkoutEmail,
+        items,
+        total: subtotal
+      })
+    });
+
+    const result = (await response.json()) as { ok?: boolean; message?: string };
+
+    if (!response.ok || !result.ok) {
+      setCheckoutStatus(result.message ?? "Unable to send the order confirmation right now.");
+      setIsCheckingOut(false);
+      return;
+    }
+
+    setCheckoutStatus("Order confirmation sent. This checkout flow is still mocked for payment.");
+    setIsCheckingOut(false);
   };
 
   if (!isHydrated) {
@@ -39,14 +88,16 @@ export function CartView() {
             key={item.id}
             className="grid gap-4 rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-4 md:grid-cols-[180px_1fr]"
           >
-            <div className="relative min-h-44 overflow-hidden rounded-[1.25rem]">
-              <Image
-                src={item.image}
-                alt={item.name}
-                fill
-                sizes="180px"
-                className="object-cover"
-              />
+            <div className="relative min-h-44 overflow-hidden rounded-[1.25rem] bg-white">
+              <div className="absolute inset-0 p-4">
+                <Image
+                  src={item.image}
+                  alt={item.name}
+                  fill
+                  sizes="180px"
+                  className="object-contain"
+                />
+              </div>
             </div>
             <div className="flex flex-col justify-between gap-6">
               <div className="space-y-2">
@@ -116,12 +167,28 @@ export function CartView() {
           </div>
 
           <div className="space-y-3">
+            <div className="space-y-2">
+              <label htmlFor="checkout-email" className="text-xs uppercase tracking-[0.3em] text-neutral-400">
+                Confirmation Email
+              </label>
+              <input
+                id="checkout-email"
+                type="email"
+                value={checkoutEmail}
+                onChange={(event) => setCheckoutEmail(event.target.value)}
+                className="w-full border border-white/10 bg-black/30 px-4 py-4 text-sm text-white outline-none transition focus:border-white"
+              />
+            </div>
+            {checkoutStatus ? (
+              <p className="text-xs uppercase leading-6 tracking-[0.2em] text-neutral-300">{checkoutStatus}</p>
+            ) : null}
             <button
               type="button"
               onClick={handleCheckout}
+              disabled={isCheckingOut}
               className="w-full border border-white px-5 py-4 text-xs font-semibold uppercase tracking-[0.35em] transition hover:bg-white hover:text-black"
             >
-              Checkout
+              {isCheckingOut ? "Sending" : "Checkout"}
             </button>
             <button
               type="button"

@@ -38,6 +38,14 @@ export function AuthForm() {
         return;
       }
 
+      await fetch("/api/email/welcome", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ email })
+      });
+
       setMessage("Account created. Check your email to confirm your account, then sign in.");
       setIsSubmitting(false);
       return;
