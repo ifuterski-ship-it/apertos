@@ -22,4 +22,5 @@ npm run dev
 
 - The cart is fully functional and persists in `localStorage`.
 - Product data is local and image files are served from `public/products`.
-- The app is kept intentionally simple so it runs locally without external services.
+- Supabase can be enabled with `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
+- The app is kept intentionally simple so it still runs locally without external services configured.
