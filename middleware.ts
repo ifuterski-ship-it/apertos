@@ -22,7 +22,6 @@ export async function middleware(request: NextRequest) {
           return request.cookies.getAll();
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
           response = NextResponse.next({
             request
           });
@@ -34,7 +33,14 @@ export async function middleware(request: NextRequest) {
     }
   );
 
-  await supabase.auth.getUser();
+  try {
+    await supabase.auth.getUser();
+  } catch {
+    // Keep storefront routes available even if auth cookie refresh fails.
+    return NextResponse.next({
+      request
+    });
+  }
 
   return response;
 }
