@@ -72,6 +72,13 @@ export type OrderRecord = {
   parsedItemsPayload: OrderItemsPayload;
 };
 
+type SupabaseResult<T> = {
+  data: T;
+  error: {
+    message: string;
+  } | null;
+};
+
 function createEmptyPayload(): OrderItemsPayload {
   return {
     version: 2,
@@ -228,6 +235,35 @@ function mapOrderRecord(order: RawOrderRecord): OrderRecord {
   };
 }
 
+function isOrdersSchemaCacheError(message: string) {
+  const normalized = message.toLowerCase();
+  return normalized.includes("schema cache") && normalized.includes("orders");
+}
+
+async function tryReloadSchemaCache(
+  supabase: Awaited<ReturnType<typeof createAdminClient>> | Awaited<ReturnType<typeof createClient>>
+) {
+  await supabase.rpc("reload_schema_cache");
+}
+
+async function withOrdersSchemaRetry<T>(
+  supabase: Awaited<ReturnType<typeof createAdminClient>> | Awaited<ReturnType<typeof createClient>>,
+  action: () => Promise<SupabaseResult<T>>
+) {
+  let result = await action();
+
+  if (result.error?.message && isOrdersSchemaCacheError(result.error.message)) {
+    try {
+      await tryReloadSchemaCache(supabase);
+      result = await action();
+    } catch {
+      return result;
+    }
+  }
+
+  return result;
+}
+
 async function getOrdersWriteClient() {
   if (hasSupabaseAdminEnv) {
     return createAdminClient();
@@ -239,50 +275,33 @@ async function getOrdersWriteClient() {
 export async function recordOrder(order: RecordedOrder) {
   try {
     const supabase = await getOrdersWriteClient();
-    const existing = await supabase
-      .from("orders")
-      .select("stripe_checkout_session_id")
-      .eq("stripe_checkout_session_id", order.stripeCheckoutSessionId)
-      .maybeSingle();
-
-    if (existing.error) {
-      console.warn("Unable to look up existing order in Supabase:", existing.error.message);
-    }
-
-    if (existing.data) {
-      const { error } = await supabase
+    const { error } = await withOrdersSchemaRetry(supabase, async () =>
+      supabase
+        .schema("public")
         .from("orders")
-        .update({
-          email: order.email,
-          stripe_customer_id: order.stripeCustomerId,
-          amount_total: order.amountTotal,
-          currency: order.currency,
-          items: order.items,
-          payment_status: order.paymentStatus
-        })
-        .eq("stripe_checkout_session_id", order.stripeCheckoutSessionId);
-
-      if (error) {
-        console.warn("Unable to update order in Supabase:", error.message);
-        return { ok: false, message: error.message };
-      }
-
-      return { ok: true };
-    }
-
-    const { error } = await supabase.from("orders").insert({
-      email: order.email,
-      stripe_checkout_session_id: order.stripeCheckoutSessionId,
-      stripe_customer_id: order.stripeCustomerId,
-      amount_total: order.amountTotal,
-      currency: order.currency,
-      items: order.items,
-      payment_status: order.paymentStatus
-    });
+        .upsert(
+          {
+            email: order.email,
+            stripe_checkout_session_id: order.stripeCheckoutSessionId,
+            stripe_customer_id: order.stripeCustomerId,
+            amount_total: order.amountTotal,
+            currency: order.currency,
+            items: order.items,
+            payment_status: order.paymentStatus
+          },
+          {
+            onConflict: "stripe_checkout_session_id"
+          }
+        )
+    );
 
     if (error) {
-      console.warn("Unable to record order in Supabase:", error.message);
-      return { ok: false, message: error.message };
+      const baseMessage = error.message;
+      const message = isOrdersSchemaCacheError(baseMessage)
+        ? `${baseMessage} Run 'NOTIFY pgrst, ''reload schema'';' in Supabase SQL and ensure this app points to the same Supabase project as your orders table.`
+        : baseMessage;
+      console.warn("Unable to record order in Supabase:", message);
+      return { ok: false, message };
     }
 
     return { ok: true };
@@ -294,9 +313,16 @@ export async function recordOrder(order: RecordedOrder) {
 
 export async function getOrdersForAdmin() {
   const supabase = createAdminClient();
-  const { data, error } = await supabase.schema("public").from("orders").select("*");
+  const { data, error } = await withOrdersSchemaRetry(supabase, async () =>
+    supabase.schema("public").from("orders").select("*")
+  );
 
   if (error) {
+    if (isOrdersSchemaCacheError(error.message)) {
+      throw new Error(
+        `${error.message} Run 'NOTIFY pgrst, ''reload schema'';' in Supabase SQL and verify Vercel Supabase env vars all come from the same project.`
+      );
+    }
     throw new Error(error.message);
   }
 
@@ -311,12 +337,14 @@ export async function getOrdersForAdmin() {
 
 export async function getOrderForAdmin(stripeCheckoutSessionId: string) {
   const supabase = createAdminClient();
-  const { data, error } = await supabase
-    .schema("public")
-    .from("orders")
-    .select("*")
-    .eq("stripe_checkout_session_id", stripeCheckoutSessionId)
-    .maybeSingle();
+  const { data, error } = await withOrdersSchemaRetry(supabase, async () =>
+    supabase
+      .schema("public")
+      .from("orders")
+      .select("*")
+      .eq("stripe_checkout_session_id", stripeCheckoutSessionId)
+      .maybeSingle()
+  );
 
   if (error) {
     throw new Error(error.message);
@@ -340,13 +368,15 @@ export async function saveShippingLabelForOrder(
   }
 
   const supabase = createAdminClient();
-  const { error } = await supabase
-    .schema("public")
-    .from("orders")
-    .update({
-      items: applyShippingLabelToPayload(existingOrder.items, shippingLabel)
-    })
-    .eq("stripe_checkout_session_id", stripeCheckoutSessionId);
+  const { error } = await withOrdersSchemaRetry(supabase, async () =>
+    supabase
+      .schema("public")
+      .from("orders")
+      .update({
+        items: applyShippingLabelToPayload(existingOrder.items, shippingLabel)
+      })
+      .eq("stripe_checkout_session_id", stripeCheckoutSessionId)
+  );
 
   if (error) {
     throw new Error(error.message);

@@ -33,13 +33,28 @@ export async function POST(request: Request) {
     const shippingDetails = session.collected_information?.shipping_details;
     const email = session.customer_details?.email ?? session.customer_email ?? null;
     const rawItems = session.metadata?.items ?? "[]";
-    const items = JSON.parse(rawItems) as Array<{
+    let items = [] as Array<{
       productId: string;
       name: string;
       quantity: number;
       size: string;
       price: number;
     }>;
+
+    try {
+      const parsed = JSON.parse(rawItems) as unknown;
+      if (Array.isArray(parsed)) {
+        items = parsed as Array<{
+          productId: string;
+          name: string;
+          quantity: number;
+          size: string;
+          price: number;
+        }>;
+      }
+    } catch {
+      items = [];
+    }
     const shippingAddress = {
       name: shippingDetails?.name ?? session.customer_details?.name ?? null,
       email,
@@ -52,7 +67,7 @@ export async function POST(request: Request) {
       country: shippingDetails?.address?.country ?? session.customer_details?.address?.country ?? null
     };
 
-    await recordOrder({
+    const recordResult = await recordOrder({
       email,
       stripeCheckoutSessionId: session.id,
       stripeCustomerId: typeof session.customer === "string" ? session.customer : null,
@@ -61,6 +76,16 @@ export async function POST(request: Request) {
       items: buildOrderItemsPayload(items, shippingAddress),
       paymentStatus: session.payment_status ?? null
     });
+
+    if (!recordResult.ok) {
+      return NextResponse.json(
+        {
+          ok: false,
+          message: recordResult.message ?? "Unable to persist order from Stripe webhook."
+        },
+        { status: 500 }
+      );
+    }
 
     if (email) {
       await sendEmail({
