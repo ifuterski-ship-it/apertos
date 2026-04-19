@@ -6,6 +6,7 @@ import { Minus, Plus, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useCart } from "@/components/cart/cart-provider";
+import { getProductById } from "@/lib/products";
 import { hasSupabaseEnv } from "@/lib/supabase/config";
 
 export function CartView() {
@@ -14,6 +15,8 @@ export function CartView() {
   const [checkoutEmail, setCheckoutEmail] = useState("");
   const [checkoutStatus, setCheckoutStatus] = useState<string | null>(null);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
+  const uniqueProductIds = [...new Set(items.map((item) => item.productId))];
+  const singleProduct = uniqueProductIds.length === 1 ? getProductById(uniqueProductIds[0]) : null;
 
   useEffect(() => {
     if (!supabase) {
@@ -29,6 +32,11 @@ export function CartView() {
 
   const handleCheckout = async () => {
     setCheckoutStatus(null);
+
+    if (!singleProduct) {
+      setCheckoutStatus("Stripe payment links work one product at a time. Please check out each product separately.");
+      return;
+    }
 
     if (!checkoutEmail) {
       setCheckoutStatus("Add an email address to receive your order confirmation.");
@@ -57,7 +65,8 @@ export function CartView() {
       return;
     }
 
-    setCheckoutStatus("Order confirmation sent. This checkout flow is still mocked for payment.");
+    setCheckoutStatus("Order confirmation sent. Opening Stripe checkout now.");
+    window.open(singleProduct.paymentLink, "_blank", "noopener,noreferrer");
     setIsCheckingOut(false);
   };
 
@@ -138,6 +147,14 @@ export function CartView() {
                   Remove
                 </button>
               </div>
+              <Link
+                href={getProductById(item.productId)?.paymentLink ?? "#"}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex w-fit border border-white/10 px-4 py-3 text-xs uppercase tracking-[0.3em] text-neutral-300 transition hover:border-white hover:text-white"
+              >
+                Buy This Item
+              </Link>
             </div>
           </div>
         ))}
@@ -188,7 +205,7 @@ export function CartView() {
               disabled={isCheckingOut}
               className="w-full border border-white px-5 py-4 text-xs font-semibold uppercase tracking-[0.35em] transition hover:bg-white hover:text-black"
             >
-              {isCheckingOut ? "Sending" : "Checkout"}
+              {isCheckingOut ? "Sending" : singleProduct ? "Checkout With Stripe" : "Checkout Items Separately"}
             </button>
             <button
               type="button"

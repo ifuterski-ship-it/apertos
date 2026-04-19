@@ -16,6 +16,7 @@ export type Product = {
   name: string;
   price: number;
   priceLabel: string;
+  paymentLink: string;
   image: string;
   images?: string[];
   sizes: string[];
@@ -31,6 +32,7 @@ export const products: Product[] = [
     name: "Apertos The Original Rashguard",
     price: 29.99,
     priceLabel: "\u00A329.99",
+    paymentLink: "https://buy.stripe.com/bJe3cx3VUgCB2MZ6rseZ201",
     image: "/products/rashguard-back.png",
     images: ["/products/rashguard-back.png", "/products/rashguard-front.png"],
     sizes: ["S", "M", "L", "XL", "2XL"],
@@ -57,6 +59,7 @@ export const products: Product[] = [
     name: "Apertos The Original Shorts",
     price: 29.99,
     priceLabel: "\u00A329.99",
+    paymentLink: "https://buy.stripe.com/3cI4gBcsq1HHafr178eZ205",
     image: "/products/shorts-back.png",
     images: ["/products/shorts-back.png", "/products/shorts-front.png"],
     sizes: ["S", "M", "L", "XL", "2XL"],
@@ -83,6 +86,7 @@ export const products: Product[] = [
     name: "Apertos The Original No Gi Set",
     price: 49.99,
     priceLabel: "\u00A349.99",
+    paymentLink: "https://buy.stripe.com/00w5kFfEC9a90ER5noeZ202",
     image: "/products/nogi-front.jpg",
     images: ["/products/nogi-front.jpg", "/products/nogi-back.jpg"],
     sizes: ["S", "M", "L", "XL", "2XL"],
