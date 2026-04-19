@@ -2,10 +2,11 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ShoppingBag } from "lucide-react";
+import { Heart, ShoppingBag } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import type { User } from "@supabase/supabase-js";
 import { useCart } from "@/components/cart/cart-provider";
+import { useWishlist } from "@/components/wishlist/wishlist-provider";
 import { hasSupabaseEnv } from "@/lib/supabase/config";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
@@ -13,12 +14,14 @@ import { cn } from "@/lib/utils";
 const navLinks = [
   { href: "/", label: "Home" },
   { href: "/shop", label: "Shop" },
+  { href: "/wishlist", label: "Wishlist" },
   { href: "/cart", label: "Cart" },
   { href: "/contact", label: "Contact" }
 ];
 
 export function SiteShell({ children }: { children: React.ReactNode }) {
   const { totalItems, isHydrated } = useCart();
+  const { totalItems: wishlistTotal } = useWishlist();
   const supabase = useMemo(() => (hasSupabaseEnv ? createClient() : null), []);
   const [user, setUser] = useState<User | null>(null);
 
@@ -70,10 +73,17 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
                 href={link.href}
                 className={cn(
                   "text-xs uppercase tracking-[0.3em] text-neutral-300 transition hover:text-white",
-                  link.href === "/cart" && "inline-flex items-center gap-2"
+                  (link.href === "/cart" || link.href === "/wishlist") && "inline-flex items-center gap-2"
                 )}
               >
                 {link.label}
+                {link.href === "/wishlist" ? (
+                  <span className="inline-flex min-w-6 items-center justify-center rounded-full border border-white/15 px-2 py-1 text-[10px]">
+                    <Heart className="h-3.5 w-3.5" />
+                    <span className="sr-only">Items in wishlist</span>
+                    <span className="ml-1">{isHydrated ? wishlistTotal : 0}</span>
+                  </span>
+                ) : null}
                 {link.href === "/cart" ? (
                   <span className="inline-flex min-w-6 items-center justify-center rounded-full border border-white/15 px-2 py-1 text-[10px]">
                     <ShoppingBag className="h-3.5 w-3.5" />

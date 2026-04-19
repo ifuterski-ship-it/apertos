@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { CartProvider } from "@/components/cart/cart-provider";
 import { SiteShell } from "@/components/layout/site-shell";
+import { WishlistProvider } from "@/components/wishlist/wishlist-provider";
 
 export const metadata: Metadata = {
   title: "APERTOS",
@@ -16,9 +17,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <CartProvider>
-          <SiteShell>{children}</SiteShell>
-        </CartProvider>
+        <WishlistProvider>
+          <CartProvider>
+            <SiteShell>{children}</SiteShell>
+          </CartProvider>
+        </WishlistProvider>
       </body>
     </html>
   );

@@ -1,12 +1,32 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { Heart } from "lucide-react";
+import { useWishlist } from "@/components/wishlist/wishlist-provider";
 import { Product } from "@/lib/products";
 
 export function ProductCard({ product }: { product: Product }) {
+  const { has, toggle } = useWishlist();
+  const inWishlist = has(product.id);
+
   return (
     <div className="group overflow-hidden rounded-[1.75rem] border border-white/10 bg-white/[0.03] transition duration-500 hover:-translate-y-1 hover:border-white/20 hover:bg-white/[0.05]">
-      <Link href={`/product/${product.id}`} className="block">
-        <div className="relative aspect-[4/5] overflow-hidden bg-white">
+      <div className="relative">
+        <button
+          type="button"
+          onClick={() => toggle(product.id)}
+          className={`absolute right-4 top-4 z-10 inline-flex items-center justify-center rounded-full border p-2 transition ${
+            inWishlist
+              ? "border-red-400/60 bg-red-500/20 text-red-300"
+              : "border-white/20 bg-black/35 text-neutral-200 hover:border-white/50 hover:text-white"
+          }`}
+          aria-label={inWishlist ? `Remove ${product.name} from wishlist` : `Add ${product.name} to wishlist`}
+        >
+          <Heart className={`h-4 w-4 ${inWishlist ? "fill-current" : ""}`} />
+        </button>
+        <Link href={`/product/${product.id}`} className="block">
+          <div className="relative aspect-[4/5] overflow-hidden bg-white">
           <div className="absolute inset-0 p-8 md:p-10">
             <Image
               src={product.image}
@@ -16,13 +36,14 @@ export function ProductCard({ product }: { product: Product }) {
               className="object-contain transition duration-500 group-hover:scale-[1.04]"
             />
           </div>
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-          <div className="absolute inset-x-0 bottom-0 p-6">
-            <p className="text-xs uppercase tracking-[0.4em] text-white/70">{product.category}</p>
-            <h3 className="font-display text-3xl uppercase tracking-[0.08em]">{product.name}</h3>
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+            <div className="absolute inset-x-0 bottom-0 p-6">
+              <p className="text-xs uppercase tracking-[0.4em] text-white/70">{product.category}</p>
+              <h3 className="font-display text-3xl uppercase tracking-[0.08em]">{product.name}</h3>
+            </div>
           </div>
-        </div>
-      </Link>
+        </Link>
+      </div>
       <div className="space-y-4 p-6">
         <div className="flex items-center justify-between gap-4">
           <div>
