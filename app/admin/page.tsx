@@ -4,6 +4,7 @@ import { hasAdminEmailsConfigured, requireAdminUser } from "@/lib/admin-auth";
 import { getOrdersForAdmin } from "@/lib/orders";
 import { hasShippoEnv, hasShippoSenderEnv } from "@/lib/shippo";
 import { hasSupabaseAdminEnv } from "@/lib/supabase/admin";
+import { getSupabaseEnvDiagnostics } from "@/lib/supabase/env-diagnostics";
 
 function formatMoney(amount: number | null, currency: string | null) {
   if (typeof amount !== "number") {
@@ -47,6 +48,7 @@ export default async function AdminPage() {
 
   let orders = [] as Awaited<ReturnType<typeof getOrdersForAdmin>>;
   let ordersError: string | null = null;
+  const diagnostics = getSupabaseEnvDiagnostics();
 
   try {
     orders = await getOrdersForAdmin();
@@ -81,6 +83,24 @@ export default async function AdminPage() {
             Check that `SUPABASE_SERVICE_ROLE_KEY` is set on Vercel and that the `orders` table exists with the
             columns used by the Stripe webhook.
           </p>
+          <div className="mt-6 rounded-[1.5rem] border border-white/10 bg-black/20 p-5">
+            <p className="text-xs uppercase tracking-[0.35em] text-muted">Supabase Runtime Diagnostics</p>
+            <div className="mt-3 space-y-2 text-xs uppercase leading-6 tracking-[0.18em] text-neutral-300">
+              <p>URL Host: {diagnostics.urlHost}</p>
+              <p>URL Project Ref: {diagnostics.urlProjectRef ?? "unknown"}</p>
+              <p>Anon Key Ref: {diagnostics.anonProjectRef ?? "unknown"}</p>
+              <p>Service Key Ref: {diagnostics.serviceProjectRef ?? "unknown"}</p>
+              <p>Anon Key (masked): {diagnostics.maskedAnonKey}</p>
+              <p>Service Key (masked): {diagnostics.maskedServiceRoleKey}</p>
+              <p>All Supabase env vars present: {diagnostics.hasAllValues ? "yes" : "no"}</p>
+              <p>All refs match: {diagnostics.refsMatch ? "yes" : "no"}</p>
+            </div>
+            <p className="mt-4 text-xs uppercase leading-6 tracking-[0.2em] text-neutral-400">
+              If refs do not match, Vercel is using values from different Supabase projects. Update
+              `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, and `SUPABASE_SERVICE_ROLE_KEY` from the
+              same project and redeploy.
+            </p>
+          </div>
         </div>
       ) : orders.length === 0 ? (
         <div className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-8">

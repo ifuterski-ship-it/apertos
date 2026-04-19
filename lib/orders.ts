@@ -294,7 +294,7 @@ export async function recordOrder(order: RecordedOrder) {
 
 export async function getOrdersForAdmin() {
   const supabase = createAdminClient();
-  const { data, error } = await supabase.from("orders").select("*");
+  const { data, error } = await supabase.schema("public").from("orders").select("*");
 
   if (error) {
     throw new Error(error.message);
@@ -312,6 +312,7 @@ export async function getOrdersForAdmin() {
 export async function getOrderForAdmin(stripeCheckoutSessionId: string) {
   const supabase = createAdminClient();
   const { data, error } = await supabase
+    .schema("public")
     .from("orders")
     .select("*")
     .eq("stripe_checkout_session_id", stripeCheckoutSessionId)
@@ -340,6 +341,7 @@ export async function saveShippingLabelForOrder(
 
   const supabase = createAdminClient();
   const { error } = await supabase
+    .schema("public")
     .from("orders")
     .update({
       items: applyShippingLabelToPayload(existingOrder.items, shippingLabel)
