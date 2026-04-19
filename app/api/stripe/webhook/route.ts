@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { sendEmail } from "@/lib/email";
 import { ordersFromEmail } from "@/lib/email-config";
-import { recordOrder } from "@/lib/orders";
+import { buildOrderItemsPayload, recordOrder } from "@/lib/orders";
 import { stripe } from "@/lib/stripe";
 
 export const runtime = "nodejs";
@@ -30,8 +30,27 @@ export async function POST(request: Request) {
 
   if (event.type === "checkout.session.completed") {
     const session = event.data.object as Stripe.Checkout.Session;
+    const shippingDetails = session.collected_information?.shipping_details;
     const email = session.customer_details?.email ?? session.customer_email ?? null;
-    const items = session.metadata?.items ?? "[]";
+    const rawItems = session.metadata?.items ?? "[]";
+    const items = JSON.parse(rawItems) as Array<{
+      productId: string;
+      name: string;
+      quantity: number;
+      size: string;
+      price: number;
+    }>;
+    const shippingAddress = {
+      name: shippingDetails?.name ?? session.customer_details?.name ?? null,
+      email,
+      phone: session.customer_details?.phone ?? null,
+      address1: shippingDetails?.address?.line1 ?? session.customer_details?.address?.line1 ?? null,
+      address2: shippingDetails?.address?.line2 ?? session.customer_details?.address?.line2 ?? null,
+      city: shippingDetails?.address?.city ?? session.customer_details?.address?.city ?? null,
+      state: shippingDetails?.address?.state ?? session.customer_details?.address?.state ?? null,
+      postalCode: shippingDetails?.address?.postal_code ?? session.customer_details?.address?.postal_code ?? null,
+      country: shippingDetails?.address?.country ?? session.customer_details?.address?.country ?? null
+    };
 
     await recordOrder({
       email,
@@ -39,7 +58,7 @@ export async function POST(request: Request) {
       stripeCustomerId: typeof session.customer === "string" ? session.customer : null,
       amountTotal: session.amount_total ?? null,
       currency: session.currency ?? null,
-      items,
+      items: buildOrderItemsPayload(items, shippingAddress),
       paymentStatus: session.payment_status ?? null
     });
 

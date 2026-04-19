@@ -22,6 +22,7 @@ export type Product = {
   category: string;
   shortDescription: string;
   description: string;
+  shippingWeightLb: number;
   sizeGuides: SizeGuideBlock[];
 };
 
@@ -36,6 +37,7 @@ export const products: Product[] = [
     sizes: ["S", "M", "L", "XL", "2XL"],
     category: "Performance Top",
     shortDescription: "Compression performance essential",
+    shippingWeightLb: 0.45,
     description:
       "A premium rashguard built for hard sessions, clean movement, and a sharp monochrome APERTOS finish.",
     sizeGuides: [
@@ -62,6 +64,7 @@ export const products: Product[] = [
     sizes: ["S", "M", "L", "XL", "2XL"],
     category: "Training Bottoms",
     shortDescription: "Lightweight fight-ready shorts",
+    shippingWeightLb: 0.55,
     description:
       "Clean, flexible shorts created for grappling and striking with a streamlined APERTOS silhouette.",
     sizeGuides: [
@@ -88,6 +91,7 @@ export const products: Product[] = [
     sizes: ["S", "M", "L", "XL", "2XL"],
     category: "Bundle",
     shortDescription: "Rashguard and shorts in one set",
+    shippingWeightLb: 1,
     description:
       "A value-driven no gi set pairing the original rashguard and shorts in one refined combat-sports package.",
     sizeGuides: [
