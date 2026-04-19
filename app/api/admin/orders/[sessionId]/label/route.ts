@@ -28,14 +28,14 @@ export async function POST(
     return NextResponse.json({ ok: false, message: "You do not have access to the admin panel." }, { status: 403 });
   }
 
-  const { sessionId } = await params;
-  const order = await getOrderForAdmin(sessionId);
-
-  if (!order) {
-    return NextResponse.json({ ok: false, message: "Order not found." }, { status: 404 });
-  }
-
   try {
+    const { sessionId } = await params;
+    const order = await getOrderForAdmin(sessionId);
+
+    if (!order) {
+      return NextResponse.json({ ok: false, message: "Order not found." }, { status: 404 });
+    }
+
     const shippingLabel = await purchaseCheapestLabel(order);
     await saveShippingLabelForOrder(order.stripeCheckoutSessionId, shippingLabel);
 

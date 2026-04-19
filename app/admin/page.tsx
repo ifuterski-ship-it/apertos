@@ -45,7 +45,14 @@ export default async function AdminPage() {
     );
   }
 
-  const orders = await getOrdersForAdmin();
+  let orders = [] as Awaited<ReturnType<typeof getOrdersForAdmin>>;
+  let ordersError: string | null = null;
+
+  try {
+    orders = await getOrdersForAdmin();
+  } catch (error) {
+    ordersError = error instanceof Error ? error.message : "Unable to load orders right now.";
+  }
 
   return (
     <div className="space-y-8 pb-24">
@@ -63,7 +70,19 @@ export default async function AdminPage() {
         ) : null}
       </div>
 
-      {orders.length === 0 ? (
+      {ordersError ? (
+        <div className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-8">
+          <p className="text-xs uppercase tracking-[0.45em] text-muted">Orders</p>
+          <h2 className="mt-4 font-display text-3xl uppercase tracking-[0.08em]">Unable To Load Orders</h2>
+          <p className="mt-4 max-w-3xl text-sm uppercase leading-7 tracking-[0.2em] text-neutral-300">
+            {ordersError}
+          </p>
+          <p className="mt-4 max-w-3xl text-xs uppercase leading-6 tracking-[0.22em] text-neutral-400">
+            Check that `SUPABASE_SERVICE_ROLE_KEY` is set on Vercel and that the `orders` table exists with the
+            columns used by the Stripe webhook.
+          </p>
+        </div>
+      ) : orders.length === 0 ? (
         <div className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-8">
           <p className="text-sm uppercase tracking-[0.2em] text-neutral-300">No orders have been recorded yet.</p>
         </div>
