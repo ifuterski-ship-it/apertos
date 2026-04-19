@@ -25,4 +25,5 @@ npm run dev
 - Supabase can be enabled with `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
 - Resend can be enabled with `RESEND_API_KEY`.
 - Contact emails default to `CONTACT_EMAIL` and fall back to `ifuterski@icloud.com`.
+- Sender identities can be separated with `RESEND_FROM_WELCOME`, `RESEND_FROM_ORDERS`, and `RESEND_FROM_SUPPORT`.
 - The app is kept intentionally simple so it still runs locally without external services configured.

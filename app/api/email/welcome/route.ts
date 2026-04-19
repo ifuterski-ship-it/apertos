@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { welcomeFromEmail } from "@/lib/email-config";
 import { sendEmail } from "@/lib/email";
 
 export async function POST(request: Request) {
@@ -11,6 +12,7 @@ export async function POST(request: Request) {
   const result = await sendEmail({
     to: email,
     subject: "Welcome to APERTOS",
+    from: welcomeFromEmail,
     html: `
       <div style="background:#050505;color:#f5f5f5;padding:40px;font-family:Arial,sans-serif">
         <p style="letter-spacing:0.4em;text-transform:uppercase;color:#a3a3a3;font-size:12px">APERTOS</p>
