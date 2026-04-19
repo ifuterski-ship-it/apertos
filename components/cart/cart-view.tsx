@@ -6,8 +6,8 @@ import { Minus, Plus, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useCart } from "@/components/cart/cart-provider";
-import { getProductById } from "@/lib/products";
 import { hasSupabaseEnv } from "@/lib/supabase/config";
+import { hasStripeClientEnv } from "@/lib/stripe";
 
 export function CartView() {
   const { items, updateQuantity, removeItem, subtotal, clearCart, isHydrated } = useCart();
@@ -15,8 +15,6 @@ export function CartView() {
   const [checkoutEmail, setCheckoutEmail] = useState("");
   const [checkoutStatus, setCheckoutStatus] = useState<string | null>(null);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
-  const uniqueProductIds = [...new Set(items.map((item) => item.productId))];
-  const singleProduct = uniqueProductIds.length === 1 ? getProductById(uniqueProductIds[0]) : null;
 
   useEffect(() => {
     if (!supabase) {
@@ -33,8 +31,8 @@ export function CartView() {
   const handleCheckout = async () => {
     setCheckoutStatus(null);
 
-    if (!singleProduct) {
-      setCheckoutStatus("Stripe payment links work one product at a time. Please check out each product separately.");
+    if (!hasStripeClientEnv()) {
+      setCheckoutStatus("Stripe checkout is not configured for this environment yet.");
       return;
     }
 
@@ -45,29 +43,35 @@ export function CartView() {
 
     setIsCheckingOut(true);
 
-    const response = await fetch("/api/email/order", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        email: checkoutEmail,
-        items,
-        total: subtotal
-      })
-    });
+    try {
+      const stripeResponse = await fetch("/api/stripe/checkout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          email: checkoutEmail,
+          items: items.map((item) => ({
+            productId: item.productId,
+            quantity: item.quantity,
+            size: item.size
+          }))
+        })
+      });
 
-    const result = (await response.json()) as { ok?: boolean; message?: string };
+      const result = (await stripeResponse.json()) as { ok?: boolean; message?: string; url?: string };
 
-    if (!response.ok || !result.ok) {
-      setCheckoutStatus(result.message ?? "Unable to send the order confirmation right now.");
+      if (!stripeResponse.ok || !result.ok || !result.url) {
+        setCheckoutStatus(result.message ?? "Unable to start Stripe checkout right now.");
+        return;
+      }
+
+      window.location.href = result.url;
+    } catch {
+      setCheckoutStatus("Unable to connect to Stripe right now. Please try again.");
+    } finally {
       setIsCheckingOut(false);
-      return;
     }
-
-    setCheckoutStatus("Order confirmation sent. Opening Stripe checkout now.");
-    window.open(singleProduct.paymentLink, "_blank", "noopener,noreferrer");
-    setIsCheckingOut(false);
   };
 
   if (!isHydrated) {
@@ -147,14 +151,6 @@ export function CartView() {
                   Remove
                 </button>
               </div>
-              <Link
-                href={getProductById(item.productId)?.paymentLink ?? "#"}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex w-fit border border-white/10 px-4 py-3 text-xs uppercase tracking-[0.3em] text-neutral-300 transition hover:border-white hover:text-white"
-              >
-                Buy This Item
-              </Link>
             </div>
           </div>
         ))}
@@ -205,7 +201,7 @@ export function CartView() {
               disabled={isCheckingOut}
               className="w-full border border-white px-5 py-4 text-xs font-semibold uppercase tracking-[0.35em] transition hover:bg-white hover:text-black"
             >
-              {isCheckingOut ? "Sending" : singleProduct ? "Checkout With Stripe" : "Checkout Items Separately"}
+              {isCheckingOut ? "Starting Checkout" : "Checkout With Stripe"}
             </button>
             <button
               type="button"

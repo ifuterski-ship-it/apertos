@@ -1,10 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { useMemo, useState } from "react";
 import { Product, SizeGuideBlock } from "@/lib/products";
 import { useCart } from "@/components/cart/cart-provider";
+import { hasStripeClientEnv } from "@/lib/stripe";
 
 function SizeGuideTable({ guide }: { guide: SizeGuideBlock }) {
   return (
@@ -43,6 +43,8 @@ export function ProductDetail({ product }: { product: Product }) {
   const [selectedSize, setSelectedSize] = useState(product.sizes[0]);
   const [isZoomOpen, setIsZoomOpen] = useState(false);
   const [zoomOrigin, setZoomOrigin] = useState("50% 50%");
+  const [checkoutMessage, setCheckoutMessage] = useState<string | null>(null);
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
   const { addItem } = useCart();
 
   const handleAddToCart = () => {
@@ -60,6 +62,48 @@ export function ProductDetail({ product }: { product: Product }) {
     const y = ((event.clientY - bounds.top) / bounds.height) * 100;
 
     setZoomOrigin(`${x}% ${y}%`);
+  };
+
+  const handleBuyNow = async () => {
+    setCheckoutMessage(null);
+
+    if (!hasStripeClientEnv()) {
+      setCheckoutMessage("Stripe checkout is not configured for this environment yet.");
+      return;
+    }
+
+    setIsCheckingOut(true);
+
+    try {
+      const response = await fetch("/api/stripe/checkout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          items: [
+            {
+              productId: product.id,
+              quantity: 1,
+              size: selectedSize
+            }
+          ]
+        })
+      });
+
+      const result = (await response.json()) as { ok?: boolean; message?: string; url?: string };
+
+      if (!response.ok || !result.ok || !result.url) {
+        setCheckoutMessage(result.message ?? "Unable to start Stripe checkout right now.");
+        return;
+      }
+
+      window.location.href = result.url;
+    } catch {
+      setCheckoutMessage("Unable to connect to Stripe right now. Please try again.");
+    } finally {
+      setIsCheckingOut(false);
+    }
   };
 
   return (
@@ -165,22 +209,25 @@ export function ProductDetail({ product }: { product: Product }) {
             </div>
           </div>
 
-        <button
-          type="button"
-          onClick={handleAddToCart}
-          className="w-full border border-white px-6 py-4 text-sm font-semibold uppercase tracking-[0.35em] transition hover:bg-white hover:text-black"
-        >
-          {added ? `Added ${selectedSize}` : "Add To Cart"}
-        </button>
-        <Link
-          href={product.paymentLink}
-          target="_blank"
-          rel="noreferrer"
-          className="block w-full border border-white/10 px-6 py-4 text-center text-sm font-semibold uppercase tracking-[0.35em] text-neutral-300 transition hover:border-white hover:text-white"
-        >
-          Buy Now
-        </Link>
-      </div>
+          <button
+            type="button"
+            onClick={handleAddToCart}
+            className="w-full border border-white px-6 py-4 text-sm font-semibold uppercase tracking-[0.35em] transition hover:bg-white hover:text-black"
+          >
+            {added ? `Added ${selectedSize}` : "Add To Cart"}
+          </button>
+          {checkoutMessage ? (
+            <p className="text-xs uppercase leading-6 tracking-[0.2em] text-neutral-300">{checkoutMessage}</p>
+          ) : null}
+          <button
+            type="button"
+            onClick={handleBuyNow}
+            disabled={isCheckingOut}
+            className="block w-full border border-white/10 px-6 py-4 text-center text-sm font-semibold uppercase tracking-[0.35em] text-neutral-300 transition hover:border-white hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {isCheckingOut ? "Starting Checkout" : "Buy Now"}
+          </button>
+        </div>
       </div>
 
       {isZoomOpen ? (

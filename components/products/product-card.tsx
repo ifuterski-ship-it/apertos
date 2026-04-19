@@ -6,15 +6,17 @@ export function ProductCard({ product }: { product: Product }) {
   return (
     <div className="group overflow-hidden rounded-[1.75rem] border border-white/10 bg-white/[0.03] transition duration-500 hover:-translate-y-1 hover:border-white/20 hover:bg-white/[0.05]">
       <Link href={`/product/${product.id}`} className="block">
-        <div className="relative aspect-[4/5] overflow-hidden">
-          <Image
-            src={product.image}
-            alt={product.name}
-            fill
-            sizes="(min-width: 1280px) 30vw, (min-width: 640px) 45vw, 100vw"
-            className="object-cover transition duration-500 group-hover:scale-105"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/15 to-transparent" />
+        <div className="relative aspect-[4/5] overflow-hidden bg-white">
+          <div className="absolute inset-0 p-8 md:p-10">
+            <Image
+              src={product.image}
+              alt={product.name}
+              fill
+              sizes="(min-width: 1280px) 30vw, (min-width: 640px) 45vw, 100vw"
+              className="object-contain transition duration-500 group-hover:scale-[1.04]"
+            />
+          </div>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
           <div className="absolute inset-x-0 bottom-0 p-6">
             <p className="text-xs uppercase tracking-[0.4em] text-white/70">{product.category}</p>
             <h3 className="font-display text-3xl uppercase tracking-[0.08em]">{product.name}</h3>
