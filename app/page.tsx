@@ -94,6 +94,40 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      <section className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
+        <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.03] p-8 md:p-12">
+          <div className="absolute -left-10 bottom-0 h-44 w-44 opacity-[0.08]">
+            <Image src="/logo-mark.png" alt="" fill sizes="176px" className="object-contain" />
+          </div>
+          <div className="relative flex h-full flex-col justify-center space-y-6">
+            <p className="text-xs uppercase tracking-[0.45em] text-muted">Movement</p>
+            <h2 className="font-display text-4xl uppercase tracking-[0.08em] md:text-6xl">
+              Designed For Scrambles, Pressure And Control
+            </h2>
+            <p className="max-w-2xl text-sm uppercase leading-7 tracking-[0.22em] text-neutral-300">
+              Every seam, panel and silhouette is built to stay composed when the pace changes. The no-gi set is made
+              to move hard and still look refined.
+            </p>
+            <Link
+              href="/shop"
+              className="inline-flex w-fit items-center border border-white px-6 py-3 text-sm font-semibold uppercase tracking-[0.35em] transition hover:bg-white hover:text-black"
+            >
+              Shop The Collection
+            </Link>
+          </div>
+        </div>
+        <div className="relative min-h-[520px] overflow-hidden rounded-[2rem] border border-white/10 bg-black">
+          <Image
+            src="/products/nogi-lifestyle-2.jpeg"
+            alt="Athlete training in the Apertos no-gi set"
+            fill
+            sizes="(min-width: 1024px) 50vw, 100vw"
+            className="object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/10 to-transparent" />
+        </div>
+      </section>
     </div>
   );
 }
