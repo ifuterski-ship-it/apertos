@@ -13,15 +13,6 @@ export function CartView() {
   const { items, updateQuantity, removeItem, clearCart, isHydrated } = useCart();
   const supabase = useMemo(() => (hasSupabaseEnv ? createClient() : null), []);
   const [checkoutEmail, setCheckoutEmail] = useState("");
-  const [shippingName, setShippingName] = useState("");
-  const [shippingPhone, setShippingPhone] = useState("");
-  const [shippingAddress1, setShippingAddress1] = useState("");
-  const [shippingAddress2, setShippingAddress2] = useState("");
-  const [shippingCity, setShippingCity] = useState("");
-  const [shippingState, setShippingState] = useState("");
-  const [shippingPostalCode, setShippingPostalCode] = useState("");
-  const [shippingCountry, setShippingCountry] = useState("GB");
-  const [isShippingStepOpen, setIsShippingStepOpen] = useState(false);
   const [checkoutStatus, setCheckoutStatus] = useState<string | null>(null);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const subtotalAmount = useMemo(
@@ -54,16 +45,6 @@ export function CartView() {
       return;
     }
 
-    if (!isShippingStepOpen) {
-      setIsShippingStepOpen(true);
-      setCheckoutStatus("Add your shipping address to continue.");
-      return;
-    }
-    if (!shippingName || !shippingAddress1 || !shippingCity || !shippingPostalCode || !shippingCountry) {
-      setCheckoutStatus("Add your shipping address so we can show live shipping rates at checkout.");
-      return;
-    }
-
     setIsCheckingOut(true);
 
     try {
@@ -78,17 +59,7 @@ export function CartView() {
             productId: item.productId,
             quantity: item.quantity,
             size: item.size
-          })),
-          shippingAddress: {
-            name: shippingName,
-            phone: shippingPhone || undefined,
-            address1: shippingAddress1,
-            address2: shippingAddress2 || undefined,
-            city: shippingCity,
-            state: shippingState || undefined,
-            postalCode: shippingPostalCode,
-            country: shippingCountry.toUpperCase()
-          }
+          }))
         })
       });
 
@@ -225,96 +196,6 @@ export function CartView() {
                 className="w-full border border-white/10 bg-black/30 px-4 py-4 text-sm text-white outline-none transition focus:border-white"
               />
             </div>
-            {isShippingStepOpen ? (
-              <div className="space-y-3 rounded-[1.25rem] border border-white/10 p-4">
-                <p className="text-xs uppercase tracking-[0.3em] text-neutral-400">Shipping Address</p>
-                <div className="space-y-2">
-                  <label htmlFor="shipping-name" className="text-xs uppercase tracking-[0.3em] text-neutral-400">
-                    Name
-                  </label>
-                  <input
-                    id="shipping-name"
-                    type="text"
-                    value={shippingName}
-                    onChange={(event) => setShippingName(event.target.value)}
-                    className="w-full border border-white/10 bg-black/30 px-4 py-4 text-sm text-white outline-none transition focus:border-white"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label htmlFor="shipping-phone" className="text-xs uppercase tracking-[0.3em] text-neutral-400">
-                    Phone (Optional)
-                  </label>
-                  <input
-                    id="shipping-phone"
-                    type="tel"
-                    value={shippingPhone}
-                    onChange={(event) => setShippingPhone(event.target.value)}
-                    className="w-full border border-white/10 bg-black/30 px-4 py-4 text-sm text-white outline-none transition focus:border-white"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label htmlFor="shipping-address1" className="text-xs uppercase tracking-[0.3em] text-neutral-400">
-                    Address Line 1
-                  </label>
-                  <input
-                    id="shipping-address1"
-                    type="text"
-                    value={shippingAddress1}
-                    onChange={(event) => setShippingAddress1(event.target.value)}
-                    className="w-full border border-white/10 bg-black/30 px-4 py-4 text-sm text-white outline-none transition focus:border-white"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label htmlFor="shipping-address2" className="text-xs uppercase tracking-[0.3em] text-neutral-400">
-                    Address Line 2 (Optional)
-                  </label>
-                  <input
-                    id="shipping-address2"
-                    type="text"
-                    value={shippingAddress2}
-                    onChange={(event) => setShippingAddress2(event.target.value)}
-                    className="w-full border border-white/10 bg-black/30 px-4 py-4 text-sm text-white outline-none transition focus:border-white"
-                  />
-                </div>
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <input
-                    aria-label="Shipping city"
-                    placeholder="City"
-                    type="text"
-                    value={shippingCity}
-                    onChange={(event) => setShippingCity(event.target.value)}
-                    className="w-full border border-white/10 bg-black/30 px-4 py-4 text-sm text-white outline-none transition focus:border-white"
-                  />
-                  <input
-                    aria-label="Shipping state"
-                    placeholder="State / Region (optional)"
-                    type="text"
-                    value={shippingState}
-                    onChange={(event) => setShippingState(event.target.value)}
-                    className="w-full border border-white/10 bg-black/30 px-4 py-4 text-sm text-white outline-none transition focus:border-white"
-                  />
-                </div>
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <input
-                    aria-label="Shipping postal code"
-                    placeholder="Postcode"
-                    type="text"
-                    value={shippingPostalCode}
-                    onChange={(event) => setShippingPostalCode(event.target.value)}
-                    className="w-full border border-white/10 bg-black/30 px-4 py-4 text-sm text-white outline-none transition focus:border-white"
-                  />
-                  <input
-                    aria-label="Shipping country code"
-                    placeholder="Country code (e.g. GB)"
-                    type="text"
-                    maxLength={2}
-                    value={shippingCountry}
-                    onChange={(event) => setShippingCountry(event.target.value.toUpperCase())}
-                    className="w-full border border-white/10 bg-black/30 px-4 py-4 text-sm text-white outline-none transition focus:border-white"
-                  />
-                </div>
-              </div>
-            ) : null}
             {checkoutStatus ? (
               <p className="text-xs uppercase leading-6 tracking-[0.2em] text-neutral-300">{checkoutStatus}</p>
             ) : null}

@@ -3,6 +3,7 @@ import Stripe from "stripe";
 import { sendEmail } from "@/lib/email";
 import { ordersFromEmail } from "@/lib/email-config";
 import { buildOrderItemsPayload, recordOrder } from "@/lib/orders";
+import { reduceInventoryForOrder } from "@/lib/inventory";
 import { stripe } from "@/lib/stripe";
 
 export const runtime = "nodejs";
@@ -30,7 +31,10 @@ export async function POST(request: Request) {
 
   if (event.type === "checkout.session.completed") {
     const session = event.data.object as Stripe.Checkout.Session;
-    const shippingDetails = session.collected_information?.shipping_details;
+    const shippingDetails =
+      session.shipping_details ??
+      session.collected_information?.shipping_details ??
+      session.customer_details?.shipping;
     const email = session.customer_details?.email ?? session.customer_email ?? null;
     const rawItems = session.metadata?.items ?? "[]";
     let items = [] as Array<{
@@ -85,6 +89,13 @@ export async function POST(request: Request) {
         },
         { status: 500 }
       );
+    }
+
+    // Reduce inventory for each item in the order
+    const inventoryResults = await reduceInventoryForOrder(items);
+    const inventoryErrors = inventoryResults.filter((result) => !result.ok);
+    if (inventoryErrors.length > 0) {
+      console.error("Inventory reduction errors:", inventoryErrors);
     }
 
     if (email) {

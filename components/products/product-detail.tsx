@@ -36,7 +36,7 @@ function SizeGuideTable({ guide }: { guide: SizeGuideBlock }) {
   );
 }
 
-export function ProductDetail({ product }: { product: Product }) {
+export function ProductDetail({ product, inventory = {}, inStock = true }: { product: Product; inventory?: Record<string, number | null>; inStock?: boolean }) {
   const [added, setAdded] = useState(false);
   const galleryImages = useMemo(() => product.images ?? [product.image], [product.image, product.images]);
   const [activeImage, setActiveImage] = useState(galleryImages[0]);
@@ -48,6 +48,7 @@ export function ProductDetail({ product }: { product: Product }) {
   const { addItem } = useCart();
 
   const handleAddToCart = () => {
+    if (!inStock) return;
     addItem(product, selectedSize);
     setAdded(true);
 
@@ -65,6 +66,7 @@ export function ProductDetail({ product }: { product: Product }) {
   };
 
   const handleBuyNow = async () => {
+    if (!inStock) return;
     setCheckoutMessage(null);
 
     if (!hasStripeClientEnv()) {
@@ -170,6 +172,12 @@ export function ProductDetail({ product }: { product: Product }) {
               <p className="text-xs uppercase tracking-[0.45em] text-muted">{product.category}</p>
               <h1 className="font-display text-4xl uppercase tracking-[0.08em] md:text-6xl">{product.name}</h1>
               <p className="text-2xl font-semibold">{product.priceLabel}</p>
+              {!inStock && (
+                <p className="text-xs uppercase tracking-[0.2em] text-red-400">Out of Stock</p>
+              )}
+              {inStock && Object.keys(inventory).length > 0 && (
+                <p className="text-xs uppercase tracking-[0.2em] text-green-400">In Stock</p>
+              )}
               <p className="max-w-xl text-sm uppercase leading-7 tracking-[0.18em] text-neutral-300">
                 {product.description}
               </p>
@@ -212,9 +220,10 @@ export function ProductDetail({ product }: { product: Product }) {
           <button
             type="button"
             onClick={handleAddToCart}
-            className="w-full border border-white px-6 py-4 text-sm font-semibold uppercase tracking-[0.35em] transition hover:bg-white hover:text-black"
+            disabled={!inStock}
+            className="w-full border border-white px-6 py-4 text-sm font-semibold uppercase tracking-[0.35em] transition hover:bg-white hover:text-black disabled:cursor-not-allowed disabled:border-neutral-600 disabled:bg-neutral-900 disabled:text-neutral-500"
           >
-            {added ? `Added ${selectedSize}` : "Add To Cart"}
+            {!inStock ? "Out of Stock" : added ? `Added ${selectedSize}` : "Add To Cart"}
           </button>
           {checkoutMessage ? (
             <p className="text-xs uppercase leading-6 tracking-[0.2em] text-neutral-300">{checkoutMessage}</p>
@@ -222,10 +231,10 @@ export function ProductDetail({ product }: { product: Product }) {
           <button
             type="button"
             onClick={handleBuyNow}
-            disabled={isCheckingOut}
+            disabled={isCheckingOut || !inStock}
             className="block w-full border border-white/10 px-6 py-4 text-center text-sm font-semibold uppercase tracking-[0.35em] text-neutral-300 transition hover:border-white hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {isCheckingOut ? "Starting Checkout" : "Buy Now"}
+            {!inStock ? "Out of Stock" : isCheckingOut ? "Starting Checkout" : "Buy Now"}
           </button>
         </div>
       </div>
