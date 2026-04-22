@@ -4,6 +4,7 @@ import { OrderItem, OrderRecord, markInventoryAdjustedForOrder } from "@/lib/ord
 
 type InventoryRow = {
   product_id: string;
+  size: string | null;
   stock: number | null;
 };
 
@@ -13,64 +14,163 @@ export type ProductInventoryStatus = {
   message: string;
 };
 
+export type ProductInventoryBySize = Record<string, ProductInventoryStatus>;
+
 type InventoryRequirement = {
   productId: string;
+  size: string;
   quantity: number;
 };
 
-const inventoryProductMap: Record<string, InventoryRequirement[]> = {
-  "apertos-the-original-rashguard": [{ productId: "rashguard", quantity: 1 }],
-  "apertos-the-original-shorts": [{ productId: "shorts", quantity: 1 }],
-  "apertos-the-original-no-gi-set": [
-    { productId: "rashguard", quantity: 1 },
-    { productId: "shorts", quantity: 1 }
-  ]
+type BaseInventoryProductId = "rashguard" | "shorts";
+
+const fallbackSizeStock: Record<BaseInventoryProductId, Record<string, number>> = {
+  rashguard: {
+    S: 1,
+    M: 2,
+    L: 2,
+    XL: 2,
+    "2XL": 2
+  },
+  shorts: {
+    S: 1,
+    M: 2,
+    L: 2,
+    XL: 2,
+    "2XL": 2
+  }
 };
 
+function normalizeSize(size: string) {
+  return size.trim().toUpperCase();
+}
+
+function makeInventoryKey(productId: string, size: string) {
+  return `${productId}:${normalizeSize(size)}`;
+}
+
+function getBaseInventoryProductsForProduct(productId: string): BaseInventoryProductId[] {
+  if (productId === "apertos-the-original-rashguard") {
+    return ["rashguard"];
+  }
+
+  if (productId === "apertos-the-original-shorts") {
+    return ["shorts"];
+  }
+
+  if (productId === "apertos-the-original-no-gi-set") {
+    return ["rashguard", "shorts"];
+  }
+
+  return [];
+}
+
+function getFallbackStock(productId: string, size: string) {
+  const normalizedSize = normalizeSize(size);
+  const fallbackByProduct = fallbackSizeStock[productId as BaseInventoryProductId];
+
+  if (!fallbackByProduct) {
+    return 0;
+  }
+
+  return fallbackByProduct[normalizedSize] ?? 0;
+}
+
 function createInventoryMap(rows: InventoryRow[]) {
-  return new Map(rows.map((row) => [row.product_id, Math.max(row.stock ?? 0, 0)]));
+  const stockMap = new Map<string, number>();
+
+  for (const [productId, sizes] of Object.entries(fallbackSizeStock)) {
+    for (const [size, stock] of Object.entries(sizes)) {
+      stockMap.set(makeInventoryKey(productId, size), stock);
+    }
+  }
+
+  for (const row of rows) {
+    if (!row.size) {
+      continue;
+    }
+
+    stockMap.set(makeInventoryKey(row.product_id, row.size), Math.max(row.stock ?? 0, 0));
+  }
+
+  return stockMap;
 }
 
-export function getInventoryRequirementsForProduct(productId: string, quantity = 1) {
-  return (inventoryProductMap[productId] ?? []).map((requirement) => ({
-    productId: requirement.productId,
-    quantity: requirement.quantity * quantity
-  }));
+function getInventoryRequirementsForProduct(productId: string, size: string, quantity = 1) {
+  const normalizedSize = normalizeSize(size);
+
+  if (productId === "apertos-the-original-rashguard") {
+    return [{ productId: "rashguard", size: normalizedSize, quantity }];
+  }
+
+  if (productId === "apertos-the-original-shorts") {
+    return [{ productId: "shorts", size: normalizedSize, quantity }];
+  }
+
+  if (productId === "apertos-the-original-no-gi-set") {
+    return [
+      { productId: "rashguard", size: normalizedSize, quantity },
+      { productId: "shorts", size: normalizedSize, quantity }
+    ];
+  }
+
+  return [] as InventoryRequirement[];
 }
 
-function getRequiredInventoryProductIds(productIds: string[]) {
-  return [
-    ...new Set(
-      productIds.flatMap((productId) => getInventoryRequirementsForProduct(productId).map((item) => item.productId))
-    )
-  ];
+function aggregateInventoryRequirements(items: OrderItem[]) {
+  const aggregated = new Map<string, InventoryRequirement>();
+
+  for (const item of items) {
+    const requirements = getInventoryRequirementsForProduct(item.productId, item.size, item.quantity);
+
+    for (const requirement of requirements) {
+      const key = makeInventoryKey(requirement.productId, requirement.size);
+      const existing = aggregated.get(key);
+
+      if (existing) {
+        aggregated.set(key, {
+          ...existing,
+          quantity: existing.quantity + requirement.quantity
+        });
+      } else {
+        aggregated.set(key, requirement);
+      }
+    }
+  }
+
+  return aggregated;
 }
 
-async function fetchInventoryRowsByIds(inventoryProductIds: string[]) {
-  if (!hasSupabaseAdminEnv || inventoryProductIds.length === 0) {
+async function fetchInventoryRows(baseProductIds: string[]) {
+  if (!hasSupabaseAdminEnv || baseProductIds.length === 0) {
     return [] as InventoryRow[];
   }
 
-  const supabase = createAdminClient();
-  const { data, error } = await supabase
-    .from("inventory")
-    .select("product_id, stock")
-    .in("product_id", inventoryProductIds);
+  try {
+    const supabase = createAdminClient();
+    const { data, error } = await supabase
+      .from("inventory")
+      .select("product_id, size, stock")
+      .in("product_id", baseProductIds);
 
-  if (error) {
-    throw new Error(error.message);
+    if (error) {
+      console.warn("Unable to fetch size inventory from Supabase:", error.message);
+      return [] as InventoryRow[];
+    }
+
+    return (data ?? []) as InventoryRow[];
+  } catch (error) {
+    console.warn("Size inventory query failed:", error);
+    return [] as InventoryRow[];
   }
-
-  return (data ?? []) as InventoryRow[];
 }
 
-export async function getInventoryStockMapForProducts(productIds: string[]) {
-  const inventoryRows = await fetchInventoryRowsByIds(getRequiredInventoryProductIds(productIds));
-  return createInventoryMap(inventoryRows);
+function getStockForRequirement(requirement: InventoryRequirement, stockMap: Map<string, number>) {
+  return stockMap.get(makeInventoryKey(requirement.productId, requirement.size)) ?? getFallbackStock(requirement.productId, requirement.size);
 }
 
-export function getProductInventoryStatus(product: Product, stockMap: Map<string, number>): ProductInventoryStatus {
-  const requirements = getInventoryRequirementsForProduct(product.id);
+function getInventoryStatusForProductAndSize(product: Product, size: string, stockMap: Map<string, number>): ProductInventoryStatus {
+  const requirements = getInventoryRequirementsForProduct(product.id, size);
 
   if (!requirements.length) {
     return {
@@ -81,12 +181,7 @@ export function getProductInventoryStatus(product: Product, stockMap: Map<string
   }
 
   const availableStock = requirements.reduce<number | null>((lowest, requirement) => {
-    const inventoryStock = stockMap.get(requirement.productId);
-
-    if (typeof inventoryStock !== "number") {
-      return 0;
-    }
-
+    const inventoryStock = getStockForRequirement(requirement, stockMap);
     const units = Math.floor(inventoryStock / requirement.quantity);
 
     return lowest === null ? units : Math.min(lowest, units);
@@ -98,54 +193,40 @@ export function getProductInventoryStatus(product: Product, stockMap: Map<string
     return {
       stock: 0,
       isOutOfStock: true,
-      message: "Out of stock"
+      message: `${normalizeSize(size)} sold out`
     };
   }
 
   return {
     stock,
     isOutOfStock: false,
-    message: `${stock} in stock`
+    message: `${stock} left in ${normalizeSize(size)}`
   };
 }
 
-function aggregateInventoryRequirements(items: OrderItem[]) {
-  const aggregated = new Map<string, number>();
-
-  for (const item of items) {
-    const requirements = getInventoryRequirementsForProduct(item.productId, item.quantity);
-
-    for (const requirement of requirements) {
-      aggregated.set(requirement.productId, (aggregated.get(requirement.productId) ?? 0) + requirement.quantity);
-    }
-  }
-
-  return aggregated;
+function getInventoryBySizeForProduct(product: Product, stockMap: Map<string, number>): ProductInventoryBySize {
+  return Object.fromEntries(
+    product.sizes.map((size) => [size, getInventoryStatusForProductAndSize(product, size, stockMap)])
+  );
 }
 
 export async function assertInventoryAvailable(items: OrderItem[]) {
-  if (!hasSupabaseAdminEnv) {
-    return;
-  }
-
   const requirements = aggregateInventoryRequirements(items);
-  const stockMap = await getInventoryStockMapForProducts(items.map((item) => item.productId));
+  const rows = await fetchInventoryRows(
+    [...new Set(items.flatMap((item) => getBaseInventoryProductsForProduct(item.productId)))]
+  );
+  const stockMap = createInventoryMap(rows);
 
-  for (const [inventoryProductId, requiredQuantity] of requirements.entries()) {
-    const availableStock = stockMap.get(inventoryProductId) ?? 0;
+  for (const requirement of requirements.values()) {
+    const availableStock = getStockForRequirement(requirement, stockMap);
 
-    if (availableStock < requiredQuantity) {
-      const productName = inventoryProductId === "rashguard" ? "rashguard" : "shorts";
-      throw new Error(`Not enough ${productName} stock is available right now.`);
+    if (availableStock < requirement.quantity) {
+      throw new Error(`Not enough ${requirement.productId} stock is available in ${requirement.size} right now.`);
     }
   }
 }
 
 export async function decrementInventoryForOrder(order: OrderRecord) {
-  if (!hasSupabaseAdminEnv) {
-    return;
-  }
-
   if (order.parsedItemsPayload.inventoryAdjustedAt) {
     return;
   }
@@ -157,35 +238,52 @@ export async function decrementInventoryForOrder(order: OrderRecord) {
     return;
   }
 
-  const supabase = createAdminClient();
-  const { data, error } = await supabase
-    .from("inventory")
-    .select("product_id, stock")
-    .in("product_id", [...requirements.keys()]);
+  const rows = await fetchInventoryRows([...new Set([...requirements.values()].map((item) => item.productId))]);
+  const stockMap = createInventoryMap(rows);
+  const existingKeys = new Set(
+    rows.filter((row) => row.size).map((row) => makeInventoryKey(row.product_id, row.size as string))
+  );
 
-  if (error) {
-    throw new Error(error.message);
+  if (!hasSupabaseAdminEnv) {
+    await markInventoryAdjustedForOrder(order.stripeCheckoutSessionId);
+    return;
   }
 
-  const stockMap = createInventoryMap((data ?? []) as InventoryRow[]);
+  const supabase = createAdminClient();
 
-  for (const [inventoryProductId, requiredQuantity] of requirements.entries()) {
-    const availableStock = stockMap.get(inventoryProductId) ?? 0;
+  for (const requirement of requirements.values()) {
+    const availableStock = getStockForRequirement(requirement, stockMap);
 
-    if (availableStock < requiredQuantity) {
-      throw new Error(`Inventory for ${inventoryProductId} is too low to fulfill this order.`);
+    if (availableStock < requirement.quantity) {
+      throw new Error(`Inventory for ${requirement.productId} ${requirement.size} is too low to fulfill this order.`);
     }
   }
 
-  for (const [inventoryProductId, requiredQuantity] of requirements.entries()) {
-    const currentStock = stockMap.get(inventoryProductId) ?? 0;
-    const { error: updateError } = await supabase
-      .from("inventory")
-      .update({ stock: currentStock - requiredQuantity })
-      .eq("product_id", inventoryProductId);
+  for (const requirement of requirements.values()) {
+    const key = makeInventoryKey(requirement.productId, requirement.size);
+    const currentStock = getStockForRequirement(requirement, stockMap);
+    const nextStock = currentStock - requirement.quantity;
 
-    if (updateError) {
-      throw new Error(updateError.message);
+    if (existingKeys.has(key)) {
+      const { error } = await supabase
+        .from("inventory")
+        .update({ stock: nextStock })
+        .eq("product_id", requirement.productId)
+        .eq("size", requirement.size);
+
+      if (error) {
+        throw new Error(error.message);
+      }
+    } else {
+      const { error } = await supabase.from("inventory").insert({
+        product_id: requirement.productId,
+        size: requirement.size,
+        stock: nextStock
+      });
+
+      if (error) {
+        throw new Error(error.message);
+      }
     }
   }
 
@@ -199,21 +297,11 @@ export async function getProductWithInventoryStatus(productId: string) {
     return null;
   }
 
-  if (!hasSupabaseAdminEnv) {
-    return {
-      product,
-      inventory: {
-        stock: null,
-        isOutOfStock: false,
-        message: "Stock unavailable"
-      } satisfies ProductInventoryStatus
-    };
-  }
-
-  const stockMap = await getInventoryStockMapForProducts([product.id]);
+  const rows = await fetchInventoryRows(getBaseInventoryProductsForProduct(product.id));
+  const stockMap = createInventoryMap(rows);
 
   return {
     product,
-    inventory: getProductInventoryStatus(product, stockMap)
+    inventoryBySize: getInventoryBySizeForProduct(product, stockMap)
   };
 }

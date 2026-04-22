@@ -19,5 +19,10 @@ export default async function ProductPage({
     notFound();
   }
 
-  return <ProductDetail product={productWithInventory.product} inventory={productWithInventory.inventory} />;
+  return (
+    <ProductDetail
+      product={productWithInventory.product}
+      inventoryBySize={productWithInventory.inventoryBySize}
+    />
+  );
 }

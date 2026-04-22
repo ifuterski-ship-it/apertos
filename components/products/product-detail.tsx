@@ -1,9 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Product, SizeGuideBlock } from "@/lib/products";
-import { ProductInventoryStatus } from "@/lib/inventory";
+import { ProductInventoryBySize } from "@/lib/inventory";
 import { useCart } from "@/components/cart/cart-provider";
 import { hasStripeClientEnv } from "@/lib/stripe";
 
@@ -39,10 +39,10 @@ function SizeGuideTable({ guide }: { guide: SizeGuideBlock }) {
 
 export function ProductDetail({
   product,
-  inventory
+  inventoryBySize
 }: {
   product: Product;
-  inventory: ProductInventoryStatus;
+  inventoryBySize: ProductInventoryBySize;
 }) {
   const [added, setAdded] = useState(false);
   const galleryImages = useMemo(() => product.images ?? [product.image], [product.image, product.images]);
@@ -53,7 +53,22 @@ export function ProductDetail({
   const [checkoutMessage, setCheckoutMessage] = useState<string | null>(null);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const { addItem } = useCart();
-  const isOutOfStock = inventory.isOutOfStock;
+  const selectedInventory = inventoryBySize[selectedSize] ?? {
+    stock: null,
+    isOutOfStock: false,
+    message: "Stock unavailable"
+  };
+  const isOutOfStock = selectedInventory.isOutOfStock;
+  const firstAvailableSize = useMemo(
+    () => product.sizes.find((size) => !inventoryBySize[size]?.isOutOfStock) ?? product.sizes[0],
+    [inventoryBySize, product.sizes]
+  );
+
+  useEffect(() => {
+    if (inventoryBySize[selectedSize]?.isOutOfStock && firstAvailableSize !== selectedSize) {
+      setSelectedSize(firstAvailableSize);
+    }
+  }, [firstAvailableSize, inventoryBySize, selectedSize]);
 
   const handleAddToCart = () => {
     if (isOutOfStock) {
@@ -188,7 +203,7 @@ export function ProductDetail({
               <h1 className="font-display text-4xl uppercase tracking-[0.08em] md:text-6xl">{product.name}</h1>
               <p className="text-2xl font-semibold">{product.priceLabel}</p>
               <p className={`text-xs uppercase tracking-[0.35em] ${isOutOfStock ? "text-red-300" : "text-neutral-300"}`}>
-                {inventory.message}
+                {selectedInventory.message}
               </p>
               <p className="max-w-xl text-sm uppercase leading-7 tracking-[0.18em] text-neutral-300">
                 {product.description}
@@ -201,17 +216,21 @@ export function ProductDetail({
             <div className="flex flex-wrap gap-3">
               {product.sizes.map((size) => {
                 const active = size === selectedSize;
+                const sizeInventory = inventoryBySize[size];
+                const disabled = Boolean(sizeInventory?.isOutOfStock);
 
                 return (
                   <button
                     key={size}
                     type="button"
+                    disabled={disabled}
                     onClick={() => setSelectedSize(size)}
                     className={`min-w-16 border px-4 py-3 text-xs uppercase tracking-[0.35em] transition ${
                       active ? "border-white bg-white text-black" : "border-white/15 hover:border-white/50"
                     }`}
                   >
                     {size}
+                    {disabled ? " Sold Out" : ""}
                   </button>
                 );
               })}
