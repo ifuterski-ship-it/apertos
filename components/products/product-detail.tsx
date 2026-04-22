@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useMemo, useState } from "react";
 import { Product, SizeGuideBlock } from "@/lib/products";
+import { ProductInventoryStatus } from "@/lib/inventory";
 import { useCart } from "@/components/cart/cart-provider";
 import { hasStripeClientEnv } from "@/lib/stripe";
 
@@ -36,7 +37,13 @@ function SizeGuideTable({ guide }: { guide: SizeGuideBlock }) {
   );
 }
 
-export function ProductDetail({ product, inventory = {}, inStock = true }: { product: Product; inventory?: Record<string, number | null>; inStock?: boolean }) {
+export function ProductDetail({
+  product,
+  inventory
+}: {
+  product: Product;
+  inventory: ProductInventoryStatus;
+}) {
   const [added, setAdded] = useState(false);
   const galleryImages = useMemo(() => product.images ?? [product.image], [product.image, product.images]);
   const [activeImage, setActiveImage] = useState(galleryImages[0]);
@@ -46,9 +53,13 @@ export function ProductDetail({ product, inventory = {}, inStock = true }: { pro
   const [checkoutMessage, setCheckoutMessage] = useState<string | null>(null);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const { addItem } = useCart();
+  const isOutOfStock = inventory.isOutOfStock;
 
   const handleAddToCart = () => {
-    if (!inStock) return;
+    if (isOutOfStock) {
+      return;
+    }
+
     addItem(product, selectedSize);
     setAdded(true);
 
@@ -66,11 +77,15 @@ export function ProductDetail({ product, inventory = {}, inStock = true }: { pro
   };
 
   const handleBuyNow = async () => {
-    if (!inStock) return;
     setCheckoutMessage(null);
 
     if (!hasStripeClientEnv()) {
       setCheckoutMessage("Stripe checkout is not configured for this environment yet.");
+      return;
+    }
+
+    if (isOutOfStock) {
+      setCheckoutMessage("This product is currently out of stock.");
       return;
     }
 
@@ -172,12 +187,9 @@ export function ProductDetail({ product, inventory = {}, inStock = true }: { pro
               <p className="text-xs uppercase tracking-[0.45em] text-muted">{product.category}</p>
               <h1 className="font-display text-4xl uppercase tracking-[0.08em] md:text-6xl">{product.name}</h1>
               <p className="text-2xl font-semibold">{product.priceLabel}</p>
-              {!inStock && (
-                <p className="text-xs uppercase tracking-[0.2em] text-red-400">Out of Stock</p>
-              )}
-              {inStock && Object.keys(inventory).length > 0 && (
-                <p className="text-xs uppercase tracking-[0.2em] text-green-400">In Stock</p>
-              )}
+              <p className={`text-xs uppercase tracking-[0.35em] ${isOutOfStock ? "text-red-300" : "text-neutral-300"}`}>
+                {inventory.message}
+              </p>
               <p className="max-w-xl text-sm uppercase leading-7 tracking-[0.18em] text-neutral-300">
                 {product.description}
               </p>
@@ -220,10 +232,10 @@ export function ProductDetail({ product, inventory = {}, inStock = true }: { pro
           <button
             type="button"
             onClick={handleAddToCart}
-            disabled={!inStock}
+            disabled={isOutOfStock}
             className="w-full border border-white px-6 py-4 text-sm font-semibold uppercase tracking-[0.35em] transition hover:bg-white hover:text-black disabled:cursor-not-allowed disabled:border-neutral-600 disabled:bg-neutral-900 disabled:text-neutral-500"
           >
-            {!inStock ? "Out of Stock" : added ? `Added ${selectedSize}` : "Add To Cart"}
+            {isOutOfStock ? "Out Of Stock" : added ? `Added ${selectedSize}` : "Add To Cart"}
           </button>
           {checkoutMessage ? (
             <p className="text-xs uppercase leading-6 tracking-[0.2em] text-neutral-300">{checkoutMessage}</p>
@@ -231,10 +243,10 @@ export function ProductDetail({ product, inventory = {}, inStock = true }: { pro
           <button
             type="button"
             onClick={handleBuyNow}
-            disabled={isCheckingOut || !inStock}
+            disabled={isCheckingOut || isOutOfStock}
             className="block w-full border border-white/10 px-6 py-4 text-center text-sm font-semibold uppercase tracking-[0.35em] text-neutral-300 transition hover:border-white hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {!inStock ? "Out of Stock" : isCheckingOut ? "Starting Checkout" : "Buy Now"}
+            {isOutOfStock ? "Out Of Stock" : isCheckingOut ? "Starting Checkout" : "Buy Now"}
           </button>
         </div>
       </div>

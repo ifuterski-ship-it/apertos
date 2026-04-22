@@ -37,6 +37,7 @@ export type OrderItemsPayload = {
   items: OrderItem[];
   shippingAddress: OrderShippingAddress | null;
   shippingLabel: OrderShippingLabel | null;
+  inventoryAdjustedAt: string | null;
 };
 
 type RecordedOrder = {
@@ -84,7 +85,8 @@ function createEmptyPayload(): OrderItemsPayload {
     version: 2,
     items: [],
     shippingAddress: null,
-    shippingLabel: null
+    shippingLabel: null,
+    inventoryAdjustedAt: null
   };
 }
 
@@ -170,7 +172,8 @@ export function parseOrderItemsPayload(rawItems: string | null | undefined): Ord
         version: 1,
         items: parsed.map(sanitizeOrderItem).filter((item): item is OrderItem => item !== null),
         shippingAddress: null,
-        shippingLabel: null
+        shippingLabel: null,
+        inventoryAdjustedAt: null
       };
     }
 
@@ -183,6 +186,7 @@ export function parseOrderItemsPayload(rawItems: string | null | undefined): Ord
       items?: unknown[];
       shippingAddress?: unknown;
       shippingLabel?: unknown;
+      inventoryAdjustedAt?: unknown;
     };
 
     return {
@@ -191,7 +195,8 @@ export function parseOrderItemsPayload(rawItems: string | null | undefined): Ord
         ? payload.items.map(sanitizeOrderItem).filter((item): item is OrderItem => item !== null)
         : [],
       shippingAddress: sanitizeShippingAddress(payload.shippingAddress),
-      shippingLabel: sanitizeShippingLabel(payload.shippingLabel)
+      shippingLabel: sanitizeShippingLabel(payload.shippingLabel),
+      inventoryAdjustedAt: typeof payload.inventoryAdjustedAt === "string" ? payload.inventoryAdjustedAt : null
     };
   } catch {
     return createEmptyPayload();
@@ -207,7 +212,8 @@ export function buildOrderItemsPayload(items: OrderItem[], shippingAddress: Orde
     version: 2,
     items,
     shippingAddress,
-    shippingLabel: null
+    shippingLabel: null,
+    inventoryAdjustedAt: null
   });
 }
 
@@ -218,6 +224,16 @@ export function applyShippingLabelToPayload(items: string, shippingLabel: OrderS
     ...payload,
     version: 2,
     shippingLabel
+  });
+}
+
+export function applyInventoryAdjustedToPayload(items: string, inventoryAdjustedAt: string) {
+  const payload = parseOrderItemsPayload(items);
+
+  return serializeOrderItemsPayload({
+    ...payload,
+    version: 2,
+    inventoryAdjustedAt
   });
 }
 
@@ -389,6 +405,38 @@ export async function saveShippingLabelForOrder(
       ...existingOrder.parsedItemsPayload,
       version: 2,
       shippingLabel
+    }
+  };
+}
+
+export async function markInventoryAdjustedForOrder(stripeCheckoutSessionId: string) {
+  const existingOrder = await getOrderForAdmin(stripeCheckoutSessionId);
+
+  if (!existingOrder || existingOrder.parsedItemsPayload.inventoryAdjustedAt) {
+    return existingOrder;
+  }
+
+  const inventoryAdjustedAt = new Date().toISOString();
+  const updatedItems = applyInventoryAdjustedToPayload(existingOrder.items, inventoryAdjustedAt);
+  const supabase = createAdminClient();
+  const { error } = await supabase
+    .from("orders")
+    .update({
+      items: updatedItems
+    })
+    .eq("stripe_checkout_session_id", stripeCheckoutSessionId);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return {
+    ...existingOrder,
+    items: updatedItems,
+    parsedItemsPayload: {
+      ...existingOrder.parsedItemsPayload,
+      version: 2,
+      inventoryAdjustedAt
     }
   };
 }

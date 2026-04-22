@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import type Stripe from "stripe";
 import { products } from "@/lib/products";
+import { assertInventoryAvailable } from "@/lib/inventory";
 import { stripe } from "@/lib/stripe";
 import { getAllowedShippingCountries } from "@/lib/shippo";
 
@@ -43,6 +44,22 @@ export async function POST(request: Request) {
   if (!normalizedItems.length) {
     return NextResponse.json({ ok: false, message: "No valid products found for checkout." }, { status: 400 });
   }
+
+  try {
+    await assertInventoryAvailable(
+      normalizedItems.map(({ product, quantity, size }) => ({
+        productId: product.id,
+        name: product.name,
+        quantity,
+        size,
+        price: product.price
+      }))
+    );
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Stock is unavailable right now.";
+    return NextResponse.json({ ok: false, message }, { status: 409 });
+  }
+
   const origin = request.headers.get("origin") ?? new URL(request.url).origin;
   const allowedCountries =
     getAllowedShippingCountries() as Stripe.Checkout.SessionCreateParams.ShippingAddressCollection.AllowedCountry[];

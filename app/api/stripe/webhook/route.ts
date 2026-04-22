@@ -2,9 +2,10 @@ import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { sendEmail } from "@/lib/email";
 import { ordersFromEmail } from "@/lib/email-config";
-import { buildOrderItemsPayload, recordOrder } from "@/lib/orders";
-import { reduceInventoryForOrder } from "@/lib/inventory";
+import { decrementInventoryForOrder } from "@/lib/inventory";
+import { buildOrderItemsPayload, getOrderForAdmin, recordOrder } from "@/lib/orders";
 import { stripe } from "@/lib/stripe";
+import { hasSupabaseAdminEnv } from "@/lib/supabase/admin";
 
 export const runtime = "nodejs";
 
@@ -31,10 +32,22 @@ export async function POST(request: Request) {
 
   if (event.type === "checkout.session.completed") {
     const session = event.data.object as Stripe.Checkout.Session;
+    const sessionWithShipping = session as Stripe.Checkout.Session & {
+      shipping_details?: {
+        name?: string | null;
+        address?: {
+          line1?: string | null;
+          line2?: string | null;
+          city?: string | null;
+          state?: string | null;
+          postal_code?: string | null;
+          country?: string | null;
+        } | null;
+      } | null;
+    };
     const shippingDetails =
-      session.shipping_details ??
-      session.collected_information?.shipping_details ??
-      session.customer_details?.shipping;
+      sessionWithShipping.shipping_details ??
+      session.collected_information?.shipping_details;
     const email = session.customer_details?.email ?? session.customer_email ?? null;
     const rawItems = session.metadata?.items ?? "[]";
     let items = [] as Array<{
@@ -59,6 +72,7 @@ export async function POST(request: Request) {
     } catch {
       items = [];
     }
+
     const shippingAddress = {
       name: shippingDetails?.name ?? session.customer_details?.name ?? null,
       email,
@@ -91,11 +105,12 @@ export async function POST(request: Request) {
       );
     }
 
-    // Reduce inventory for each item in the order
-    const inventoryResults = await reduceInventoryForOrder(items);
-    const inventoryErrors = inventoryResults.filter((result) => !result.ok);
-    if (inventoryErrors.length > 0) {
-      console.error("Inventory reduction errors:", inventoryErrors);
+    if (hasSupabaseAdminEnv) {
+      const recordedOrder = await getOrderForAdmin(session.id);
+
+      if (recordedOrder) {
+        await decrementInventoryForOrder(recordedOrder);
+      }
     }
 
     if (email) {
