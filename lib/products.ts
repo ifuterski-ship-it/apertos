@@ -87,7 +87,7 @@ export const products: Product[] = [
     price: 49.99,
     priceLabel: "\u00A349.99",
     image: "/products/nogi-front.jpg",
-    images: ["/products/nogi-front.jpg", "/products/nogi-back.jpg"],
+    images: ["/products/nogi-front.jpg", "/products/nogi-back.jpg", "/products/nogi-lifestyle.jpeg"],
     sizes: ["S", "M", "L", "XL", "2XL"],
     category: "Bundle",
     shortDescription: "Rashguard and shorts in one set",

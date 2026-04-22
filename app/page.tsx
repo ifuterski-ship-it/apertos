@@ -60,6 +60,40 @@ export default function HomePage() {
         />
         <ProductGrid products={featuredProducts} />
       </section>
+
+      <section className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr]">
+        <div className="relative min-h-[520px] overflow-hidden rounded-[2rem] border border-white/10 bg-black">
+          <Image
+            src="/products/nogi-lifestyle.jpeg"
+            alt="Athlete wearing the Apertos no-gi set"
+            fill
+            sizes="(min-width: 1024px) 50vw, 100vw"
+            className="object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
+        </div>
+        <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.03] p-8 md:p-12">
+          <div className="absolute -right-8 top-0 h-40 w-40 opacity-[0.08]">
+            <Image src="/logo-mark.png" alt="" fill sizes="160px" className="object-contain" />
+          </div>
+          <div className="relative flex h-full flex-col justify-center space-y-6">
+            <p className="text-xs uppercase tracking-[0.45em] text-muted">On The Mat</p>
+            <h2 className="font-display text-4xl uppercase tracking-[0.08em] md:text-6xl">
+              Built To Look Sharp Under Pressure
+            </h2>
+            <p className="max-w-2xl text-sm uppercase leading-7 tracking-[0.22em] text-neutral-300">
+              The original no-gi set worn the way it was designed to feel: clean lines, locked-in movement, and a
+              competition-ready silhouette that stands out without losing discipline.
+            </p>
+            <Link
+              href="/product/apertos-the-original-no-gi-set"
+              className="inline-flex w-fit items-center border border-white px-6 py-3 text-sm font-semibold uppercase tracking-[0.35em] transition hover:bg-white hover:text-black"
+            >
+              View The Set
+            </Link>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
