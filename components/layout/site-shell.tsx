@@ -153,19 +153,38 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
               >
                 {user ? "Account" : "Login"}
               </Link>
+
+              <a
+                href="https://www.tiktok.com/@apertos.fightwear"
+                target="_blank"
+                rel="noreferrer"
+                className="px-1 pt-2 text-center text-[11px] uppercase tracking-[0.32em] text-neutral-500 transition hover:text-white"
+              >
+                TikTok @apertos.fightwear
+              </a>
             </nav>
           </div>
         ) : null}
       </header>
       <main className="mx-auto w-full max-w-7xl px-4 pt-10 sm:px-6 lg:px-8">{children}</main>
-      <footer className="mx-auto mt-8 flex w-full max-w-7xl items-center justify-between border-t border-white/10 px-4 py-8 text-xs uppercase tracking-[0.28em] text-neutral-400 sm:px-6 lg:px-8">
+      <footer className="mx-auto mt-8 flex w-full max-w-7xl flex-col gap-5 border-t border-white/10 px-4 py-8 text-xs uppercase tracking-[0.28em] text-neutral-400 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
         <div className="flex items-center gap-4">
           <div className="relative h-10 w-10 overflow-hidden rounded-full border border-white/10 bg-black">
             <Image src="/logo-mark.png" alt="Apertos logo" fill sizes="40px" className="object-cover opacity-70" />
           </div>
           <span>Premium Combat Sports</span>
         </div>
-        <span>Apertos Est. 2026</span>
+        <div className="flex flex-col gap-3 text-left lg:items-end lg:text-right">
+          <a
+            href="https://www.tiktok.com/@apertos.fightwear"
+            target="_blank"
+            rel="noreferrer"
+            className="transition hover:text-white"
+          >
+            @apertos.fightwear
+          </a>
+          <span>Apertos Est. 2026</span>
+        </div>
       </footer>
     </div>
   );
