@@ -1,24 +1,52 @@
-// Reset password form component with session validation and password confirmation
-import React, { useState } from 'react';
+"use client";
+import { useState } from "react";
+import { createClient } from "@/lib/supabase/client";
 
-const ResetPasswordForm = () => {
-    const [email, setEmail] = useState('');
-    const [newPassword, setNewPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
+export function ResetPasswordForm() {
+  const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [done, setDone] = useState(false);
+  const [error, setError] = useState("");
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        // TODO: Add session validation and password reset logic
-    };
+  async function handleSubmit() {
+    if (password !== confirm) {
+      setError("Passwords do not match.");
+      return;
+    }
+    const supabase = createClient();
+    const { error } = await supabase.auth.updateUser({ password });
+    if (error) {
+      setError(error.message);
+    } else {
+      setDone(true);
+    }
+  }
 
-    return (
-        <form onSubmit={handleSubmit}>
-            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" required />
-            <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="New Password" required />
-            <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="Confirm Password" required />
-            <button type="submit">Reset Password</button>
-        </form>
-    );
-};
+  if (done) return <p className="text-sm uppercase tracking-widest text-neutral-300">Password updated! You can now sign in.</p>;
 
-export default ResetPasswordForm;
+  return (
+    <div className="space-y-4">
+      <input
+        type="password"
+        placeholder="New password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        className="w-full border border-white/20 bg-transparent px-4 py-3 text-sm uppercase tracking-widest outline-none"
+      />
+      <input
+        type="password"
+        placeholder="Confirm password"
+        value={confirm}
+        onChange={(e) => setConfirm(e.target.value)}
+        className="w-full border border-white/20 bg-transparent px-4 py-3 text-sm uppercase tracking-widest outline-none"
+      />
+      {error && <p className="text-xs text-red-400">{error}</p>}
+      <button
+        onClick={handleSubmit}
+        className="w-full border border-white px-4 py-3 text-sm uppercase tracking-widest hover:bg-white hover:text-black"
+      >
+        Update Password
+      </button>
+    </div>
+  );
+}
