@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 const ForgotPasswordForm = () => {
     const [email, setEmail] = useState('');
 
-    const handleSubmit = (e) => {
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         // TODO: Add logic to send reset email
     };
