@@ -3,6 +3,7 @@ import "./globals.css";
 import { CartProvider } from "@/components/cart/cart-provider";
 import { SiteShell } from "@/components/layout/site-shell";
 import { WishlistProvider } from "@/components/wishlist/wishlist-provider";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export const metadata: Metadata = {
   title: "APERTOS",
@@ -22,6 +23,7 @@ export default function RootLayout({
             <SiteShell>{children}</SiteShell>
           </CartProvider>
         </WishlistProvider>
+        <SpeedInsights />
       </body>
     </html>
   );
