@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { SignOutButton } from "@/app/account/sign-out-button";
 import { hasSupabaseEnv } from "@/lib/supabase/config";
@@ -31,6 +32,12 @@ export default async function AccountPage() {
           <p className="text-sm uppercase leading-7 tracking-[0.2em] text-neutral-300">
             Your APERTOS account is active. Additional profile, order history, and member tools can be added here next.
           </p>
+          <Link
+            href="/auth/forgot-password"
+            className="inline-flex text-xs uppercase tracking-[0.28em] text-neutral-400 transition hover:text-white"
+          >
+            Need To Reset Your Password?
+          </Link>
           <SignOutButton />
         </div>
       </div>

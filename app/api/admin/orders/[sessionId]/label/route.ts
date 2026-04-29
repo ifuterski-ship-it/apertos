@@ -1,4 +1,7 @@
 import { NextResponse } from "next/server";
+import { sendEmail } from "@/lib/email";
+import { ordersFromEmail } from "@/lib/email-config";
+import { renderShippingNotificationEmail } from "@/lib/email-templates";
 import { createClient } from "@/lib/supabase/server";
 import { hasSupabaseEnv } from "@/lib/supabase/config";
 import { getOrderForAdmin, saveShippingLabelForOrder } from "@/lib/orders";
@@ -37,7 +40,21 @@ export async function POST(
     }
 
     const shippingLabel = await purchaseCheapestLabel(order);
-    await saveShippingLabelForOrder(order.stripeCheckoutSessionId, shippingLabel);
+    const updatedOrder = await saveShippingLabelForOrder(order.stripeCheckoutSessionId, shippingLabel);
+    const shippingAddress = updatedOrder.parsedItemsPayload.shippingAddress;
+
+    if (updatedOrder.email) {
+      await sendEmail({
+        to: updatedOrder.email,
+        from: ordersFromEmail,
+        subject: "Your APERTOS Shipping Update",
+        html: renderShippingNotificationEmail({
+          customerName: shippingAddress?.name ?? null,
+          trackingNumber: shippingLabel.trackingNumber,
+          shippingLabel
+        })
+      });
+    }
 
     return NextResponse.json({
       ok: true,

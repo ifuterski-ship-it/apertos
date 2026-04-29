@@ -1,14 +1,59 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { ProductGrid } from "@/components/products/product-grid";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { getFeaturedProducts } from "@/lib/products";
+import { absoluteUrl } from "@/lib/site";
+
+const homepageTitle = "Apertos Fightwear | Premium BJJ & MMA Gear — Rash Guards, Shorts & No-Gi Sets";
+const homepageDescription =
+  "Premium BJJ and MMA fightwear built for hard training, with rash guards, shorts, and no-gi sets engineered for performance.";
+
+export const metadata: Metadata = {
+  title: homepageTitle,
+  description: homepageDescription,
+  alternates: {
+    canonical: absoluteUrl("/")
+  },
+  openGraph: {
+    title: homepageTitle,
+    description: homepageDescription,
+    url: absoluteUrl("/"),
+    images: [
+      {
+        url: absoluteUrl("/products/nogi-lifestyle.jpeg"),
+        width: 1200,
+        height: 1800,
+        alt: "Apertos Fightwear no-gi set"
+      }
+    ]
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: homepageTitle,
+    description: homepageDescription,
+    images: [absoluteUrl("/products/nogi-lifestyle.jpeg")]
+  }
+};
 
 export default function HomePage() {
   const featuredProducts = getFeaturedProducts();
+  const organizationSchema = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "Apertos Fightwear",
+    url: "https://apertosfightwear.com",
+    email: "info@apertosfightwear.com",
+    sameAs: ["https://instagram.com/apertos.fightwear"]
+  };
 
   return (
     <div className="space-y-24 pb-24">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+      />
       <section className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-panel/70 px-6 py-20 shadow-luxe md:px-10 md:py-28">
         <div className="absolute inset-0 bg-grain opacity-80" />
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/60 to-transparent" />
@@ -24,6 +69,11 @@ export default function HomePage() {
             <h1 className="font-display text-5xl uppercase leading-none tracking-[0.08em] md:text-7xl">
               Engineered For Dominance
             </h1>
+            <p className="mx-auto max-w-3xl text-sm uppercase leading-7 tracking-[0.2em] text-neutral-300">
+              Apertos Fightwear is a premium combat sports brand creating rash guards, shorts, and no-gi sets for BJJ
+              and MMA athletes who demand sharp fit, durable performance fabrics, dependable stretch, and clean
+              fightwear built to stay composed through hard rounds, live scrambles, and repeat sessions on the mat.
+            </p>
           </div>
           <Link
             href="/shop"

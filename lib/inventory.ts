@@ -8,6 +8,16 @@ type InventoryRow = {
   stock: number | null;
 };
 
+type BaseInventoryProductId = "rashguard" | "shorts";
+
+type InventoryState = Record<
+  BaseInventoryProductId,
+  {
+    totalStock: number;
+    hasBaseRow: boolean;
+  }
+>;
+
 export type ProductInventoryStatus = {
   stock: number | null;
   isOutOfStock: boolean;
@@ -16,38 +26,10 @@ export type ProductInventoryStatus = {
 
 export type ProductInventoryBySize = Record<string, ProductInventoryStatus>;
 
-type InventoryRequirement = {
-  productId: string;
-  size: string;
-  quantity: number;
+const fallbackProductStock: Record<BaseInventoryProductId, number> = {
+  rashguard: 9,
+  shorts: 9
 };
-
-type BaseInventoryProductId = "rashguard" | "shorts";
-
-const fallbackSizeStock: Record<BaseInventoryProductId, Record<string, number>> = {
-  rashguard: {
-    S: 1,
-    M: 2,
-    L: 2,
-    XL: 2,
-    "2XL": 2
-  },
-  shorts: {
-    S: 1,
-    M: 2,
-    L: 2,
-    XL: 2,
-    "2XL": 2
-  }
-};
-
-function normalizeSize(size: string) {
-  return size.trim().toUpperCase();
-}
-
-function makeInventoryKey(productId: string, size: string) {
-  return `${productId}:${normalizeSize(size)}`;
-}
 
 function getBaseInventoryProductsForProduct(productId: string): BaseInventoryProductId[] {
   if (productId === "apertos-the-original-rashguard") {
@@ -65,83 +47,21 @@ function getBaseInventoryProductsForProduct(productId: string): BaseInventoryPro
   return [];
 }
 
-function getFallbackStock(productId: string, size: string) {
-  const normalizedSize = normalizeSize(size);
-  const fallbackByProduct = fallbackSizeStock[productId as BaseInventoryProductId];
-
-  if (!fallbackByProduct) {
-    return 0;
-  }
-
-  return fallbackByProduct[normalizedSize] ?? 0;
-}
-
-function createInventoryMap(rows: InventoryRow[]) {
-  const stockMap = new Map<string, number>();
-
-  for (const [productId, sizes] of Object.entries(fallbackSizeStock)) {
-    for (const [size, stock] of Object.entries(sizes)) {
-      stockMap.set(makeInventoryKey(productId, size), stock);
-    }
-  }
-
-  for (const row of rows) {
-    if (!row.size) {
-      continue;
-    }
-
-    stockMap.set(makeInventoryKey(row.product_id, row.size), Math.max(row.stock ?? 0, 0));
-  }
-
-  return stockMap;
-}
-
-function getInventoryRequirementsForProduct(productId: string, size: string, quantity = 1) {
-  const normalizedSize = normalizeSize(size);
-
-  if (productId === "apertos-the-original-rashguard") {
-    return [{ productId: "rashguard", size: normalizedSize, quantity }];
-  }
-
-  if (productId === "apertos-the-original-shorts") {
-    return [{ productId: "shorts", size: normalizedSize, quantity }];
-  }
-
-  if (productId === "apertos-the-original-no-gi-set") {
-    return [
-      { productId: "rashguard", size: normalizedSize, quantity },
-      { productId: "shorts", size: normalizedSize, quantity }
-    ];
-  }
-
-  return [] as InventoryRequirement[];
-}
-
-function aggregateInventoryRequirements(items: OrderItem[]) {
-  const aggregated = new Map<string, InventoryRequirement>();
+function getBaseInventoryRequirements(items: OrderItem[]) {
+  const requirements = new Map<BaseInventoryProductId, number>();
 
   for (const item of items) {
-    const requirements = getInventoryRequirementsForProduct(item.productId, item.size, item.quantity);
+    const baseProducts = getBaseInventoryProductsForProduct(item.productId);
 
-    for (const requirement of requirements) {
-      const key = makeInventoryKey(requirement.productId, requirement.size);
-      const existing = aggregated.get(key);
-
-      if (existing) {
-        aggregated.set(key, {
-          ...existing,
-          quantity: existing.quantity + requirement.quantity
-        });
-      } else {
-        aggregated.set(key, requirement);
-      }
+    for (const baseProduct of baseProducts) {
+      requirements.set(baseProduct, (requirements.get(baseProduct) ?? 0) + item.quantity);
     }
   }
 
-  return aggregated;
+  return requirements;
 }
 
-async function fetchInventoryRows(baseProductIds: string[]) {
+async function fetchInventoryRows(baseProductIds: BaseInventoryProductId[]) {
   if (!hasSupabaseAdminEnv || baseProductIds.length === 0) {
     return [] as InventoryRow[];
   }
@@ -154,25 +74,89 @@ async function fetchInventoryRows(baseProductIds: string[]) {
       .in("product_id", baseProductIds);
 
     if (error) {
-      console.warn("Unable to fetch size inventory from Supabase:", error.message);
+      console.warn("Unable to fetch inventory from Supabase:", error.message);
       return [] as InventoryRow[];
     }
 
     return (data ?? []) as InventoryRow[];
   } catch (error) {
-    console.warn("Size inventory query failed:", error);
+    console.warn("Inventory query failed:", error);
     return [] as InventoryRow[];
   }
 }
 
-function getStockForRequirement(requirement: InventoryRequirement, stockMap: Map<string, number>) {
-  return stockMap.get(makeInventoryKey(requirement.productId, requirement.size)) ?? getFallbackStock(requirement.productId, requirement.size);
+function createInventoryState(rows: InventoryRow[]): InventoryState {
+  const state: InventoryState = {
+    rashguard: {
+      totalStock: fallbackProductStock.rashguard,
+      hasBaseRow: false
+    },
+    shorts: {
+      totalStock: fallbackProductStock.shorts,
+      hasBaseRow: false
+    }
+  };
+
+  const groupedRows = new Map<BaseInventoryProductId, InventoryRow[]>();
+
+  for (const row of rows) {
+    if (row.product_id !== "rashguard" && row.product_id !== "shorts") {
+      continue;
+    }
+
+    const productId = row.product_id as BaseInventoryProductId;
+    const currentRows = groupedRows.get(productId) ?? [];
+    currentRows.push(row);
+    groupedRows.set(productId, currentRows);
+  }
+
+  for (const productId of Object.keys(state) as BaseInventoryProductId[]) {
+    const productRows = groupedRows.get(productId) ?? [];
+    const baseRows = productRows.filter((row) => !row.size);
+
+    if (baseRows.length > 0) {
+      state[productId] = {
+        totalStock: Math.max(
+          baseRows.reduce((total, row) => total + Math.max(row.stock ?? 0, 0), 0),
+          0
+        ),
+        hasBaseRow: true
+      };
+      continue;
+    }
+
+    if (productRows.length > 0) {
+      state[productId] = {
+        totalStock: Math.max(
+          productRows.reduce((total, row) => total + Math.max(row.stock ?? 0, 0), 0),
+          0
+        ),
+        hasBaseRow: false
+      };
+    }
+  }
+
+  return state;
 }
 
-function getInventoryStatusForProductAndSize(product: Product, size: string, stockMap: Map<string, number>): ProductInventoryStatus {
-  const requirements = getInventoryRequirementsForProduct(product.id, size);
+function getDisplayStock(product: Product, inventoryState: InventoryState) {
+  const baseProducts = getBaseInventoryProductsForProduct(product.id);
 
-  if (!requirements.length) {
+  if (baseProducts.length === 0) {
+    return null;
+  }
+
+  if (baseProducts.length === 1) {
+    return inventoryState[baseProducts[0]].totalStock;
+  }
+
+  return Math.min(...baseProducts.map((productId) => inventoryState[productId].totalStock));
+}
+
+function createInventoryStatus(product: Product, inventoryState: InventoryState): ProductInventoryStatus {
+  const stock = getDisplayStock(product, inventoryState);
+
+  if (stock === null) {
     return {
       stock: null,
       isOutOfStock: false,
@@ -180,48 +164,37 @@ function getInventoryStatusForProductAndSize(product: Product, size: string, sto
     };
   }
 
-  const availableStock = requirements.reduce<number | null>((lowest, requirement) => {
-    const inventoryStock = getStockForRequirement(requirement, stockMap);
-    const units = Math.floor(inventoryStock / requirement.quantity);
-
-    return lowest === null ? units : Math.min(lowest, units);
-  }, null);
-
-  const stock = availableStock ?? 0;
-
   if (stock <= 0) {
     return {
       stock: 0,
       isOutOfStock: true,
-      message: `${normalizeSize(size)} sold out`
+      message: product.id === "apertos-the-original-no-gi-set" ? "No sets available" : "Out of stock"
     };
   }
 
   return {
     stock,
     isOutOfStock: false,
-    message: `${stock} left in ${normalizeSize(size)}`
+    message:
+      product.id === "apertos-the-original-no-gi-set" ? `${stock} sets available` : `${stock} available now`
   };
 }
 
-function getInventoryBySizeForProduct(product: Product, stockMap: Map<string, number>): ProductInventoryBySize {
-  return Object.fromEntries(
-    product.sizes.map((size) => [size, getInventoryStatusForProductAndSize(product, size, stockMap)])
-  );
+function createInventoryBySize(product: Product, inventoryState: InventoryState): ProductInventoryBySize {
+  const status = createInventoryStatus(product, inventoryState);
+  return Object.fromEntries(product.sizes.map((size) => [size, status]));
 }
 
 export async function assertInventoryAvailable(items: OrderItem[]) {
-  const requirements = aggregateInventoryRequirements(items);
-  const rows = await fetchInventoryRows(
-    [...new Set(items.flatMap((item) => getBaseInventoryProductsForProduct(item.productId)))]
-  );
-  const stockMap = createInventoryMap(rows);
+  const requirements = getBaseInventoryRequirements(items);
+  const rows = await fetchInventoryRows([...requirements.keys()]);
+  const inventoryState = createInventoryState(rows);
 
-  for (const requirement of requirements.values()) {
-    const availableStock = getStockForRequirement(requirement, stockMap);
+  for (const [productId, quantity] of requirements.entries()) {
+    const availableStock = inventoryState[productId].totalStock;
 
-    if (availableStock < requirement.quantity) {
-      throw new Error(`Not enough ${requirement.productId} stock is available in ${requirement.size} right now.`);
+    if (availableStock < quantity) {
+      throw new Error(`Not enough ${productId} stock is available right now.`);
     }
   }
 }
@@ -231,18 +204,21 @@ export async function decrementInventoryForOrder(order: OrderRecord) {
     return;
   }
 
-  const requirements = aggregateInventoryRequirements(order.parsedItemsPayload.items);
+  const requirements = getBaseInventoryRequirements(order.parsedItemsPayload.items);
 
   if (requirements.size === 0) {
     await markInventoryAdjustedForOrder(order.stripeCheckoutSessionId);
     return;
   }
 
-  const rows = await fetchInventoryRows([...new Set([...requirements.values()].map((item) => item.productId))]);
-  const stockMap = createInventoryMap(rows);
-  const existingKeys = new Set(
-    rows.filter((row) => row.size).map((row) => makeInventoryKey(row.product_id, row.size as string))
-  );
+  const rows = await fetchInventoryRows([...requirements.keys()]);
+  const inventoryState = createInventoryState(rows);
+
+  for (const [productId, quantity] of requirements.entries()) {
+    if (inventoryState[productId].totalStock < quantity) {
+      throw new Error(`Inventory for ${productId} is too low to fulfill this order.`);
+    }
+  }
 
   if (!hasSupabaseAdminEnv) {
     await markInventoryAdjustedForOrder(order.stripeCheckoutSessionId);
@@ -251,35 +227,31 @@ export async function decrementInventoryForOrder(order: OrderRecord) {
 
   const supabase = createAdminClient();
 
-  for (const requirement of requirements.values()) {
-    const availableStock = getStockForRequirement(requirement, stockMap);
+  for (const [productId, quantity] of requirements.entries()) {
+    const currentStock = inventoryState[productId].totalStock;
+    const nextStock = Math.max(currentStock - quantity, 0);
 
-    if (availableStock < requirement.quantity) {
-      throw new Error(`Inventory for ${requirement.productId} ${requirement.size} is too low to fulfill this order.`);
-    }
-  }
-
-  for (const requirement of requirements.values()) {
-    const key = makeInventoryKey(requirement.productId, requirement.size);
-    const currentStock = getStockForRequirement(requirement, stockMap);
-    const nextStock = currentStock - requirement.quantity;
-
-    if (existingKeys.has(key)) {
+    if (inventoryState[productId].hasBaseRow) {
       const { error } = await supabase
         .from("inventory")
         .update({ stock: nextStock })
-        .eq("product_id", requirement.productId)
-        .eq("size", requirement.size);
+        .eq("product_id", productId)
+        .is("size", null);
 
       if (error) {
         throw new Error(error.message);
       }
     } else {
-      const { error } = await supabase.from("inventory").insert({
-        product_id: requirement.productId,
-        size: requirement.size,
-        stock: nextStock
-      });
+      const { error } = await supabase.from("inventory").upsert(
+        {
+          product_id: productId,
+          stock: nextStock,
+          size: null
+        },
+        {
+          onConflict: "product_id,size"
+        }
+      );
 
       if (error) {
         throw new Error(error.message);
@@ -298,10 +270,10 @@ export async function getProductWithInventoryStatus(productId: string) {
   }
 
   const rows = await fetchInventoryRows(getBaseInventoryProductsForProduct(product.id));
-  const stockMap = createInventoryMap(rows);
+  const inventoryState = createInventoryState(rows);
 
   return {
     product,
-    inventoryBySize: getInventoryBySizeForProduct(product, stockMap)
+    inventoryBySize: createInventoryBySize(product, inventoryState)
   };
 }

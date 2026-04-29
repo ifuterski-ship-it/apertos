@@ -1,9 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Product, SizeGuideBlock } from "@/lib/products";
 import { ProductInventoryBySize } from "@/lib/inventory";
+import { trackEvent } from "@/lib/analytics";
 import { useCart } from "@/components/cart/cart-provider";
 import { hasStripeClientEnv } from "@/lib/stripe";
 
@@ -53,6 +54,7 @@ export function ProductDetail({
   const [checkoutMessage, setCheckoutMessage] = useState<string | null>(null);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const { addItem } = useCart();
+  const hasTrackedProductView = useRef(false);
   const selectedInventory = inventoryBySize[selectedSize] ?? {
     stock: null,
     isOutOfStock: false,
@@ -70,12 +72,47 @@ export function ProductDetail({
     }
   }, [firstAvailableSize, inventoryBySize, selectedSize]);
 
+  useEffect(() => {
+    if (hasTrackedProductView.current) {
+      return;
+    }
+
+    trackEvent("view_item", {
+      currency: "GBP",
+      value: product.price,
+      items: [
+        {
+          item_id: product.id,
+          item_name: product.name,
+          item_category: product.category,
+          price: product.price
+        }
+      ]
+    });
+
+    hasTrackedProductView.current = true;
+  }, [product.category, product.id, product.name, product.price]);
+
   const handleAddToCart = () => {
     if (isOutOfStock) {
       return;
     }
 
     addItem(product, selectedSize);
+    trackEvent("add_to_cart", {
+      currency: "GBP",
+      value: product.price,
+      items: [
+        {
+          item_id: product.id,
+          item_name: product.name,
+          item_category: product.category,
+          item_variant: selectedSize,
+          price: product.price,
+          quantity: 1
+        }
+      ]
+    });
     setAdded(true);
 
     window.setTimeout(() => {
