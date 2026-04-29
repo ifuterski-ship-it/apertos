@@ -6,6 +6,7 @@ import { Heart, Menu, ShoppingBag, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import type { User } from "@supabase/supabase-js";
 import { useCart } from "@/components/cart/cart-provider";
+import { NewsletterSignup } from "@/components/marketing/newsletter-signup";
 import { useWishlist } from "@/components/wishlist/wishlist-provider";
 import { hasSupabaseEnv } from "@/lib/supabase/config";
 import { createClient } from "@/lib/supabase/client";
@@ -167,12 +168,15 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
         ) : null}
       </header>
       <main className="mx-auto w-full max-w-7xl px-4 pt-10 sm:px-6 lg:px-8">{children}</main>
-      <footer className="mx-auto mt-8 flex w-full max-w-7xl flex-col gap-5 border-t border-white/10 px-4 py-8 text-xs uppercase tracking-[0.28em] text-neutral-400 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
-        <div className="flex items-center gap-4">
-          <div className="relative h-10 w-10 overflow-hidden rounded-full border border-white/10 bg-black">
-            <Image src="/logo-mark.png" alt="Apertos logo" fill sizes="40px" className="object-cover opacity-70" />
+      <footer className="mx-auto mt-8 flex w-full max-w-7xl flex-col gap-8 border-t border-white/10 px-4 py-8 text-xs uppercase tracking-[0.28em] text-neutral-400 sm:px-6 lg:flex-row lg:items-end lg:justify-between lg:px-8">
+        <div className="space-y-5">
+          <div className="flex items-center gap-4">
+            <div className="relative h-10 w-10 overflow-hidden rounded-full border border-white/10 bg-black">
+              <Image src="/logo-mark.png" alt="Apertos logo" fill sizes="40px" className="object-cover opacity-70" />
+            </div>
+            <span>Premium Combat Sports</span>
           </div>
-          <span>Premium Combat Sports</span>
+          <NewsletterSignup />
         </div>
         <div className="flex flex-col gap-3 text-left lg:items-end lg:text-right">
           <a

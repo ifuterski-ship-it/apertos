@@ -106,3 +106,28 @@ export function renderShippingNotificationEmail({
     footer: "Apertos Fightwear"
   });
 }
+
+export function renderNewsletterWelcomeEmail(email: string) {
+  return renderEmailShell({
+    eyebrow: siteName,
+    title: "Subscribed To Apertos News",
+    body: `
+      <p style="margin:0 0 18px">${email} is now on the APERTOS news list.</p>
+      <p style="margin:0 0 18px">You’ll hear first about product drops, no-gi releases, and future training-focused updates.</p>
+      <p style="margin:0">Expect clean, occasional emails only when there is something worth opening.</p>
+    `,
+    footer: "Apertos Fightwear"
+  });
+}
+
+export function renderNewsletterInternalEmail(email: string) {
+  return renderEmailShell({
+    eyebrow: siteName,
+    title: "New News Subscriber",
+    body: `
+      <p style="margin:0 0 18px">A new APERTOS news signup has been captured.</p>
+      <p style="margin:0">${email}</p>
+    `,
+    footer: "Apertos Fightwear"
+  });
+}
