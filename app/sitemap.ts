@@ -3,7 +3,14 @@ import { products } from "@/lib/products";
 import { absoluteUrl } from "@/lib/site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const staticPages = ["/", "/shop", "/contact", "/blogs/what-is-a-bjj-rash-guard"];
+  const staticPages = [
+    "/",
+    "/shop",
+    "/contact",
+    "/blogs/what-is-a-bjj-rash-guard",
+    "/blogs/what-are-mma-shorts",
+    "/blogs/what-is-a-no-gi-set"
+  ];
   const productPages = products.map((product) => `/product/${product.id}`);
 
   return [...staticPages, ...productPages].map((path) => ({

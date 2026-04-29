@@ -5,7 +5,7 @@ import { GoogleAnalytics } from "@/components/analytics/google-analytics";
 import { CartProvider } from "@/components/cart/cart-provider";
 import { SiteShell } from "@/components/layout/site-shell";
 import { WishlistProvider } from "@/components/wishlist/wishlist-provider";
-import { absoluteUrl, siteDescription, siteName, siteUrl } from "@/lib/site";
+import { absoluteUrl, siteDescription, siteKeywords, siteLogoPath, siteName, siteUrl } from "@/lib/site";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -14,7 +14,17 @@ export const metadata: Metadata = {
     template: `%s | ${siteName}`
   },
   description: siteDescription,
+  keywords: siteKeywords,
   applicationName: siteName,
+  category: "Sports Apparel",
+  icons: {
+    icon: [
+      { url: siteLogoPath, sizes: "32x32", type: "image/png" },
+      { url: siteLogoPath, sizes: "192x192", type: "image/png" }
+    ],
+    apple: [{ url: siteLogoPath, sizes: "180x180", type: "image/png" }],
+    shortcut: [siteLogoPath]
+  },
   alternates: {
     canonical: absoluteUrl("/")
   },
@@ -27,7 +37,7 @@ export const metadata: Metadata = {
     description: siteDescription,
     images: [
       {
-        url: absoluteUrl("/logo-mark.png"),
+        url: absoluteUrl(siteLogoPath),
         width: 1200,
         height: 1200,
         alt: `${siteName} logo`
@@ -38,7 +48,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: siteName,
     description: siteDescription,
-    images: [absoluteUrl("/logo-mark.png")]
+    images: [absoluteUrl(siteLogoPath)]
   }
 };
 

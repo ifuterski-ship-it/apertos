@@ -4,15 +4,16 @@ import Link from "next/link";
 import { ProductGrid } from "@/components/products/product-grid";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { getFeaturedProducts } from "@/lib/products";
-import { absoluteUrl } from "@/lib/site";
+import { absoluteUrl, siteKeywords } from "@/lib/site";
 
-const homepageTitle = "Apertos Fightwear | Premium BJJ & MMA Gear — Rash Guards, Shorts & No-Gi Sets";
+const homepageTitle = "Apertos Fightwear | Premium BJJ & MMA Gear - Rash Guards, Shorts & No-Gi Sets";
 const homepageDescription =
   "Premium BJJ and MMA fightwear built for hard training, with rash guards, shorts, and no-gi sets engineered for performance.";
 
 export const metadata: Metadata = {
   title: homepageTitle,
   description: homepageDescription,
+  keywords: siteKeywords,
   alternates: {
     canonical: absoluteUrl("/")
   },
@@ -44,8 +45,16 @@ export default function HomePage() {
     "@type": "Organization",
     name: "Apertos Fightwear",
     url: "https://apertosfightwear.com",
+    logo: absoluteUrl("/logo-mark.png"),
     email: "info@apertosfightwear.com",
-    sameAs: ["https://instagram.com/apertos.fightwear"]
+    sameAs: ["https://instagram.com/apertos.fightwear", "https://www.tiktok.com/@apertos.fightwear"]
+  };
+  const websiteSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "Apertos Fightwear",
+    url: "https://apertosfightwear.com",
+    description: homepageDescription
   };
 
   return (
@@ -53,6 +62,10 @@ export default function HomePage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
       />
       <section className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-panel/70 px-6 py-20 shadow-luxe md:px-10 md:py-28">
         <div className="absolute inset-0 bg-grain opacity-80" />
@@ -106,9 +119,33 @@ export default function HomePage() {
         <SectionHeading
           eyebrow="Featured"
           title="The Original Collection"
-          description="Three APERTOS staples designed to keep the storefront clean, focused, and ready to ship."
+          description="Premium BJJ rash guards, MMA shorts and no-gi sets designed to keep the storefront clean, focused, and ready to ship."
         />
         <ProductGrid products={featuredProducts} />
+      </section>
+
+      <section className="grid gap-8 lg:grid-cols-3">
+        <div className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-8">
+          <p className="text-xs uppercase tracking-[0.45em] text-muted">Rash Guards</p>
+          <h2 className="mt-4 font-display text-3xl uppercase tracking-[0.08em]">BJJ Rash Guards Built For Live Rounds</h2>
+          <p className="mt-4 text-sm uppercase leading-7 tracking-[0.18em] text-neutral-300">
+            Apertos rash guards are made for no-gi grappling, fast scrambles, hard drilling, and durable everyday mat use.
+          </p>
+        </div>
+        <div className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-8">
+          <p className="text-xs uppercase tracking-[0.45em] text-muted">MMA Shorts</p>
+          <h2 className="mt-4 font-display text-3xl uppercase tracking-[0.08em]">MMA Shorts For Grappling And Striking</h2>
+          <p className="mt-4 text-sm uppercase leading-7 tracking-[0.18em] text-neutral-300">
+            Apertos MMA shorts are cut for movement, training comfort, and a clean fightwear silhouette through every session.
+          </p>
+        </div>
+        <div className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-8">
+          <p className="text-xs uppercase tracking-[0.45em] text-muted">No-Gi Sets</p>
+          <h2 className="mt-4 font-display text-3xl uppercase tracking-[0.08em]">No-Gi Sets That Stay Sharp Under Pressure</h2>
+          <p className="mt-4 text-sm uppercase leading-7 tracking-[0.18em] text-neutral-300">
+            The original Apertos no-gi set pairs a premium rash guard with matching shorts for a refined BJJ and MMA look.
+          </p>
+        </div>
       </section>
 
       <section className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr]">

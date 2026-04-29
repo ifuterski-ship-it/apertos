@@ -22,12 +22,31 @@ export async function generateMetadata({
   }
 
   const { product } = productWithInventory;
+  const keywordDescriptionByProductId: Record<string, string> = {
+    "apertos-the-original-rashguard":
+      "Shop the Apertos Fightwear BJJ rash guard built for no-gi grappling, hard drilling and premium compression-style performance.",
+    "apertos-the-original-shorts":
+      "Shop Apertos Fightwear MMA shorts made for grappling, sparring and high-movement combat sports training.",
+    "apertos-the-original-no-gi-set":
+      "Shop the Apertos Fightwear no-gi set with matching rash guard and shorts for BJJ, grappling and MMA training."
+  };
   const title = `${product.name} | Apertos Fightwear`;
-  const description = `${product.name} in performance fightwear fabric for BJJ and MMA training. Available in GBP with UK shipping from Apertos Fightwear.`;
+  const description =
+    keywordDescriptionByProductId[product.id] ??
+    `${product.name} in performance fightwear fabric for BJJ and MMA training. Available in GBP with UK shipping from Apertos Fightwear.`;
 
   return {
     title,
     description,
+    keywords: [
+      product.name,
+      product.id.includes("rashguard") ? "BJJ rash guard" : null,
+      product.id.includes("shorts") ? "MMA shorts" : null,
+      product.id.includes("no-gi-set") ? "no-gi set" : null,
+      "Apertos Fightwear",
+      "BJJ",
+      "MMA"
+    ].filter((value): value is string => Boolean(value)),
     alternates: {
       canonical: absoluteUrl(`/product/${product.id}`)
     },
