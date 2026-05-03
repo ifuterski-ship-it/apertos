@@ -6,7 +6,7 @@ import { SectionHeading } from "@/components/ui/section-heading";
 import { getFeaturedProducts } from "@/lib/products";
 import { absoluteUrl, siteKeywords } from "@/lib/site";
 
-const homepageTitle = "Apertos Fightwear | Premium BJJ & MMA Gear - Rash Guards, Shorts & No-Gi Sets";
+const homepageTitle = "Apertos Fightwear | Premium BJJ & MMA Gear";
 const homepageDescription =
   "Premium BJJ and MMA fightwear built for hard training, with rash guards, shorts, and no-gi sets engineered for performance.";
 

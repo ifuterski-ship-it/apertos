@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { hasSupabaseEnv } from "@/lib/supabase/config";
 import { getOrderForAdmin, saveShippingLabelForOrder } from "@/lib/orders";
 import { isAdminEmail } from "@/lib/admin-auth";
-import { purchaseCheapestLabel } from "@/lib/shippo";
+import { purchaseCheapestLabel } from "@/lib/easypost";
 
 export const runtime = "nodejs";
 
