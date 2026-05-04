@@ -83,6 +83,12 @@ export function ProductDetail({
     selectedInventory.stock !== null &&
     selectedInventory.stock > 0 &&
     selectedInventory.stock <= 5;
+  const categoryTaglines: Record<string, string> = {
+    "Performance Top": "Compression-style BJJ rash guard built for no-gi drilling, mat durability and clean performance fit.",
+    "Training Bottoms": "Lightweight MMA shorts made for grappling movement, sparring comfort and everyday combat sports training.",
+    "Bundle": "Matching no-gi set pairing a premium rash guard with shorts for a complete combat sports look."
+  };
+  const categoryTagline = categoryTaglines[product.category];
   const firstAvailableSize = useMemo(
     () => product.sizes.find((size) => !inventoryBySize[size]?.isOutOfStock) ?? product.sizes[0],
     [inventoryBySize, product.sizes]
@@ -209,6 +215,13 @@ export function ProductDetail({
                     {reviewSummary.average.toFixed(1)} ({reviewSummary.count} {reviewSummary.count === 1 ? "review" : "reviews"})
                   </p>
                 </div>
+              ) : null}
+
+              {/* Category tagline */}
+              {categoryTagline ? (
+                <p className="text-[13px] uppercase leading-6 tracking-[0.22em] text-neutral-400">
+                  {categoryTagline}
+                </p>
               ) : null}
 
               <p className="text-2xl font-semibold">{product.priceLabel}</p>

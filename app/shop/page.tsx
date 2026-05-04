@@ -127,10 +127,6 @@ export default function ShopPage() {
         <h1 className="mt-4 font-display text-4xl uppercase tracking-[0.08em] md:text-6xl">
           The Apertos Collection
         </h1>
-        <p className="mt-4 max-w-3xl text-sm uppercase leading-7 tracking-[0.2em] text-neutral-300">
-          Shop Apertos Fightwear BJJ rash guards, MMA shorts and no-gi sets designed for
-          grappling, judo, striking and high-output combat sports training.
-        </p>
       </div>
 
       {/* Category cards */}
