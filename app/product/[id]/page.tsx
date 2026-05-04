@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ProductDetail } from "@/components/products/product-detail";
+import { ProductReviews } from "@/components/products/product-reviews";
 import { getProductWithInventoryStatus } from "@/lib/inventory";
 import { products } from "@/lib/products";
+import { createAdminClient, hasSupabaseAdminEnv } from "@/lib/supabase/admin";
 import { absoluteUrl } from "@/lib/site";
 
 export function generateStaticParams() {
@@ -82,6 +84,21 @@ export default async function ProductPage({
     notFound();
   }
 
+  let reviewSummary: { average: number; count: number } | null = null;
+  if (hasSupabaseAdminEnv) {
+    const supabase = createAdminClient();
+    const { data: reviewRows } = await supabase
+      .from("reviews")
+      .select("rating")
+      .eq("product_id", id);
+    if (reviewRows && reviewRows.length > 0) {
+      reviewSummary = {
+        count: reviewRows.length,
+        average: reviewRows.reduce((sum: number, r: { rating: number }) => sum + r.rating, 0) / reviewRows.length
+      };
+    }
+  }
+
   const stockBySize = productWithInventory.inventoryBySize;
   const aggregateStock = Math.max(
     ...Object.values(stockBySize)
@@ -156,7 +173,15 @@ export default async function ProductPage({
       <ProductDetail
         product={productWithInventory.product}
         inventoryBySize={productWithInventory.inventoryBySize}
+        reviewSummary={reviewSummary}
       />
+      <div className="mx-auto max-w-2xl pb-24 pt-4">
+        <ProductReviews
+          productId={id}
+          initialAverage={reviewSummary?.average ?? null}
+          initialCount={reviewSummary?.count ?? 0}
+        />
+      </div>
     </>
   );
 }

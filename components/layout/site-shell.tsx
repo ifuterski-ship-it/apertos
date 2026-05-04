@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils";
 const navLinks = [
   { href: "/", label: "Home" },
   { href: "/shop", label: "Shop" },
+  { href: "/about", label: "About" },
   { href: "/wishlist", label: "Wishlist" },
   { href: "/cart", label: "Cart" },
   { href: "/contact", label: "Contact" }
@@ -167,6 +168,19 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
           </div>
         ) : null}
       </header>
+      <div className="border-b border-white/10 bg-white/[0.02] py-2.5">
+        <div className="mx-auto flex w-full max-w-7xl items-center justify-center px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1 text-[10px] uppercase tracking-[0.35em] text-neutral-400">
+            <span>Free UK Shipping Over £40</span>
+            <span className="hidden text-white/20 sm:inline">·</span>
+            <span className="hidden sm:inline">Secure Checkout</span>
+            <span className="hidden text-white/20 sm:inline">·</span>
+            <span className="hidden sm:inline">Easy Returns</span>
+            <span className="hidden text-white/20 sm:inline">·</span>
+            <span className="hidden sm:inline">UK-Based Brand</span>
+          </div>
+        </div>
+      </div>
       <main className="mx-auto w-full max-w-7xl px-4 pt-10 sm:px-6 lg:px-8">{children}</main>
       <footer className="mx-auto mt-8 flex w-full max-w-7xl flex-col gap-8 border-t border-white/10 px-4 py-8 text-xs uppercase tracking-[0.28em] text-neutral-400 sm:px-6 lg:flex-row lg:items-end lg:justify-between lg:px-8">
         <div className="space-y-5">

@@ -118,6 +118,9 @@ export default function HomePage() {
               fightwear built to stay composed through hard rounds, live scrambles, and repeat sessions on the mat.
             </p>
           </div>
+          <p className="text-[11px] uppercase tracking-[0.35em] text-neutral-500">
+            Trusted by grapplers across the UK
+          </p>
           <Link
             href="/shop"
             className="inline-flex items-center border border-white px-6 py-3 text-sm font-semibold uppercase tracking-[0.35em] transition hover:bg-white hover:text-black"
@@ -243,6 +246,35 @@ export default function HomePage() {
             className="object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/10 to-transparent" />
+        </div>
+      </section>
+
+      <section className="rounded-[2rem] border border-white/10 bg-white/[0.03] px-6 py-16 text-center md:px-12">
+        <p className="text-xs uppercase tracking-[0.5em] text-muted">Follow Us</p>
+        <h2 className="mt-4 font-display text-4xl uppercase tracking-[0.08em] md:text-5xl">
+          Follow Us On The Mat
+        </h2>
+        <p className="mx-auto mt-4 max-w-xl text-sm uppercase leading-7 tracking-[0.2em] text-neutral-300">
+          See how athletes are training in Apertos gear. Follow us on TikTok for behind-the-scenes, training clips, and
+          new drops.
+        </p>
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+          <a
+            href="https://www.tiktok.com/@apertos.fightwear"
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center border border-white px-6 py-3 text-sm font-semibold uppercase tracking-[0.35em] transition hover:bg-white hover:text-black"
+          >
+            TikTok @apertos.fightwear
+          </a>
+          <a
+            href="https://instagram.com/apertos.fightwear"
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center border border-white/20 px-6 py-3 text-sm uppercase tracking-[0.35em] transition hover:border-white hover:text-white"
+          >
+            Instagram @apertos.fightwear
+          </a>
         </div>
       </section>
     </div>

@@ -13,6 +13,11 @@ export function ProductCard({ product }: { product: Product }) {
   return (
     <div className="group overflow-hidden rounded-[1.75rem] border border-white/10 bg-white/[0.03] transition duration-500 hover:-translate-y-1 hover:border-white/20 hover:bg-white/[0.05]">
       <div className="relative">
+        {product.isBestSeller ? (
+          <div className="absolute left-4 top-4 z-10 bg-white px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.3em] text-black">
+            Best Seller
+          </div>
+        ) : null}
         <button
           type="button"
           onClick={() => toggle(product.id)}

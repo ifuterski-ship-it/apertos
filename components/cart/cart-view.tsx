@@ -167,6 +167,33 @@ export function CartView() {
             <h2 className="mt-3 font-display text-3xl uppercase tracking-[0.08em]">Cart Total</h2>
           </div>
 
+          {(() => {
+            const FREE_SHIPPING_THRESHOLD = 40;
+            const remaining = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotalAmount);
+            const progress = Math.min(100, (subtotalAmount / FREE_SHIPPING_THRESHOLD) * 100);
+            return (
+              <div className="space-y-2 rounded-xl border border-white/10 bg-white/[0.02] p-4">
+                {remaining > 0 ? (
+                  <p className="text-[11px] uppercase tracking-[0.3em] text-neutral-400">
+                    {"You're "}
+                    <span className="text-white">£{remaining.toFixed(2)}</span>
+                    {" away from free UK shipping"}
+                  </p>
+                ) : (
+                  <p className="text-[11px] uppercase tracking-[0.3em] text-emerald-400">
+                    Free UK shipping unlocked
+                  </p>
+                )}
+                <div className="h-1 overflow-hidden rounded-full bg-white/10">
+                  <div
+                    className="h-full rounded-full bg-white transition-all duration-500"
+                    style={{ width: `${progress}%` }}
+                  />
+                </div>
+              </div>
+            );
+          })()}
+
           <div className="space-y-3 border-y border-white/10 py-5 text-sm uppercase tracking-[0.2em]">
             <div className="flex items-center justify-between text-neutral-300">
               <span>Subtotal</span>

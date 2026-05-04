@@ -24,6 +24,9 @@ export type Product = {
   description: string;
   shippingWeightLb: number;
   sizeGuides: SizeGuideBlock[];
+  material?: string;
+  careInstructions?: string;
+  isBestSeller?: boolean;
 };
 
 export const products: Product[] = [
@@ -40,6 +43,8 @@ export const products: Product[] = [
     shippingWeightLb: 0.45,
     description:
       "A premium rashguard built for hard sessions, clean movement, and a sharp monochrome APERTOS finish.",
+    material: "85% Polyester, 15% Spandex — 4-way stretch, moisture-wicking performance fabric",
+    careInstructions: "Machine wash cold 30°C · Do not tumble dry · Hang dry · Do not iron print",
     sizeGuides: [
       {
         title: "Rashguard Size Guide",
@@ -67,6 +72,8 @@ export const products: Product[] = [
     shippingWeightLb: 0.55,
     description:
       "Clean, flexible shorts created for grappling and striking with a streamlined APERTOS silhouette.",
+    material: "85% Polyester, 15% Spandex — lightweight 4-way stretch, quick-dry",
+    careInstructions: "Machine wash cold 30°C · Do not tumble dry · Hang dry",
     sizeGuides: [
       {
         title: "Shorts Size Guide",
@@ -99,6 +106,9 @@ export const products: Product[] = [
     shippingWeightLb: 1,
     description:
       "A value-driven no gi set pairing the original rashguard and shorts in one refined combat-sports package.",
+    material: "85% Polyester, 15% Spandex — 4-way stretch, moisture-wicking performance fabric",
+    careInstructions: "Machine wash cold 30°C · Do not tumble dry · Hang dry · Do not iron print",
+    isBestSeller: true,
     sizeGuides: [
       {
         title: "Rashguard Size Guide",
