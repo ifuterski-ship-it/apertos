@@ -17,6 +17,9 @@ export const metadata: Metadata = {
   keywords: siteKeywords,
   applicationName: siteName,
   category: "Sports Apparel",
+  verification: {
+    google: "PLACEHOLDER_VERIFICATION_CODE"
+  },
   icons: {
     icon: [
       { url: siteLogoPath, sizes: "32x32", type: "image/png" },

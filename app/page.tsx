@@ -6,9 +6,9 @@ import { SectionHeading } from "@/components/ui/section-heading";
 import { getFeaturedProducts } from "@/lib/products";
 import { absoluteUrl, siteKeywords } from "@/lib/site";
 
-const homepageTitle = "Apertos Fightwear | Premium BJJ & MMA Gear";
+const homepageTitle = "Apertos Fightwear | BJJ Rash Guards, MMA Shorts & No-Gi Sets";
 const homepageDescription =
-  "Shop Apertos Fightwear — premium BJJ rash guards, MMA shorts and no-gi sets built for grappling, judo and high-output combat sports training. UK-based fightwear brand.";
+  "Apertos Fightwear makes compression-style BJJ rash guards, lightweight MMA shorts, and matching no-gi sets built for grappling, striking, and high-output training.";
 const homepageKeywords = [
   ...siteKeywords,
   "bjj rash guard",
@@ -48,43 +48,96 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: homepageTitle,
-    description: homepageDescription,
+    description:
+      "Premium fightwear designed for grapplers, strikers, and combat sports athletes. Shop rash guards, MMA shorts, and no-gi sets at apertosfightwear.com",
     url: absoluteUrl("/"),
     type: "website",
+    siteName: "Apertos Fightwear",
+    locale: "en_GB",
     images: [
       {
         url: absoluteUrl("/products/nogi-lifestyle.jpeg"),
         width: 1200,
         height: 1800,
-        alt: "Apertos Fightwear no-gi set"
+        alt: "Apertos Fightwear no-gi set — rash guard and shorts"
       }
     ]
   },
   twitter: {
     card: "summary_large_image",
-    title: homepageTitle,
-    description: homepageDescription,
+    title: "Apertos Fightwear | BJJ & MMA Gear",
+    description: "Compression rash guards, MMA shorts, and no-gi sets built for high-output training.",
     images: [absoluteUrl("/products/nogi-lifestyle.jpeg")]
   }
 };
 
+const faqItems = [
+  {
+    question: "What Is Apertos Fightwear?",
+    answer:
+      "Apertos Fightwear is a premium combat sports brand offering BJJ rash guards, MMA fight shorts, and matching no-gi sets. All products are engineered for high-output grappling and striking training."
+  },
+  {
+    question: "What Sports Is Apertos Gear Designed For?",
+    answer:
+      "Apertos gear is designed for Brazilian Jiu-Jitsu (BJJ), MMA, no-gi grappling, Muay Thai cross-training, and general combat sports conditioning."
+  },
+  {
+    question: "What Sizes Do You Stock?",
+    answer:
+      "Apertos Fightwear is available in sizes XS through 3XL across all product categories. Size charts are available on each product page."
+  },
+  {
+    question: "How Do I Care For Apertos Rash Guards And Shorts?",
+    answer:
+      "Machine wash cold with similar colours. Turn inside out before washing. Tumble dry low or hang to dry. Do not use bleach or fabric softener."
+  },
+  {
+    question: "Do You Ship Internationally?",
+    answer:
+      "Yes. Apertos Fightwear ships worldwide. Delivery times and shipping rates are calculated at checkout based on your location."
+  }
+];
+
 export default function HomePage() {
   const featuredProducts = getFeaturedProducts();
+
   const organizationSchema = {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: "Apertos Fightwear",
     url: "https://apertosfightwear.com",
+    description:
+      "Premium BJJ rash guards, MMA shorts, and no-gi sets engineered for grapplers, strikers, and high-output combat sports athletes.",
     logo: absoluteUrl("/logo-mark.png"),
     email: "info@apertosfightwear.com",
     sameAs: ["https://instagram.com/apertos.fightwear", "https://www.tiktok.com/@apertos.fightwear"]
   };
+
   const websiteSchema = {
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: "Apertos Fightwear",
     url: "https://apertosfightwear.com",
-    description: homepageDescription
+    description: homepageDescription,
+    potentialAction: {
+      "@type": "SearchAction",
+      target: "https://apertosfightwear.com/shop?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  };
+
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqItems.map((item) => ({
+      "@type": "Question",
+      name: item.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: item.answer
+      }
+    }))
   };
 
   return (
@@ -97,6 +150,12 @@ export default function HomePage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
       />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
+
+      {/* Hero */}
       <section className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-panel/70 px-6 py-20 shadow-luxe md:px-10 md:py-28">
         <div className="absolute inset-0 bg-grain opacity-80" />
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/60 to-transparent" />
@@ -106,16 +165,23 @@ export default function HomePage() {
         <div className="relative mx-auto flex max-w-4xl animate-float-in flex-col items-center space-y-8 text-center">
           <div className="space-y-5">
             <div className="mx-auto relative h-24 w-24 overflow-hidden rounded-full border border-white/10 bg-black shadow-luxe">
-              <Image src="/logo-mark.png" alt="Apertos logo" fill sizes="96px" className="object-cover opacity-90" />
+              <Image
+                src="/logo-mark.png"
+                alt="Apertos Fightwear logo"
+                fill
+                sizes="96px"
+                className="object-cover opacity-90"
+              />
             </div>
             <p className="text-sm uppercase tracking-[0.5em] text-muted">Premium Combat Sports</p>
             <h1 className="font-display text-5xl uppercase leading-none tracking-[0.08em] md:text-7xl">
-              Engineered For Dominance
+              Apertos Fightwear — BJJ &amp; MMA Gear Built For High-Output Training
             </h1>
             <p className="mx-auto max-w-3xl text-sm uppercase leading-7 tracking-[0.2em] text-neutral-300">
-              Apertos Fightwear is a premium combat sports brand creating rash guards, shorts, and no-gi sets for BJJ
-              and MMA athletes who demand sharp fit, durable performance fabrics, dependable stretch, and clean
-              fightwear built to stay composed through hard rounds, live scrambles, and repeat sessions on the mat.
+              Apertos Fightwear is a premium combat sports brand offering compression-style BJJ rash
+              guards, lightweight MMA fight shorts, and matching no-gi sets. Every piece is engineered
+              for mat durability, full range of motion, and clean performance fit — built for grapplers,
+              strikers, and athletes who train seriously.
             </p>
           </div>
           <p className="text-[11px] uppercase tracking-[0.35em] text-neutral-500">
@@ -130,6 +196,7 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Discipline */}
       <section className="grid gap-8 lg:grid-cols-[1.4fr_1fr]">
         <div className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-8 md:p-12">
           <SectionHeading
@@ -148,6 +215,7 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Featured products */}
       <section className="space-y-8">
         <SectionHeading
           eyebrow="Featured"
@@ -157,35 +225,91 @@ export default function HomePage() {
         <ProductGrid products={featuredProducts} />
       </section>
 
+      {/* Category cards */}
       <section className="grid gap-8 lg:grid-cols-3">
         <div className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-8">
           <p className="text-xs uppercase tracking-[0.45em] text-muted">Rash Guards</p>
           <h2 className="mt-4 font-display text-3xl uppercase tracking-[0.08em]">BJJ Rash Guards Built For Live Rounds</h2>
           <p className="mt-4 text-sm uppercase leading-7 tracking-[0.18em] text-neutral-300">
-            Apertos rash guards are made for no-gi grappling, fast scrambles, hard drilling, and durable everyday mat use.
+            Compression-style BJJ rash guards built for no-gi drilling, mat durability and clean
+            performance fit. Engineered with four-way stretch fabric and reinforced flatlock stitching
+            to withstand daily training.
           </p>
+          <ul className="mt-4 space-y-2">
+            {[
+              "Short sleeve and long sleeve options",
+              "Moisture-wicking, quick-dry performance fabric",
+              "Sublimated design — never fades, cracks or peels",
+              "Sized XS to 3XL"
+            ].map((feature) => (
+              <li
+                key={feature}
+                className="flex items-start gap-2.5 text-xs uppercase leading-6 tracking-[0.15em] text-neutral-500"
+              >
+                <span className="mt-[9px] h-1 w-1 shrink-0 rounded-full bg-white/30" />
+                {feature}
+              </li>
+            ))}
+          </ul>
         </div>
         <div className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-8">
           <p className="text-xs uppercase tracking-[0.45em] text-muted">MMA Shorts</p>
           <h2 className="mt-4 font-display text-3xl uppercase tracking-[0.08em]">MMA Shorts For Grappling And Striking</h2>
           <p className="mt-4 text-sm uppercase leading-7 tracking-[0.18em] text-neutral-300">
-            Apertos MMA shorts are cut for movement, training comfort, and a clean fightwear silhouette through every session.
+            Lightweight MMA shorts made for grappling movement, sparring comfort and everyday combat
+            sports training. Cut with side splits for explosive movement and built from tear-resistant
+            performance fabric.
           </p>
+          <ul className="mt-4 space-y-2">
+            {[
+              "Featherlight, tear-resistant fabric",
+              "Deep side splits for full range of motion",
+              "Secure drawstring waistband",
+              "Suitable for BJJ, MMA, Muay Thai and grappling",
+              "Sized XS to 3XL"
+            ].map((feature) => (
+              <li
+                key={feature}
+                className="flex items-start gap-2.5 text-xs uppercase leading-6 tracking-[0.15em] text-neutral-500"
+              >
+                <span className="mt-[9px] h-1 w-1 shrink-0 rounded-full bg-white/30" />
+                {feature}
+              </li>
+            ))}
+          </ul>
         </div>
         <div className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-8">
           <p className="text-xs uppercase tracking-[0.45em] text-muted">No-Gi Sets</p>
           <h2 className="mt-4 font-display text-3xl uppercase tracking-[0.08em]">No-Gi Sets That Stay Sharp Under Pressure</h2>
           <p className="mt-4 text-sm uppercase leading-7 tracking-[0.18em] text-neutral-300">
-            The original Apertos no-gi set pairs a premium rash guard with matching shorts for a refined BJJ and MMA look.
+            Matching no-gi sets that pair rash guards and shorts for athletes who want a complete
+            premium fightwear look. Coordinated designs built for competition, training and open mats.
           </p>
+          <ul className="mt-4 space-y-2">
+            {[
+              "Rash guard + shorts sold as a matched set",
+              "Consistent colourway and design across both pieces",
+              "Ideal for competition and open mat sessions",
+              "Sized XS to 3XL"
+            ].map((feature) => (
+              <li
+                key={feature}
+                className="flex items-start gap-2.5 text-xs uppercase leading-6 tracking-[0.15em] text-neutral-500"
+              >
+                <span className="mt-[9px] h-1 w-1 shrink-0 rounded-full bg-white/30" />
+                {feature}
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 
+      {/* Lifestyle image — no-gi set */}
       <section className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr]">
         <div className="relative min-h-[520px] overflow-hidden rounded-[2rem] border border-white/10 bg-black">
           <Image
             src="/products/nogi-lifestyle.jpeg"
-            alt="Athlete wearing the Apertos no-gi set"
+            alt="BJJ athlete wearing Apertos Fightwear no-gi set — matching rash guard and fight shorts"
             fill
             sizes="(min-width: 1024px) 50vw, 100vw"
             className="object-cover"
@@ -215,6 +339,7 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Lifestyle image — training */}
       <section className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
         <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.03] p-8 md:p-12">
           <div className="absolute -left-10 bottom-0 h-44 w-44 opacity-[0.08]">
@@ -240,7 +365,7 @@ export default function HomePage() {
         <div className="relative min-h-[520px] overflow-hidden rounded-[2rem] border border-white/10 bg-black">
           <Image
             src="/products/nogi-lifestyle-2.jpeg"
-            alt="Athlete training in the Apertos no-gi set"
+            alt="BJJ athlete training in Apertos Fightwear no-gi set during no-gi grappling session"
             fill
             sizes="(min-width: 1024px) 50vw, 100vw"
             className="object-cover"
@@ -249,6 +374,30 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* FAQ */}
+      <section className="space-y-8">
+        <div>
+          <p className="text-xs uppercase tracking-[0.5em] text-muted">FAQ</p>
+          <h2 className="mt-4 font-display text-4xl uppercase tracking-[0.08em] md:text-5xl">
+            Frequently Asked Questions
+          </h2>
+        </div>
+        <div className="space-y-4">
+          {faqItems.map((item) => (
+            <div
+              key={item.question}
+              className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-8"
+            >
+              <h3 className="font-display text-xl uppercase tracking-[0.08em]">{item.question}</h3>
+              <p className="mt-4 text-sm uppercase leading-7 tracking-[0.18em] text-neutral-300">
+                {item.answer}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Social */}
       <section className="rounded-[2rem] border border-white/10 bg-white/[0.03] px-6 py-16 text-center md:px-12">
         <p className="text-xs uppercase tracking-[0.5em] text-muted">Follow Us</p>
         <h2 className="mt-4 font-display text-4xl uppercase tracking-[0.08em] md:text-5xl">
