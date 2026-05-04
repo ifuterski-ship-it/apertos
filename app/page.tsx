@@ -8,12 +8,41 @@ import { absoluteUrl, siteKeywords } from "@/lib/site";
 
 const homepageTitle = "Apertos Fightwear | Premium BJJ & MMA Gear";
 const homepageDescription =
-  "Premium BJJ and MMA fightwear built for hard training, with rash guards, shorts, and no-gi sets engineered for performance.";
+  "Shop Apertos Fightwear — premium BJJ rash guards, MMA shorts and no-gi sets built for grappling, judo and high-output combat sports training. UK-based fightwear brand.";
+const homepageKeywords = [
+  ...siteKeywords,
+  "bjj rash guard",
+  "no gi rash guard",
+  "mma shorts",
+  "bjj shorts",
+  "judo rashguard",
+  "no-gi sets",
+  "fightwear uk",
+  "bjj gear uk",
+  "grappling shorts",
+  "compression rash guard bjj",
+  "bjj clothing uk",
+  "mma clothing uk",
+  "no gi bjj uk",
+  "grappling gear uk",
+  "bjj rash guard uk",
+  "mma gear uk",
+  "bjj training gear",
+  "combat sports apparel uk",
+  "no gi training"
+];
 
 export const metadata: Metadata = {
-  title: homepageTitle,
+  title: {
+    absolute: homepageTitle
+  },
   description: homepageDescription,
-  keywords: siteKeywords,
+  keywords: homepageKeywords,
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true }
+  },
   alternates: {
     canonical: absoluteUrl("/")
   },
@@ -21,6 +50,7 @@ export const metadata: Metadata = {
     title: homepageTitle,
     description: homepageDescription,
     url: absoluteUrl("/"),
+    type: "website",
     images: [
       {
         url: absoluteUrl("/products/nogi-lifestyle.jpeg"),

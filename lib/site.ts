@@ -6,16 +6,29 @@ export const siteDescription =
 export const siteLogoPath = "/logo-mark.png";
 export const siteKeywords = [
   "Apertos Fightwear",
-  "BJJ rash guard",
-  "rash guard",
-  "MMA shorts",
-  "no gi set",
+  "bjj rash guard",
+  "no gi rash guard",
+  "mma shorts",
+  "bjj shorts",
+  "judo rashguard",
+  "no-gi sets",
+  "fightwear uk",
+  "bjj gear uk",
+  "grappling shorts",
+  "compression rash guard bjj",
+  "bjj clothing uk",
+  "mma clothing uk",
+  "no gi bjj uk",
+  "grappling gear uk",
+  "bjj rash guard uk",
+  "mma gear uk",
   "no-gi fightwear",
-  "BJJ shorts",
-  "grappling rash guard",
-  "combat sports apparel",
+  "bjj training gear",
+  "combat sports apparel uk",
   "premium fightwear",
-  "UK fightwear brand"
+  "UK fightwear brand",
+  "grappling rash guard",
+  "no gi training"
 ];
 
 export function absoluteUrl(path = "/") {
