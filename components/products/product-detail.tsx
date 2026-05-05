@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { Star, X } from "lucide-react";
+import { Star } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Product, SizeGuideBlock } from "@/lib/products";
 import { ProductInventoryBySize } from "@/lib/inventory";
@@ -22,7 +22,17 @@ function Stars({ rating }: { rating: number }) {
   );
 }
 
-function SizeGuideTable({ guide }: { guide: SizeGuideBlock }) {
+function SizeGuideTable({
+  guide,
+  selectedSize,
+  inventoryBySize,
+  onSelectSize
+}: {
+  guide: SizeGuideBlock;
+  selectedSize?: string;
+  inventoryBySize?: ProductInventoryBySize;
+  onSelectSize?: (size: string) => void;
+}) {
   return (
     <div className="space-y-3">
       <div className="space-y-1">
@@ -36,17 +46,40 @@ function SizeGuideTable({ guide }: { guide: SizeGuideBlock }) {
           <span>Waist</span>
           <span>Length</span>
         </div>
-        {guide.rows.map((row) => (
-          <div
-            key={row.size}
-            className="grid grid-cols-4 border-t border-white/10 px-4 py-3 text-sm uppercase tracking-[0.18em] text-neutral-200"
-          >
-            <span>{row.size}</span>
-            <span>{row.chest ?? "—"}</span>
-            <span>{row.waist ?? "—"}</span>
-            <span>{row.length ?? "—"}</span>
-          </div>
-        ))}
+        {guide.rows.map((row) => {
+          const isSelected = row.size === selectedSize;
+          const isOutOfStock = Boolean(inventoryBySize?.[row.size]?.isOutOfStock);
+          return onSelectSize ? (
+            <button
+              key={row.size}
+              type="button"
+              onClick={() => !isOutOfStock && onSelectSize(row.size)}
+              disabled={isOutOfStock}
+              className={`grid w-full grid-cols-4 border-t border-white/10 px-4 py-3 text-left text-sm uppercase tracking-[0.18em] transition ${
+                isSelected
+                  ? "bg-white text-black"
+                  : isOutOfStock
+                    ? "cursor-not-allowed text-neutral-600 line-through"
+                    : "text-neutral-200 hover:bg-white/[0.05]"
+              }`}
+            >
+              <span>{row.size}</span>
+              <span>{row.chest ?? "—"}</span>
+              <span>{row.waist ?? "—"}</span>
+              <span>{row.length ?? "—"}</span>
+            </button>
+          ) : (
+            <div
+              key={row.size}
+              className="grid grid-cols-4 border-t border-white/10 px-4 py-3 text-sm uppercase tracking-[0.18em] text-neutral-200"
+            >
+              <span>{row.size}</span>
+              <span>{row.chest ?? "—"}</span>
+              <span>{row.waist ?? "—"}</span>
+              <span>{row.length ?? "—"}</span>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
@@ -66,7 +99,6 @@ export function ProductDetail({
   const [activeImage, setActiveImage] = useState(galleryImages[0]);
   const [selectedSize, setSelectedSize] = useState(product.sizes[0]);
   const [isZoomOpen, setIsZoomOpen] = useState(false);
-  const [isSizeGuideOpen, setIsSizeGuideOpen] = useState(false);
   const [zoomOrigin, setZoomOrigin] = useState("50% 50%");
   const [checkoutMessage, setCheckoutMessage] = useState<string | null>(null);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
@@ -255,13 +287,6 @@ export function ProductDetail({
           <div className="space-y-3">
             <div className="flex items-center justify-between gap-4">
               <p className="text-xs uppercase tracking-[0.35em] text-muted">Select Size</p>
-              <button
-                type="button"
-                onClick={() => setIsSizeGuideOpen(true)}
-                className="text-[11px] uppercase tracking-[0.3em] text-neutral-400 underline underline-offset-4 transition hover:text-white"
-              >
-                Size Guide
-              </button>
             </div>
             <div className="flex flex-wrap gap-3">
               {product.sizes.map((size) => {
@@ -322,13 +347,24 @@ export function ProductDetail({
             ) : null}
             <details className="group rounded-[1.5rem] border border-white/10 bg-white/[0.02]">
               <summary className="flex cursor-pointer list-none items-center justify-between px-5 py-4">
-                <span className="text-[11px] uppercase tracking-[0.35em] text-neutral-400">Sizing</span>
+                <span className="text-[11px] uppercase tracking-[0.35em] text-neutral-400">Size Guide</span>
                 <span className="text-neutral-500 transition-transform duration-200 group-open:rotate-45">+</span>
               </summary>
-              <div className="px-5 pb-4">
-                <p className="text-[11px] uppercase leading-6 tracking-[0.3em] text-neutral-500">
-                  Available in {product.sizes.join(", ")}. Use the Size Guide above for detailed measurements.
-                </p>
+              <div className="space-y-5 px-5 pb-5">
+                {product.sizeGuides.map((guide) => (
+                  <SizeGuideTable
+                    key={guide.title}
+                    guide={guide}
+                    selectedSize={selectedSize}
+                    inventoryBySize={inventoryBySize}
+                    onSelectSize={setSelectedSize}
+                  />
+                ))}
+                <div className="rounded-[1.25rem] border border-amber-500/20 bg-amber-500/[0.06] px-4 py-3">
+                  <p className="text-[11px] uppercase leading-6 tracking-[0.22em] text-amber-200">
+                    BJJ rash guards should fit snug — size down if between sizes.
+                  </p>
+                </div>
               </div>
             </details>
             <details className="group rounded-[1.5rem] border border-white/10 bg-white/[0.02]">
@@ -362,41 +398,6 @@ export function ProductDetail({
           </button>
         </div>
       </div>
-
-      {/* ── Size guide modal ── */}
-      {isSizeGuideOpen ? (
-        <div
-          className="fixed inset-0 z-50 flex items-end justify-center bg-black/80 p-0 backdrop-blur-sm sm:items-center sm:p-4"
-          onClick={(e) => e.target === e.currentTarget && setIsSizeGuideOpen(false)}
-        >
-          <div className="w-full max-w-2xl overflow-hidden rounded-t-[2rem] border border-white/10 bg-canvas sm:rounded-[2rem]">
-            <div className="flex items-center justify-between border-b border-white/10 px-6 py-5">
-              <div>
-                <p className="text-xs uppercase tracking-[0.45em] text-muted">Sizing</p>
-                <h2 className="font-display text-2xl uppercase tracking-[0.08em]">Size Guide</h2>
-              </div>
-              <button
-                type="button"
-                onClick={() => setIsSizeGuideOpen(false)}
-                className="border border-white/10 p-2.5 transition hover:border-white hover:bg-white hover:text-black"
-                aria-label="Close size guide"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-            <div className="max-h-[70vh] space-y-6 overflow-y-auto px-6 py-6">
-              {product.sizeGuides.map((guide) => (
-                <SizeGuideTable key={guide.title} guide={guide} />
-              ))}
-              <div className="rounded-[1.25rem] border border-amber-500/20 bg-amber-500/[0.06] px-5 py-4">
-                <p className="text-xs uppercase leading-6 tracking-[0.22em] text-amber-200">
-                  BJJ rash guards should fit snug — size down if between sizes.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      ) : null}
 
       {/* ── Zoom modal ── */}
       {isZoomOpen ? (
