@@ -22,6 +22,17 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.6
   }));
 
+  const collectionEntries: MetadataRoute.Sitemap = [
+    "/shop/rash-guards",
+    "/shop/mma-shorts",
+    "/shop/no-gi-sets"
+  ].map((path) => ({
+    url: `${BASE_URL}${path}`,
+    lastModified: new Date(),
+    changeFrequency: "weekly" as const,
+    priority: 0.8
+  }));
+
   return [
     {
       url: `${BASE_URL}/`,
@@ -35,6 +46,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "daily",
       priority: 0.9
     },
+    ...collectionEntries,
     {
       url: `${BASE_URL}/about`,
       lastModified: new Date(),

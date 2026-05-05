@@ -225,83 +225,27 @@ export default function HomePage() {
         <ProductGrid products={featuredProducts} />
       </section>
 
-      {/* Category cards */}
-      <section className="grid gap-8 lg:grid-cols-3">
-        <div className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-8">
-          <p className="text-xs uppercase tracking-[0.45em] text-muted">Rash Guards</p>
-          <h2 className="mt-4 font-display text-3xl uppercase tracking-[0.08em]">BJJ Rash Guards Built For Live Rounds</h2>
-          <p className="mt-4 text-sm uppercase leading-7 tracking-[0.18em] text-neutral-300">
-            Compression-style BJJ rash guards built for no-gi drilling, mat durability and clean
-            performance fit. Engineered with four-way stretch fabric and reinforced flatlock stitching
-            to withstand daily training.
-          </p>
-          <ul className="mt-4 space-y-2">
-            {[
-              "Short sleeve and long sleeve options",
-              "Moisture-wicking, quick-dry performance fabric",
-              "Sublimated design — never fades, cracks or peels",
-              "Sized XS to 3XL"
-            ].map((feature) => (
-              <li
-                key={feature}
-                className="flex items-start gap-2.5 text-xs uppercase leading-6 tracking-[0.15em] text-neutral-500"
-              >
-                <span className="mt-[9px] h-1 w-1 shrink-0 rounded-full bg-white/30" />
-                {feature}
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-8">
-          <p className="text-xs uppercase tracking-[0.45em] text-muted">MMA Shorts</p>
-          <h2 className="mt-4 font-display text-3xl uppercase tracking-[0.08em]">MMA Shorts For Grappling And Striking</h2>
-          <p className="mt-4 text-sm uppercase leading-7 tracking-[0.18em] text-neutral-300">
-            Lightweight MMA shorts made for grappling movement, sparring comfort and everyday combat
-            sports training. Cut with side splits for explosive movement and built from tear-resistant
-            performance fabric.
-          </p>
-          <ul className="mt-4 space-y-2">
-            {[
-              "Featherlight, tear-resistant fabric",
-              "Deep side splits for full range of motion",
-              "Secure drawstring waistband",
-              "Suitable for BJJ, MMA, Muay Thai and grappling",
-              "Sized XS to 3XL"
-            ].map((feature) => (
-              <li
-                key={feature}
-                className="flex items-start gap-2.5 text-xs uppercase leading-6 tracking-[0.15em] text-neutral-500"
-              >
-                <span className="mt-[9px] h-1 w-1 shrink-0 rounded-full bg-white/30" />
-                {feature}
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-8">
-          <p className="text-xs uppercase tracking-[0.45em] text-muted">No-Gi Sets</p>
-          <h2 className="mt-4 font-display text-3xl uppercase tracking-[0.08em]">No-Gi Sets That Stay Sharp Under Pressure</h2>
-          <p className="mt-4 text-sm uppercase leading-7 tracking-[0.18em] text-neutral-300">
-            Matching no-gi sets that pair rash guards and shorts for athletes who want a complete
-            premium fightwear look. Coordinated designs built for competition, training and open mats.
-          </p>
-          <ul className="mt-4 space-y-2">
-            {[
-              "Rash guard + shorts sold as a matched set",
-              "Consistent colourway and design across both pieces",
-              "Ideal for competition and open mat sessions",
-              "Sized XS to 3XL"
-            ].map((feature) => (
-              <li
-                key={feature}
-                className="flex items-start gap-2.5 text-xs uppercase leading-6 tracking-[0.15em] text-neutral-500"
-              >
-                <span className="mt-[9px] h-1 w-1 shrink-0 rounded-full bg-white/30" />
-                {feature}
-              </li>
-            ))}
-          </ul>
-        </div>
+      {/* Category cards — stripped to title + arrow, link to collection pages */}
+      <section className="grid gap-6 lg:grid-cols-3">
+        {[
+          { href: "/shop/rash-guards", label: "Rash Guards", eyebrow: "Performance Top" },
+          { href: "/shop/mma-shorts", label: "MMA Shorts", eyebrow: "Training Bottoms" },
+          { href: "/shop/no-gi-sets", label: "No-Gi Sets", eyebrow: "Bundle" }
+        ].map(({ href, label, eyebrow }) => (
+          <Link
+            key={href}
+            href={href}
+            className="group flex items-center justify-between rounded-[2rem] border border-white/10 bg-white/[0.03] p-8 transition hover:border-white/30 hover:bg-white/[0.06]"
+          >
+            <div>
+              <p className="text-xs uppercase tracking-[0.45em] text-muted">{eyebrow}</p>
+              <h2 className="mt-2 font-display text-3xl uppercase tracking-[0.08em]">{label}</h2>
+            </div>
+            <span className="text-2xl text-neutral-500 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-white">
+              →
+            </span>
+          </Link>
+        ))}
       </section>
 
       {/* Lifestyle image — no-gi set */}

@@ -284,35 +284,64 @@ export function ProductDetail({
             </div>
           </div>
 
-          {/* Add to cart — desktop/tablet */}
+          {/* Buttons — desktop/tablet */}
           <div className="hidden space-y-3 sm:block">
             <button
               type="button"
-              onClick={handleAddToCart}
-              disabled={isOutOfStock}
-              className="min-h-[52px] w-full border border-white px-6 py-4 text-sm font-semibold uppercase tracking-[0.35em] transition hover:bg-white hover:text-black disabled:cursor-not-allowed disabled:border-neutral-600 disabled:bg-neutral-900 disabled:text-neutral-500"
+              onClick={handleBuyNow}
+              disabled={isCheckingOut || isOutOfStock}
+              className="block min-h-[56px] w-full bg-white px-6 py-4 text-center text-sm font-semibold uppercase tracking-[0.35em] text-black transition hover:bg-neutral-100 disabled:cursor-not-allowed disabled:bg-neutral-700 disabled:text-neutral-400"
             >
-              {addToCartLabel}
+              {isOutOfStock ? "Out Of Stock" : isCheckingOut ? "Starting Checkout…" : "Buy Now"}
             </button>
             {checkoutMessage ? (
               <p className="text-xs uppercase leading-6 tracking-[0.2em] text-neutral-300">{checkoutMessage}</p>
             ) : null}
             <button
               type="button"
-              onClick={handleBuyNow}
-              disabled={isCheckingOut || isOutOfStock}
-              className="block min-h-[52px] w-full border border-white/10 px-6 py-4 text-center text-sm font-semibold uppercase tracking-[0.35em] text-neutral-300 transition hover:border-white hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
+              onClick={handleAddToCart}
+              disabled={isOutOfStock}
+              className="min-h-[52px] w-full border border-white/20 px-6 py-4 text-sm font-semibold uppercase tracking-[0.35em] text-neutral-300 transition hover:border-white hover:text-white disabled:cursor-not-allowed disabled:border-neutral-700 disabled:text-neutral-600"
             >
-              {isOutOfStock ? "Out Of Stock" : isCheckingOut ? "Starting Checkout" : "Buy Now"}
+              {addToCartLabel}
             </button>
           </div>
 
-          {/* Care instructions */}
-          {product.careInstructions ? (
-            <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.02] px-5 py-4">
-              <p className="text-[11px] uppercase tracking-[0.35em] text-neutral-500">{product.careInstructions}</p>
-            </div>
-          ) : null}
+          {/* Accordions */}
+          <div className="space-y-2">
+            {product.careInstructions ? (
+              <details className="group rounded-[1.5rem] border border-white/10 bg-white/[0.02]">
+                <summary className="flex cursor-pointer list-none items-center justify-between px-5 py-4">
+                  <span className="text-[11px] uppercase tracking-[0.35em] text-neutral-400">Care Instructions</span>
+                  <span className="text-neutral-500 transition-transform duration-200 group-open:rotate-45">+</span>
+                </summary>
+                <div className="px-5 pb-4">
+                  <p className="text-[11px] uppercase leading-6 tracking-[0.3em] text-neutral-500">{product.careInstructions}</p>
+                </div>
+              </details>
+            ) : null}
+            <details className="group rounded-[1.5rem] border border-white/10 bg-white/[0.02]">
+              <summary className="flex cursor-pointer list-none items-center justify-between px-5 py-4">
+                <span className="text-[11px] uppercase tracking-[0.35em] text-neutral-400">Sizing</span>
+                <span className="text-neutral-500 transition-transform duration-200 group-open:rotate-45">+</span>
+              </summary>
+              <div className="px-5 pb-4">
+                <p className="text-[11px] uppercase leading-6 tracking-[0.3em] text-neutral-500">
+                  Available in {product.sizes.join(", ")}. Use the Size Guide above for detailed measurements.
+                </p>
+              </div>
+            </details>
+            <details className="group rounded-[1.5rem] border border-white/10 bg-white/[0.02]">
+              <summary className="flex cursor-pointer list-none items-center justify-between px-5 py-4">
+                <span className="text-[11px] uppercase tracking-[0.35em] text-neutral-400">Shipping</span>
+                <span className="text-neutral-500 transition-transform duration-200 group-open:rotate-45">+</span>
+              </summary>
+              <div className="space-y-1 px-5 pb-4">
+                <p className="text-[11px] uppercase leading-6 tracking-[0.3em] text-neutral-500">Free UK shipping on orders over £40 · Standard 2–5 working days</p>
+                <p className="text-[11px] uppercase leading-6 tracking-[0.3em] text-neutral-500">International shipping available to EU, US, CA and more</p>
+              </div>
+            </details>
+          </div>
         </div>
       </div>
 
