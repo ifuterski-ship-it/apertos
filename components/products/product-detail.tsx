@@ -7,7 +7,6 @@ import { Product, SizeGuideBlock } from "@/lib/products";
 import { ProductInventoryBySize } from "@/lib/inventory";
 import { trackEvent } from "@/lib/analytics";
 import { useCart } from "@/components/cart/cart-provider";
-import { hasStripeClientEnv } from "@/lib/stripe";
 
 function Stars({ rating }: { rating: number }) {
   return (
@@ -161,7 +160,6 @@ export function ProductDetail({
 
   const handleBuyNow = async () => {
     setCheckoutMessage(null);
-    if (!hasStripeClientEnv()) { setCheckoutMessage("Stripe checkout is not configured for this environment yet."); return; }
     if (isOutOfStock) { setCheckoutMessage("This product is currently out of stock."); return; }
     setIsCheckingOut(true);
     try {

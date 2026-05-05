@@ -7,7 +7,6 @@ import { useEffect, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useCart } from "@/components/cart/cart-provider";
 import { hasSupabaseEnv } from "@/lib/supabase/config";
-import { hasStripeClientEnv } from "@/lib/stripe";
 
 export function CartView() {
   const { items, updateQuantity, removeItem, clearCart, isHydrated } = useCart();
@@ -34,11 +33,6 @@ export function CartView() {
 
   const handleCheckout = async () => {
     setCheckoutStatus(null);
-
-    if (!hasStripeClientEnv()) {
-      setCheckoutStatus("Stripe checkout is not configured for this environment yet.");
-      return;
-    }
 
     if (!checkoutEmail) {
       setCheckoutStatus("Add an email address to receive your order confirmation.");
