@@ -176,13 +176,18 @@ export async function getShipEngineRates(
 
   const rates: ShipEngineRate[] = rawRates
     .filter((r) => r.shipping_amount?.amount != null)
-    .map((r) => ({
-      rateId: r.rate_id,
-      displayName: r.service_type || `${r.carrier_friendly_name} ${r.service_code}`.replace(/_/g, " "),
-      amountPence: Math.round(r.shipping_amount.amount * 100),
-      currency: (r.shipping_amount.currency ?? "GBP").toUpperCase(),
-      estimatedDays: r.delivery_days ?? null
-    }))
+    .map((r) => {
+      const carrier = r.carrier_friendly_name || r.carrier_id || "";
+      const service = r.service_type || (r.service_code ?? "").replace(/_/g, " ");
+      const displayName = [carrier, service].filter(Boolean).join(" — ") || r.rate_id;
+      return {
+        rateId: r.rate_id,
+        displayName,
+        amountPence: Math.round(r.shipping_amount.amount * 100),
+        currency: (r.shipping_amount.currency ?? "GBP").toUpperCase(),
+        estimatedDays: r.delivery_days ?? null
+      };
+    })
     .sort((a, b) => a.amountPence - b.amountPence);
 
   if (subtotalPence >= FREE_SHIPPING_THRESHOLD_PENCE && address.country === "GB") {
