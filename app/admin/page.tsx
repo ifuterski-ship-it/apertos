@@ -2,7 +2,7 @@ import Link from "next/link";
 import { GenerateLabelButton } from "@/app/admin/generate-label-button";
 import { hasAdminEmailsConfigured, requireAdminUser } from "@/lib/admin-auth";
 import { getOrdersForAdmin } from "@/lib/orders";
-import { hasShipStationEnv } from "@/lib/shipstation";
+import { hasShipEngineEnv } from "@/lib/shipengine";
 import { hasSupabaseAdminEnv } from "@/lib/supabase/admin";
 import { getSupabaseEnvDiagnostics } from "@/lib/supabase/env-diagnostics";
 
@@ -64,9 +64,9 @@ export default async function AdminPage() {
         <p className="mt-4 max-w-3xl text-sm uppercase leading-7 tracking-[0.2em] text-neutral-300">
           Review paid orders, open existing labels, and generate a ShipStation label for each order.
         </p>
-        {!hasShipStationEnv() ? (
+        {!hasShipEngineEnv() ? (
           <p className="mt-6 text-xs uppercase leading-6 tracking-[0.25em] text-neutral-400">
-            ShipStation is not fully configured yet. Add `SHIPSTATION_API_KEY` and `SHIPSTATION_API_SECRET` to enable label purchases.
+            ShipEngine is not configured yet. Add `SHIPENGINE_API_KEY` to enable label purchases.
           </p>
         ) : null}
       </div>
