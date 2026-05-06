@@ -3,74 +3,15 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Minus, Plus, Trash2 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { useMemo } from "react";
 import { useCart } from "@/components/cart/cart-provider";
-import { hasSupabaseEnv } from "@/lib/supabase/config";
 
 export function CartView() {
   const { items, updateQuantity, removeItem, clearCart, isHydrated } = useCart();
-  const supabase = useMemo(() => (hasSupabaseEnv ? createClient() : null), []);
-  const [checkoutEmail, setCheckoutEmail] = useState("");
-  const [checkoutStatus, setCheckoutStatus] = useState<string | null>(null);
-  const [isCheckingOut, setIsCheckingOut] = useState(false);
   const subtotalAmount = useMemo(
     () => items.reduce((total, item) => total + Math.round(item.price * 100) * item.quantity, 0) / 100,
     [items]
   );
-
-  useEffect(() => {
-    if (!supabase) {
-      return;
-    }
-
-    supabase.auth.getUser().then(({ data }) => {
-      if (data.user?.email) {
-        setCheckoutEmail(data.user.email);
-      }
-    });
-  }, [supabase]);
-
-  const handleCheckout = async () => {
-    setCheckoutStatus(null);
-
-    if (!checkoutEmail) {
-      setCheckoutStatus("Add an email address to receive your order confirmation.");
-      return;
-    }
-
-    setIsCheckingOut(true);
-
-    try {
-      const stripeResponse = await fetch("/api/stripe/checkout", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          email: checkoutEmail,
-          items: items.map((item) => ({
-            productId: item.productId,
-            quantity: item.quantity,
-            size: item.size
-          }))
-        })
-      });
-
-      const result = (await stripeResponse.json()) as { ok?: boolean; message?: string; url?: string };
-
-      if (!stripeResponse.ok || !result.ok || !result.url) {
-        setCheckoutStatus(result.message ?? "Unable to start Stripe checkout right now.");
-        return;
-      }
-
-      window.location.href = result.url;
-    } catch {
-      setCheckoutStatus("Unable to connect to Stripe right now. Please try again.");
-    } finally {
-      setIsCheckingOut(false);
-    }
-  };
 
   if (!isHydrated) {
     return <div className="py-24 text-sm uppercase tracking-[0.3em] text-muted">Loading cart...</div>;
@@ -205,29 +146,12 @@ export function CartView() {
           </div>
 
           <div className="space-y-3">
-            <div className="space-y-2">
-              <label htmlFor="checkout-email" className="text-xs uppercase tracking-[0.3em] text-neutral-400">
-                Confirmation Email
-              </label>
-              <input
-                id="checkout-email"
-                type="email"
-                value={checkoutEmail}
-                onChange={(event) => setCheckoutEmail(event.target.value)}
-                className="w-full border border-white/10 bg-black/30 px-4 py-4 text-sm text-white outline-none transition focus:border-white"
-              />
-            </div>
-            {checkoutStatus ? (
-              <p className="text-xs uppercase leading-6 tracking-[0.2em] text-neutral-300">{checkoutStatus}</p>
-            ) : null}
-            <button
-              type="button"
-              onClick={handleCheckout}
-              disabled={isCheckingOut}
-              className="w-full border border-white px-5 py-4 text-xs font-semibold uppercase tracking-[0.35em] transition hover:bg-white hover:text-black"
+            <Link
+              href="/checkout"
+              className="block w-full border border-white px-5 py-4 text-center text-xs font-semibold uppercase tracking-[0.35em] transition hover:bg-white hover:text-black"
             >
-              {isCheckingOut ? "Starting Checkout" : "Proceed To Checkout"}
-            </button>
+              Proceed To Checkout
+            </Link>
             <button
               type="button"
               onClick={clearCart}

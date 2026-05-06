@@ -2,6 +2,7 @@ import type { OrderRecord } from "@/lib/orders";
 import { getProductById } from "@/lib/products";
 
 const SHIPENGINE_BASE_URL = "https://api.shipengine.com";
+const FREE_SHIPPING_THRESHOLD_PENCE = 4000;
 
 const defaultAllowedCountries = ["GB", "IE", "US", "CA", "FR", "DE", "ES", "IT", "NL", "BE", "PT"];
 
@@ -10,7 +11,6 @@ export function getAllowedShippingCountries() {
     .split(",")
     .map((c) => c.trim().toUpperCase())
     .filter(Boolean);
-
   return configured.length ? configured : defaultAllowedCountries;
 }
 
@@ -59,8 +59,7 @@ function getFromAddress() {
   };
 }
 
-function estimateWeightOz(order: OrderRecord) {
-  const items = order.parsedItemsPayload.items;
+function estimateWeightOz(items: Array<{ productId: string; quantity: number }>) {
   const total = items.reduce((sum, item) => {
     const product = getProductById(item.productId);
     return sum + (product?.shippingWeightLb ?? 0.5) * 16 * item.quantity;
@@ -68,16 +67,47 @@ function estimateWeightOz(order: OrderRecord) {
   return Math.max(total, 4);
 }
 
-type Rate = {
+async function fetchCarrierIds(): Promise<string[]> {
+  const res = await fetch(`${SHIPENGINE_BASE_URL}/v1/carriers`, { headers: getHeaders() });
+  if (!res.ok) {
+    throw new Error(`ShipEngine carriers error ${res.status}: ${await res.text()}`);
+  }
+  const data = (await res.json()) as { carriers: Array<{ carrier_id: string }> };
+  return (data.carriers ?? []).map((c) => c.carrier_id);
+}
+
+export type ShipEngineRate = {
+  rateId: string;
+  displayName: string;
+  amountPence: number;
+  currency: string;
+  estimatedDays: number | null;
+};
+
+export type ShipAddress = {
+  name?: string | null;
+  address1: string;
+  address2?: string | null;
+  city: string;
+  state?: string | null;
+  postalCode: string;
+  country: string;
+  phone?: string | null;
+};
+
+type RateItem = {
   rate_id: string;
   carrier_id: string;
+  carrier_friendly_name: string;
   service_code: string;
+  service_type: string;
   shipping_amount: { amount: number; currency: string };
+  delivery_days: number | null;
 };
 
 type RatesResponse = {
   rate_response: {
-    rates: Rate[];
+    rates: RateItem[];
     errors: Array<{ message: string }>;
   };
 };
@@ -91,32 +121,14 @@ type LabelResponse = {
   service_code: string;
 };
 
-export async function createShipEngineLabel(order: OrderRecord) {
-  if (!hasShipEngineEnv()) {
-    throw new Error("ShipEngine is not configured. Set SHIPENGINE_API_KEY.");
-  }
+async function fetchRates(
+  items: Array<{ productId: string; quantity: number }>,
+  address: ShipAddress
+): Promise<RateItem[]> {
+  const carrierIds = await fetchCarrierIds();
+  if (!carrierIds.length) throw new Error("No carriers connected to your ShipEngine account.");
 
-  const address = order.parsedItemsPayload.shippingAddress;
-
-  if (!address?.address1 || !address.city || !address.postalCode || !address.country) {
-    throw new Error("This order has an incomplete shipping address.");
-  }
-
-  const weightOz = estimateWeightOz(order);
-
-  // Fetch connected carrier IDs
-  const carriersRes = await fetch(`${SHIPENGINE_BASE_URL}/v1/carriers`, { headers: getHeaders() });
-  if (!carriersRes.ok) {
-    throw new Error(`ShipEngine carriers error ${carriersRes.status}: ${await carriersRes.text()}`);
-  }
-  const carriersData = (await carriersRes.json()) as { carriers: Array<{ carrier_id: string }> };
-  const carrierIds = (carriersData.carriers ?? []).map((c) => c.carrier_id);
-  if (!carrierIds.length) {
-    throw new Error("No carriers connected to your ShipEngine account.");
-  }
-
-  // Get rates from all connected carriers
-  const ratesRes = await fetch(`${SHIPENGINE_BASE_URL}/v1/rates`, {
+  const res = await fetch(`${SHIPENGINE_BASE_URL}/v1/rates`, {
     method: "POST",
     headers: getHeaders(),
     body: JSON.stringify({
@@ -133,26 +145,88 @@ export async function createShipEngineLabel(order: OrderRecord) {
           country_code: address.country,
           phone: address.phone || undefined
         },
-        packages: [{ weight: { value: weightOz, unit: "ounce" } }]
+        packages: [{ weight: { value: estimateWeightOz(items), unit: "ounce" } }]
       }
     })
   });
 
-  if (!ratesRes.ok) {
-    throw new Error(`ShipEngine rates error ${ratesRes.status}: ${await ratesRes.text()}`);
+  if (!res.ok) {
+    throw new Error(`ShipEngine rates error ${res.status}: ${await res.text()}`);
   }
 
-  const ratesData = (await ratesRes.json()) as RatesResponse;
-  const rates = ratesData.rate_response.rates ?? [];
+  const data = (await res.json()) as RatesResponse;
+  const rates = data.rate_response.rates ?? [];
 
   if (!rates.length) {
-    const errMsg = ratesData.rate_response.errors?.[0]?.message ?? "No rates returned";
-    throw new Error(`ShipEngine returned no rates: ${errMsg}`);
+    const errMsg = data.rate_response.errors?.[0]?.message ?? "No rates available for this destination";
+    throw new Error(errMsg);
   }
 
-  const cheapest = [...rates].sort((a, b) => a.shipping_amount.amount - b.shipping_amount.amount)[0];
+  return rates;
+}
 
-  // Purchase label from cheapest rate
+export async function getShipEngineRates(
+  items: Array<{ productId: string; quantity: number }>,
+  address: ShipAddress,
+  subtotalPence: number
+): Promise<ShipEngineRate[]> {
+  if (!hasShipEngineEnv()) throw new Error("ShipEngine is not configured.");
+
+  const rawRates = await fetchRates(items, address);
+
+  const rates: ShipEngineRate[] = rawRates
+    .filter((r) => r.shipping_amount?.amount != null)
+    .map((r) => ({
+      rateId: r.rate_id,
+      displayName: r.service_type || `${r.carrier_friendly_name} ${r.service_code}`.replace(/_/g, " "),
+      amountPence: Math.round(r.shipping_amount.amount * 100),
+      currency: (r.shipping_amount.currency ?? "GBP").toUpperCase(),
+      estimatedDays: r.delivery_days ?? null
+    }))
+    .sort((a, b) => a.amountPence - b.amountPence);
+
+  if (subtotalPence >= FREE_SHIPPING_THRESHOLD_PENCE && address.country === "GB") {
+    return [
+      {
+        rateId: "free",
+        displayName: "Free Standard UK Shipping",
+        amountPence: 0,
+        currency: "GBP",
+        estimatedDays: null
+      },
+      ...rates
+    ];
+  }
+
+  return rates;
+}
+
+export async function createShipEngineLabel(order: OrderRecord) {
+  if (!hasShipEngineEnv()) {
+    throw new Error("ShipEngine is not configured. Set SHIPENGINE_API_KEY.");
+  }
+
+  const address = order.parsedItemsPayload.shippingAddress;
+
+  if (!address?.address1 || !address.city || !address.postalCode || !address.country) {
+    throw new Error("This order has an incomplete shipping address.");
+  }
+
+  const rawRates = await fetchRates(order.parsedItemsPayload.items, {
+    name: address.name,
+    address1: address.address1,
+    address2: address.address2,
+    city: address.city,
+    state: address.state,
+    postalCode: address.postalCode,
+    country: address.country,
+    phone: address.phone
+  });
+
+  const cheapest = [...rawRates].sort(
+    (a, b) => a.shipping_amount.amount - b.shipping_amount.amount
+  )[0];
+
   const labelRes = await fetch(`${SHIPENGINE_BASE_URL}/v1/labels/rates/${cheapest.rate_id}`, {
     method: "POST",
     headers: getHeaders(),
@@ -174,9 +248,9 @@ export async function createShipEngineLabel(order: OrderRecord) {
     trackingNumber: label.tracking_number,
     transactionId: label.label_id,
     rateAmount: String(cheapest.shipping_amount.amount),
-    rateCurrency: cheapest.shipping_amount.currency.toUpperCase(),
-    provider: label.carrier_id,
-    serviceLevel: label.service_code,
+    rateCurrency: (cheapest.shipping_amount.currency ?? "GBP").toUpperCase(),
+    provider: cheapest.carrier_id,
+    serviceLevel: cheapest.service_code,
     purchasedAt: new Date().toISOString()
   };
 }

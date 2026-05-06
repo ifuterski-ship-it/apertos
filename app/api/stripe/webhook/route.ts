@@ -50,19 +50,26 @@ async function handleCheckoutSession(
     items = [];
   }
 
+  let metaAddress: Record<string, string | null> | null = null;
+  try {
+    const raw = session.metadata?.shipping_address;
+    if (raw) metaAddress = JSON.parse(raw) as Record<string, string | null>;
+  } catch { /* ignore */ }
+
   const shippingAddress = {
-    name: shippingDetails?.name ?? session.customer_details?.name ?? null,
+    name: shippingDetails?.name ?? metaAddress?.name ?? session.customer_details?.name ?? null,
     email,
-    phone: session.customer_details?.phone ?? null,
-    address1: shippingDetails?.address?.line1 ?? session.customer_details?.address?.line1 ?? null,
-    address2: shippingDetails?.address?.line2 ?? session.customer_details?.address?.line2 ?? null,
-    city: shippingDetails?.address?.city ?? session.customer_details?.address?.city ?? null,
-    state: shippingDetails?.address?.state ?? session.customer_details?.address?.state ?? null,
+    phone: metaAddress?.phone ?? session.customer_details?.phone ?? null,
+    address1: shippingDetails?.address?.line1 ?? metaAddress?.address1 ?? session.customer_details?.address?.line1 ?? null,
+    address2: shippingDetails?.address?.line2 ?? metaAddress?.address2 ?? session.customer_details?.address?.line2 ?? null,
+    city: shippingDetails?.address?.city ?? metaAddress?.city ?? session.customer_details?.address?.city ?? null,
+    state: shippingDetails?.address?.state ?? metaAddress?.state ?? session.customer_details?.address?.state ?? null,
     postalCode:
       shippingDetails?.address?.postal_code ??
+      metaAddress?.postalCode ??
       session.customer_details?.address?.postal_code ??
       null,
-    country: shippingDetails?.address?.country ?? session.customer_details?.address?.country ?? null
+    country: shippingDetails?.address?.country ?? metaAddress?.country ?? session.customer_details?.address?.country ?? null
   };
 
   const recordResult = await recordOrder({
