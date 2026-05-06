@@ -6,7 +6,8 @@ import { hasSupabaseEnv, supabaseAnonKey, supabaseUrl } from "@/lib/supabase/con
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get("code");
-  let response = NextResponse.redirect(new URL("/account", request.url));
+  const next = requestUrl.searchParams.get("next") ?? "/account";
+  let response = NextResponse.redirect(new URL(next, request.url));
 
   if (!hasSupabaseEnv) {
     return NextResponse.redirect(new URL("/auth", request.url));
