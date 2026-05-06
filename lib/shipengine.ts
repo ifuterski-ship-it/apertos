@@ -104,12 +104,23 @@ export async function createShipEngineLabel(order: OrderRecord) {
 
   const weightOz = estimateWeightOz(order);
 
+  // Fetch connected carrier IDs
+  const carriersRes = await fetch(`${SHIPENGINE_BASE_URL}/v1/carriers`, { headers: getHeaders() });
+  if (!carriersRes.ok) {
+    throw new Error(`ShipEngine carriers error ${carriersRes.status}: ${await carriersRes.text()}`);
+  }
+  const carriersData = (await carriersRes.json()) as { carriers: Array<{ carrier_id: string }> };
+  const carrierIds = (carriersData.carriers ?? []).map((c) => c.carrier_id);
+  if (!carrierIds.length) {
+    throw new Error("No carriers connected to your ShipEngine account.");
+  }
+
   // Get rates from all connected carriers
   const ratesRes = await fetch(`${SHIPENGINE_BASE_URL}/v1/rates`, {
     method: "POST",
     headers: getHeaders(),
     body: JSON.stringify({
-      rate_options: { carrier_ids: [] },
+      rate_options: { carrier_ids: carrierIds },
       shipment: {
         ship_from: getFromAddress(),
         ship_to: {
