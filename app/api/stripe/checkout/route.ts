@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type Stripe from "stripe";
 import { products } from "@/lib/products";
 import { assertInventoryAvailable } from "@/lib/inventory";
-import { stripe } from "@/lib/stripe";
+import { getStripe } from "@/lib/stripe";
 import { getAllowedShippingCountries } from "@/lib/easypost";
 
 type CheckoutItem = {
@@ -12,6 +12,7 @@ type CheckoutItem = {
 };
 
 export async function POST(request: Request) {
+  const stripe = getStripe();
   if (!stripe) {
     return NextResponse.json({ ok: false, message: "Stripe is not configured." }, { status: 500 });
   }

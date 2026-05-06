@@ -5,7 +5,7 @@ import { renderOrderConfirmationEmail } from "@/lib/email-templates";
 import { ordersFromEmail } from "@/lib/email-config";
 import { decrementInventoryForOrder } from "@/lib/inventory";
 import { buildOrderItemsPayload, getOrderForAdmin, recordOrder } from "@/lib/orders";
-import { stripe } from "@/lib/stripe";
+import { getStripe } from "@/lib/stripe";
 import { hasSupabaseAdminEnv } from "@/lib/supabase/admin";
 
 export const runtime = "nodejs";
@@ -104,6 +104,7 @@ async function handleCheckoutSession(
 }
 
 export async function POST(request: Request) {
+  const stripe = getStripe();
   if (!stripe || !process.env.STRIPE_WEBHOOK_SECRET) {
     return NextResponse.json(
       { ok: false, message: "Stripe webhook is not configured." },

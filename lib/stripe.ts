@@ -1,10 +1,9 @@
 import Stripe from "stripe";
 
-const stripeSecretKey = process.env.STRIPE_SECRET_KEY ?? "";
-
-export const stripe = stripeSecretKey
-  ? new Stripe(stripeSecretKey)
-  : null;
+export function getStripe(): Stripe | null {
+  const key = process.env.STRIPE_SECRET_KEY;
+  return key ? new Stripe(key) : null;
+}
 
 export function hasStripeServerEnv() {
   return Boolean(process.env.STRIPE_SECRET_KEY);

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { PurchaseEvent } from "@/components/analytics/purchase-event";
-import { stripe } from "@/lib/stripe";
+import { getStripe } from "@/lib/stripe";
 
 export default async function CheckoutSuccessPage({
   searchParams
@@ -19,6 +19,7 @@ export default async function CheckoutSuccessPage({
     quantity: number;
   }> = [];
 
+  const stripe = getStripe();
   if (stripe && sessionId) {
     try {
       const session = await stripe.checkout.sessions.retrieve(sessionId);
