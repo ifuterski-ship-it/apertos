@@ -18,13 +18,25 @@ export function ResetPasswordForm() {
     let mounted = true;
 
     const initializeRecovery = async () => {
+      const params = new URLSearchParams(window.location.search);
+      const code = params.get("code");
+
+      if (code) {
+        const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+        if (!mounted) return;
+        if (exchangeError) {
+          setError("This reset link is invalid or has expired. Request a new password reset email.");
+          return;
+        }
+        setIsReady(true);
+        return;
+      }
+
       const {
         data: { session }
       } = await supabase.auth.getSession();
 
-      if (!mounted) {
-        return;
-      }
+      if (!mounted) return;
 
       if (session) {
         setIsReady(true);
