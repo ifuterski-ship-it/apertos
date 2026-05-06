@@ -67,13 +67,15 @@ function estimateWeightOz(items: Array<{ productId: string; quantity: number }>)
   return Math.max(total, 4);
 }
 
-async function fetchCarrierIds(): Promise<string[]> {
+type CarrierInfo = { carrier_id: string; friendly_name: string };
+
+async function fetchCarriers(): Promise<CarrierInfo[]> {
   const res = await fetch(`${SHIPENGINE_BASE_URL}/v1/carriers`, { headers: getHeaders() });
   if (!res.ok) {
     throw new Error(`ShipEngine carriers error ${res.status}: ${await res.text()}`);
   }
-  const data = (await res.json()) as { carriers: Array<{ carrier_id: string }> };
-  return (data.carriers ?? []).map((c) => c.carrier_id);
+  const data = (await res.json()) as { carriers: CarrierInfo[] };
+  return data.carriers ?? [];
 }
 
 export type ShipEngineRate = {
@@ -124,9 +126,15 @@ type LabelResponse = {
 async function fetchRates(
   items: Array<{ productId: string; quantity: number }>,
   address: ShipAddress
-): Promise<RateItem[]> {
-  const carrierIds = await fetchCarrierIds();
-  if (!carrierIds.length) throw new Error("No carriers connected to your ShipEngine account.");
+): Promise<{ rates: RateItem[]; carrierNames: Record<string, string> }> {
+  const carriers = await fetchCarriers();
+  if (!carriers.length) throw new Error("No carriers connected to your ShipEngine account.");
+
+  const carrierIds = carriers.map((c) => c.carrier_id);
+  const carrierNames: Record<string, string> = {};
+  for (const c of carriers) {
+    carrierNames[c.carrier_id] = c.friendly_name;
+  }
 
   const res = await fetch(`${SHIPENGINE_BASE_URL}/v1/rates`, {
     method: "POST",
@@ -162,7 +170,7 @@ async function fetchRates(
     throw new Error(errMsg);
   }
 
-  return rates;
+  return { rates, carrierNames };
 }
 
 export async function getShipEngineRates(
@@ -172,12 +180,12 @@ export async function getShipEngineRates(
 ): Promise<ShipEngineRate[]> {
   if (!hasShipEngineEnv()) throw new Error("ShipEngine is not configured.");
 
-  const rawRates = await fetchRates(items, address);
+  const { rates: rawRates, carrierNames } = await fetchRates(items, address);
 
   const rates: ShipEngineRate[] = rawRates
     .filter((r) => r.shipping_amount?.amount != null)
     .map((r) => {
-      const carrier = r.carrier_friendly_name || r.carrier_id || "";
+      const carrier = carrierNames[r.carrier_id] || r.carrier_friendly_name || r.carrier_id || "";
       const service = r.service_type || (r.service_code ?? "").replace(/_/g, " ");
       const displayName = [carrier, service].filter(Boolean).join(" — ") || r.rate_id;
       return {
@@ -217,7 +225,7 @@ export async function createShipEngineLabel(order: OrderRecord) {
     throw new Error("This order has an incomplete shipping address.");
   }
 
-  const rawRates = await fetchRates(order.parsedItemsPayload.items, {
+  const { rates: rawRates } = await fetchRates(order.parsedItemsPayload.items, {
     name: address.name,
     address1: address.address1,
     address2: address.address2,
