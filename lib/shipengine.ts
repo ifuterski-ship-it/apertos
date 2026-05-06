@@ -15,16 +15,36 @@ function getHeaders() {
 }
 
 function getFromAddress() {
+  const name = process.env.EASYPOST_FROM_NAME ?? "";
+  const address_line1 = process.env.EASYPOST_FROM_STREET1 ?? "";
+  const city_locality = process.env.EASYPOST_FROM_CITY ?? "";
+  const postal_code = process.env.EASYPOST_FROM_ZIP ?? "";
+  const country_code = process.env.EASYPOST_FROM_COUNTRY ?? "GB";
+  const phone = process.env.EASYPOST_FROM_PHONE ?? "";
+
+  const missing: string[] = [];
+  if (!name) missing.push("EASYPOST_FROM_NAME");
+  if (!address_line1) missing.push("EASYPOST_FROM_STREET1");
+  if (!city_locality) missing.push("EASYPOST_FROM_CITY");
+  if (!postal_code) missing.push("EASYPOST_FROM_ZIP");
+  if (!phone) missing.push("EASYPOST_FROM_PHONE");
+
+  if (missing.length) {
+    throw new Error(
+      `Sender address is not configured. Add these Vercel env vars: ${missing.join(", ")}`
+    );
+  }
+
   return {
-    name: process.env.EASYPOST_FROM_NAME ?? "",
+    name,
     company_name: process.env.EASYPOST_FROM_COMPANY || undefined,
-    address_line1: process.env.EASYPOST_FROM_STREET1 ?? "",
+    address_line1,
     address_line2: process.env.EASYPOST_FROM_STREET2 || undefined,
-    city_locality: process.env.EASYPOST_FROM_CITY ?? "",
+    city_locality,
     state_province: process.env.EASYPOST_FROM_STATE || undefined,
-    postal_code: process.env.EASYPOST_FROM_ZIP ?? "",
-    country_code: process.env.EASYPOST_FROM_COUNTRY ?? "GB",
-    phone: process.env.EASYPOST_FROM_PHONE || undefined
+    postal_code,
+    country_code,
+    phone
   };
 }
 
