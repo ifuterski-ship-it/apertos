@@ -3,7 +3,7 @@ import type Stripe from "stripe";
 import { products } from "@/lib/products";
 import { assertInventoryAvailable } from "@/lib/inventory";
 import { getStripe } from "@/lib/stripe";
-import { getAllowedShippingCountries } from "@/lib/easypost";
+import { getAllowedShippingCountries } from "@/lib/shipengine";
 
 type CheckoutItem = {
   productId: string;
