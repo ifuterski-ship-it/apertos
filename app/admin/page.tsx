@@ -2,7 +2,7 @@ import Link from "next/link";
 import { GenerateLabelButton } from "@/app/admin/generate-label-button";
 import { hasAdminEmailsConfigured, requireAdminUser } from "@/lib/admin-auth";
 import { getOrdersForAdmin } from "@/lib/orders";
-import { hasEasyPostEnv, hasEasyPostSenderEnv } from "@/lib/easypost";
+import { hasShipStationEnv } from "@/lib/shipstation";
 import { hasSupabaseAdminEnv } from "@/lib/supabase/admin";
 import { getSupabaseEnvDiagnostics } from "@/lib/supabase/env-diagnostics";
 
@@ -62,12 +62,11 @@ export default async function AdminPage() {
         <p className="text-xs uppercase tracking-[0.45em] text-muted">Admin</p>
         <h1 className="mt-4 font-display text-4xl uppercase tracking-[0.08em] md:text-6xl">Orders</h1>
         <p className="mt-4 max-w-3xl text-sm uppercase leading-7 tracking-[0.2em] text-neutral-300">
-          Review paid orders, open existing labels, and generate an EasyPost label from the cheapest available rate.
+          Review paid orders, open existing labels, and generate a ShipStation label for each order.
         </p>
-        {(!hasEasyPostEnv || !hasEasyPostSenderEnv) ? (
+        {!hasShipStationEnv() ? (
           <p className="mt-6 text-xs uppercase leading-6 tracking-[0.25em] text-neutral-400">
-            EasyPost is not fully configured yet. Add `EASYPOST_API_KEY` and the `EASYPOST_FROM_*` sender address
-            variables to enable label purchases.
+            ShipStation is not fully configured yet. Add `SHIPSTATION_API_KEY` and `SHIPSTATION_API_SECRET` to enable label purchases.
           </p>
         ) : null}
       </div>

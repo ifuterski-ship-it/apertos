@@ -2,11 +2,12 @@ import { NextResponse } from "next/server";
 import { sendEmail } from "@/lib/email";
 import { ordersFromEmail } from "@/lib/email-config";
 import { renderShippingNotificationEmail } from "@/lib/email-templates";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { hasSupabaseEnv } from "@/lib/supabase/config";
 import { getOrderForAdmin, saveShippingLabelForOrder } from "@/lib/orders";
 import { isAdminEmail } from "@/lib/admin-auth";
-import { purchaseCheapestLabel } from "@/lib/easypost";
+import { createShipStationLabel } from "@/lib/shipstation";
 
 export const runtime = "nodejs";
 
@@ -39,7 +40,36 @@ export async function POST(
       return NextResponse.json({ ok: false, message: "Order not found." }, { status: 404 });
     }
 
-    const shippingLabel = await purchaseCheapestLabel(order);
+    const result = await createShipStationLabel(order);
+
+    // Upload label PDF to Supabase Storage
+    let labelUrl: string;
+    try {
+      const adminSupabase = createAdminClient();
+      const pdfBuffer = Buffer.from(result.labelData, "base64");
+      const storagePath = `${sessionId}.pdf`;
+
+      await adminSupabase.storage
+        .from("labels")
+        .upload(storagePath, pdfBuffer, { contentType: "application/pdf", upsert: true });
+
+      const { data: urlData } = adminSupabase.storage.from("labels").getPublicUrl(storagePath);
+      labelUrl = urlData.publicUrl;
+    } catch {
+      labelUrl = `data:application/pdf;base64,${result.labelData}`;
+    }
+
+    const shippingLabel = {
+      labelUrl,
+      trackingNumber: result.trackingNumber,
+      transactionId: String(result.shipmentId),
+      rateAmount: String(result.shipmentCost),
+      rateCurrency: "GBP",
+      provider: result.carrierCode,
+      serviceLevel: result.serviceCode,
+      purchasedAt: new Date().toISOString()
+    };
+
     const updatedOrder = await saveShippingLabelForOrder(order.stripeCheckoutSessionId, shippingLabel);
     const shippingAddress = updatedOrder.parsedItemsPayload.shippingAddress;
 
