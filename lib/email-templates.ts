@@ -82,6 +82,26 @@ export function renderOrderConfirmationEmail({
   });
 }
 
+function getTrackingUrl(trackingNumber: string, serviceLevel: string | null): string | null {
+  const service = (serviceLevel ?? "").toLowerCase();
+  if (service.startsWith("royal_mail")) {
+    return `https://www.royalmail.com/track-your-item#/tracking-results/${trackingNumber}`;
+  }
+  if (service.startsWith("evri") || service.startsWith("hermes")) {
+    return `https://www.evri.com/track-a-parcel#/${trackingNumber}`;
+  }
+  if (service.startsWith("dhl")) {
+    return `https://www.dhl.com/gb-en/home/tracking.html?tracking-id=${trackingNumber}`;
+  }
+  if (service.startsWith("ups")) {
+    return `https://www.ups.com/track?tracknum=${trackingNumber}`;
+  }
+  if (service.startsWith("fedex")) {
+    return `https://www.fedex.com/en-gb/tracking.html?trknbr=${trackingNumber}`;
+  }
+  return null;
+}
+
 export function renderShippingNotificationEmail({
   customerName,
   trackingNumber,
@@ -91,17 +111,34 @@ export function renderShippingNotificationEmail({
   trackingNumber: string | null;
   shippingLabel: OrderShippingLabel;
 }) {
+  const trackingUrl = trackingNumber
+    ? getTrackingUrl(trackingNumber, shippingLabel.serviceLevel)
+    : null;
+
+  const trackingBlock = trackingNumber
+    ? `
+      <p style="margin:0 0 18px">Your tracking number is <strong>${trackingNumber}</strong></p>
+      ${
+        trackingUrl
+          ? `<p style="margin:0 0 24px">
+              <a href="${trackingUrl}"
+                style="display:inline-block;background:#ffffff;color:#000000;padding:14px 28px;text-decoration:none;text-transform:uppercase;letter-spacing:0.3em;font-size:12px;font-weight:600;border-radius:2px">
+                Track Your Parcel
+              </a>
+            </p>`
+          : `<p style="margin:0 0 18px">Visit your carrier's website and enter the tracking number above to follow your delivery.</p>`
+      }
+    `
+    : `<p style="margin:0 0 18px">Your tracking number will be available shortly.</p>`;
+
   return renderEmailShell({
     eyebrow: siteName,
-    title: "Shipping Update",
+    title: "Your Order Is On Its Way",
     body: `
-      <p style="margin:0 0 18px">${customerName ?? "Apertos Athlete"}, your order is now packed and moving.</p>
-      <p style="margin:0 0 18px">Carrier ${shippingLabel.provider ?? "Shipping partner"}</p>
-      <p style="margin:0 0 18px">Service ${shippingLabel.serviceLevel ?? "Standard"}</p>
-      <p style="margin:0 0 18px">Tracking ${trackingNumber ?? "Tracking assigned"}</p>
-      <p style="margin:0">
-        <a href="${shippingLabel.labelUrl}" style="color:#ffffff;text-decoration:underline">Open shipping label PDF</a>
-      </p>
+      <p style="margin:0 0 18px">${customerName ?? "Apertos Athlete"}, your order has been packed and is on its way to you.</p>
+      ${trackingBlock}
+      <p style="margin:0 0 8px;color:#a3a3a3">Carrier: ${shippingLabel.provider ?? "Shipping partner"}</p>
+      <p style="margin:0;color:#a3a3a3">Service: ${shippingLabel.serviceLevel ?? "Standard"}</p>
     `,
     footer: "Apertos Fightwear"
   });
