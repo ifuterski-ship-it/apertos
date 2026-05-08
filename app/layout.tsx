@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Suspense } from "react";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import { GoogleAnalytics } from "@/components/analytics/google-analytics";
 import { CartProvider } from "@/components/cart/cart-provider";
@@ -68,6 +69,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
+        <Analytics />
         <Suspense fallback={null}>
           <GoogleAnalytics />
         </Suspense>
