@@ -28,15 +28,12 @@ export default async function AccountPage() {
 
       <div className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-8">
         <div className="space-y-4">
-          <p className="text-xs uppercase tracking-[0.45em] text-muted">Profile</p>
-          <p className="text-sm uppercase leading-7 tracking-[0.2em] text-neutral-300">
-            Your APERTOS account is active. Additional profile, order history, and member tools can be added here next.
-          </p>
+          <p className="text-xs uppercase tracking-[0.45em] text-muted">Account Settings</p>
           <Link
             href="/auth/forgot-password"
             className="inline-flex text-xs uppercase tracking-[0.28em] text-neutral-400 transition hover:text-white"
           >
-            Need To Reset Your Password?
+            Reset Password
           </Link>
           <SignOutButton />
         </div>

@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { Star } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Product, SizeGuideBlock } from "@/lib/products";
 import { ProductInventoryBySize } from "@/lib/inventory";
 import { trackEvent } from "@/lib/analytics";
@@ -100,8 +101,8 @@ export function ProductDetail({
   const [isZoomOpen, setIsZoomOpen] = useState(false);
   const [zoomOrigin, setZoomOrigin] = useState("50% 50%");
   const [checkoutMessage, setCheckoutMessage] = useState<string | null>(null);
-  const [isCheckingOut, setIsCheckingOut] = useState(false);
   const { addItem } = useCart();
+  const router = useRouter();
   const hasTrackedProductView = useRef(false);
   const selectedInventory = inventoryBySize[selectedSize] ?? {
     stock: null,
@@ -158,24 +159,10 @@ export function ProductDetail({
     setZoomOrigin(`${((event.clientX - bounds.left) / bounds.width) * 100}% ${((event.clientY - bounds.top) / bounds.height) * 100}%`);
   };
 
-  const handleBuyNow = async () => {
-    setCheckoutMessage(null);
+  const handleBuyNow = () => {
     if (isOutOfStock) { setCheckoutMessage("This product is currently out of stock."); return; }
-    setIsCheckingOut(true);
-    try {
-      const response = await fetch("/api/stripe/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ items: [{ productId: product.id, quantity: 1, size: selectedSize }] })
-      });
-      const result = (await response.json()) as { ok?: boolean; message?: string; url?: string };
-      if (!response.ok || !result.ok || !result.url) { setCheckoutMessage(result.message ?? "Unable to start Stripe checkout right now."); return; }
-      window.location.href = result.url;
-    } catch {
-      setCheckoutMessage("Unable to connect to Stripe right now. Please try again.");
-    } finally {
-      setIsCheckingOut(false);
-    }
+    addItem(product, selectedSize);
+    router.push("/checkout");
   };
 
   const addToCartLabel = isOutOfStock ? "Out Of Stock" : added ? `Added ${selectedSize}` : "Add To Cart";
@@ -312,10 +299,10 @@ export function ProductDetail({
             <button
               type="button"
               onClick={handleBuyNow}
-              disabled={isCheckingOut || isOutOfStock}
+              disabled={isOutOfStock}
               className="block min-h-[56px] w-full bg-white px-6 py-4 text-center text-sm font-semibold uppercase tracking-[0.35em] text-black transition hover:bg-neutral-100 disabled:cursor-not-allowed disabled:bg-neutral-700 disabled:text-neutral-400"
             >
-              {isOutOfStock ? "Out Of Stock" : isCheckingOut ? "Starting Checkout…" : "Buy Now"}
+              {isOutOfStock ? "Out Of Stock" : "Buy Now"}
             </button>
             {checkoutMessage ? (
               <p className="text-xs uppercase leading-6 tracking-[0.2em] text-neutral-300">{checkoutMessage}</p>

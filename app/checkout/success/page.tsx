@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { PurchaseEvent } from "@/components/analytics/purchase-event";
+import { CartClear } from "@/app/checkout/success/cart-clear";
 import { getStripe } from "@/lib/stripe";
 import { sendEmail } from "@/lib/email";
 import { renderOrderConfirmationEmail } from "@/lib/email-templates";
@@ -163,6 +164,7 @@ export default async function CheckoutSuccessPage({
 
   return (
     <div className="space-y-8 pb-24">
+      <CartClear />
       {sessionId && purchaseItems.length > 0 ? (
         <PurchaseEvent
           transactionId={sessionId}
