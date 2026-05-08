@@ -236,34 +236,41 @@ export async function createShipEngineLabel(order: OrderRecord) {
     phone: address.phone
   });
 
-  const cheapest = [...rawRates].sort(
-    (a, b) => a.shipping_amount.amount - b.shipping_amount.amount
-  )[0];
+  const sorted = [...rawRates].sort((a, b) => a.shipping_amount.amount - b.shipping_amount.amount);
 
-  const labelRes = await fetch(`${SHIPENGINE_BASE_URL}/v1/labels/rates/${cheapest.rate_id}`, {
-    method: "POST",
-    headers: getHeaders(),
-    body: JSON.stringify({ label_format: "pdf", label_layout: "4x6" })
-  });
+  let lastError = "No carriers could produce a label for this shipment.";
 
-  if (!labelRes.ok) {
-    throw new Error(`ShipEngine label error ${labelRes.status}: ${await labelRes.text()}`);
+  for (const rate of sorted) {
+    const labelRes = await fetch(`${SHIPENGINE_BASE_URL}/v1/labels/rates/${rate.rate_id}`, {
+      method: "POST",
+      headers: getHeaders(),
+      body: JSON.stringify({ label_format: "pdf", label_layout: "4x6" })
+    });
+
+    if (!labelRes.ok) {
+      const text = await labelRes.text();
+      lastError = `ShipEngine label error ${labelRes.status}: ${text}`;
+      continue;
+    }
+
+    const label = (await labelRes.json()) as LabelResponse;
+
+    if (!label.tracking_number) {
+      lastError = "ShipEngine did not return a tracking number.";
+      continue;
+    }
+
+    return {
+      labelUrl: label.label_download.pdf,
+      trackingNumber: label.tracking_number,
+      transactionId: label.label_id,
+      rateAmount: String(rate.shipping_amount.amount),
+      rateCurrency: (rate.shipping_amount.currency ?? "GBP").toUpperCase(),
+      provider: rate.carrier_id,
+      serviceLevel: rate.service_code,
+      purchasedAt: new Date().toISOString()
+    };
   }
 
-  const label = (await labelRes.json()) as LabelResponse;
-
-  if (!label.tracking_number) {
-    throw new Error("ShipEngine did not return a tracking number.");
-  }
-
-  return {
-    labelUrl: label.label_download.pdf,
-    trackingNumber: label.tracking_number,
-    transactionId: label.label_id,
-    rateAmount: String(cheapest.shipping_amount.amount),
-    rateCurrency: (cheapest.shipping_amount.currency ?? "GBP").toUpperCase(),
-    provider: cheapest.carrier_id,
-    serviceLevel: cheapest.service_code,
-    purchasedAt: new Date().toISOString()
-  };
+  throw new Error(lastError);
 }
