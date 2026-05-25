@@ -343,6 +343,18 @@ export async function getProductWithInventoryStatus(productId: string) {
     return null;
   }
 
+  if (product.isComingSoon) {
+    const comingSoonStatus: ProductInventoryStatus = {
+      stock: 0,
+      isOutOfStock: true,
+      message: "Coming Soon"
+    };
+    return {
+      product,
+      inventoryBySize: Object.fromEntries(product.sizes.map((size) => [size, comingSoonStatus]))
+    };
+  }
+
   const rows = await fetchInventoryRows(getBaseInventoryProductsForProduct(product.id));
   const inventoryState = createInventoryState(rows);
 
