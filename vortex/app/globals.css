@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap');
+
+:root {
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: #0a0a0b;
+  color: #fff;
+  font-family: 'DM Sans', 'Helvetica Neue', sans-serif;
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+.vx-heading {
+  font-family: 'Bebas Neue', Impact, sans-serif;
+  letter-spacing: 0.06em;
+}
+
+textarea::placeholder { color: #444; }
+select option { background: #111115; }
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 3px; }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes pulse-bar { 0%,100% { opacity: 1; } 50% { opacity: 0.6; } }
