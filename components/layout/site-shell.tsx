@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Heart, Menu, ShoppingBag, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { usePathname } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
 import { useCart } from "@/components/cart/cart-provider";
 import { NewsletterSignup } from "@/components/marketing/newsletter-signup";
@@ -22,8 +23,13 @@ const navLinks = [
 ];
 
 export function SiteShell({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
   const { totalItems, isHydrated } = useCart();
   const { totalItems: wishlistTotal } = useWishlist();
+
+  if (pathname?.startsWith('/vortex')) {
+    return <>{children}</>;
+  }
   const supabase = useMemo(() => (hasSupabaseEnv ? createClient() : null), []);
   const [user, setUser] = useState<User | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
