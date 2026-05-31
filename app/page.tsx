@@ -207,11 +207,12 @@ export default function HomePage() {
       </section>
 
       {/* ── Category links ── */}
-      <section className="grid gap-5 lg:grid-cols-3">
+      <section className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
         {[
           { href: "/shop/rash-guards", label: "Rash Guards", eyebrow: "Performance Top" },
           { href: "/shop/mma-shorts", label: "MMA Shorts", eyebrow: "Training Bottoms" },
-          { href: "/shop/no-gi-sets", label: "No-Gi Sets", eyebrow: "Bundle" }
+          { href: "/shop/no-gi-sets", label: "No-Gi Sets", eyebrow: "Bundle" },
+          { href: "/shop/apparel", label: "Apparel & Accessories", eyebrow: "Lifestyle" }
         ].map(({ href, label, eyebrow }) => (
           <Link
             key={href}

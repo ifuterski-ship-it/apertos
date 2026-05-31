@@ -131,12 +131,19 @@ export default function ShopPage() {
         </p>
       </div>
 
-      {/* Category cards */}
-      <div className="grid gap-4 md:grid-cols-3">
+      {/* Products */}
+      <div className="space-y-3">
+        <p className="text-[10px] uppercase tracking-[0.55em] text-crimson">All Products</p>
+        <ProductGrid products={products} />
+      </div>
+
+      {/* Category cards — below products for SEO */}
+      <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4">
         {[
           { title: "Rash Guards", desc: "Compression-style BJJ rash guards built for no-gi drilling, mat durability and clean performance fit." },
           { title: "MMA Shorts", desc: "Lightweight MMA shorts made for grappling movement, sparring comfort and everyday combat sports training." },
-          { title: "No-Gi Sets", desc: "Matching no-gi sets that pair rash guards and shorts for athletes who want a complete premium fightwear look." }
+          { title: "No-Gi Sets", desc: "Matching no-gi sets that pair rash guards and shorts for athletes who want a complete premium fightwear look." },
+          { title: "Apparel & Accessories", desc: "Premium hoodies and lifestyle apparel built for athletes who carry their training mentality off the mat." }
         ].map(({ title, desc }) => (
           <div key={title} className="rounded-[1.5rem] border border-white/10 bg-panel p-6">
             <div className="mb-3 h-0.5 w-8 bg-crimson" />
@@ -144,12 +151,6 @@ export default function ShopPage() {
             <p className="mt-3 text-sm uppercase leading-7 tracking-[0.18em] text-neutral-400">{desc}</p>
           </div>
         ))}
-      </div>
-
-      {/* Products */}
-      <div className="space-y-3">
-        <p className="text-[10px] uppercase tracking-[0.55em] text-crimson">All Products</p>
-        <ProductGrid products={products} />
       </div>
     </div>
   );

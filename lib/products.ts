@@ -170,7 +170,11 @@ export const products: Product[] = [
 ];
 
 export function getFeaturedProducts() {
-  return products;
+  return products.filter((p) => p.id === "apertos-the-original-no-gi-set");
+}
+
+export function getApparelProducts() {
+  return products.filter((p) => p.category === "Outerwear");
 }
 
 export function getProductById(id: string) {
