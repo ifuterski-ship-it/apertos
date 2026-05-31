@@ -39,16 +39,16 @@ export function ProductCard({ product }: { product: Product }) {
         ) : null}
 
         <Link href={`/product/${product.id}`} className="block">
-          <div className="relative aspect-[4/5] overflow-hidden bg-white">
+          <div className="relative aspect-[4/5] overflow-hidden bg-[#0d0d0d]">
             {product.isComingSoon ? (
-              <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#0a0a0a]">
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <div className="relative h-16 w-16 opacity-20">
                   <Image src="/logo-mark.png" alt="" fill sizes="64px" className="object-contain" />
                 </div>
                 <p className="mt-4 text-[10px] uppercase tracking-[0.4em] text-neutral-600">Image Coming Soon</p>
               </div>
             ) : (
-              <div className="absolute inset-0 p-8 md:p-10">
+              <div className="absolute inset-0 p-6 md:p-8">
                 <Image
                   src={product.image}
                   alt={product.name}
@@ -58,9 +58,9 @@ export function ProductCard({ product }: { product: Product }) {
                 />
               </div>
             )}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
             <div className="absolute inset-x-0 bottom-0 p-5">
-              <p className="text-[10px] uppercase tracking-[0.4em] text-white/60">{product.category}</p>
+              <p className="text-[10px] uppercase tracking-[0.4em] text-white/50">{product.category}</p>
               <h3 className="font-display text-2xl uppercase tracking-[0.08em] text-white">{product.name}</h3>
             </div>
           </div>

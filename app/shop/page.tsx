@@ -122,12 +122,11 @@ export default function ShopPage() {
       />
 
       {/* Hero */}
-      <div className="rounded-[1.75rem] border border-white/10 bg-panel p-8 md:p-12">
-        <p className="text-[10px] uppercase tracking-[0.55em] text-crimson">Shop</p>
-        <h1 className="mt-3 font-display text-5xl uppercase tracking-[0.06em] md:text-7xl">
-          The Apertos Collection
+      <div className="py-10 text-center">
+        <h1 className="font-display text-6xl uppercase tracking-[0.06em] text-white sm:text-7xl md:text-8xl lg:text-9xl">
+          The Apertos<br />Collection
         </h1>
-        <p className="mt-4 max-w-2xl text-sm uppercase leading-7 tracking-[0.2em] text-neutral-400">
+        <p className="mx-auto mt-6 max-w-xl text-sm uppercase leading-7 tracking-[0.22em] text-neutral-400">
           Premium BJJ rash guards, MMA shorts and no-gi sets built for grapplers who train seriously.
         </p>
       </div>

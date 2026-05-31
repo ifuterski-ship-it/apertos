@@ -157,9 +157,8 @@ export default function HomePage() {
             <p className="mb-5 text-[11px] uppercase tracking-[0.55em] text-crimson">
               Apertos Fightwear — Premium Combat Sports
             </p>
-            <h1 className="font-display text-6xl uppercase leading-none tracking-[0.04em] text-white sm:text-7xl md:text-8xl lg:text-9xl">
-              Premium<br />No-Gi.<br />
-              <span className="text-crimson">Built For</span><br />Scrambles.
+            <h1 className="font-display text-6xl uppercase leading-none tracking-[0.04em] text-crimson sm:text-7xl md:text-8xl lg:text-9xl">
+              Premium No-Gi.<br />Built For<br />Scrambles.
             </h1>
             <p className="mt-8 max-w-md text-sm uppercase leading-7 tracking-[0.2em] text-neutral-300">
               BJJ rash guards, MMA shorts and no-gi sets engineered for grapplers who train seriously.
@@ -187,11 +186,9 @@ export default function HomePage() {
         {featureCards.map(({ icon: Icon, title, description }) => (
           <div
             key={title}
-            className="rounded-[1.75rem] border border-white/10 bg-panel p-8 space-y-4"
+            className="rounded-[1.75rem] border border-white/10 bg-panel p-8 space-y-5"
           >
-            <div className="inline-flex items-center justify-center rounded-full border border-crimson/30 bg-crimson/10 p-3">
-              <Icon className="h-5 w-5 text-crimson" />
-            </div>
+            <Icon className="h-8 w-8 text-white/70" strokeWidth={1.5} />
             <h3 className="font-display text-2xl uppercase tracking-[0.15em]">{title}</h3>
             <p className="text-sm uppercase leading-7 tracking-[0.18em] text-neutral-400">{description}</p>
           </div>
