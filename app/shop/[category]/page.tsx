@@ -6,7 +6,7 @@ import { absoluteUrl } from "@/lib/site";
 
 type CategoryConfig = {
   displayName: string;
-  categoryFilter: string;
+  categoryFilter: string[];
   description: string;
   features: string[];
   metaTitle: string;
@@ -17,7 +17,7 @@ type CategoryConfig = {
 const categoryConfig: Record<string, CategoryConfig> = {
   "rash-guards": {
     displayName: "Rash Guards",
-    categoryFilter: "Performance Top",
+    categoryFilter: ["Performance Top"],
     description:
       "Compression-style BJJ rash guards built for no-gi drilling, mat durability and clean performance fit. Crafted from 4-way stretch polyester-spandex blend for freedom of movement and moisture-wicking breathability during hard training sessions.",
     features: [
@@ -43,7 +43,7 @@ const categoryConfig: Record<string, CategoryConfig> = {
   },
   "mma-shorts": {
     displayName: "MMA Shorts",
-    categoryFilter: "Training Bottoms",
+    categoryFilter: ["Training Bottoms"],
     description:
       "Lightweight MMA shorts made for grappling movement, sparring comfort and everyday combat sports training. Quick-dry 4-way stretch fabric delivers unrestricted range of motion whether you're drilling takedowns, working guard or sparring on the feet.",
     features: [
@@ -69,7 +69,7 @@ const categoryConfig: Record<string, CategoryConfig> = {
   },
   "no-gi-sets": {
     displayName: "No-Gi Sets",
-    categoryFilter: "Bundle",
+    categoryFilter: ["Bundle"],
     description:
       "Matching no-gi sets pairing a premium rash guard and MMA shorts in one complete combat sports bundle. A better-value option for athletes who want a unified APERTOS look on the mat — built from the same high-performance 4-way stretch fabric as our individual pieces.",
     features: [
@@ -91,6 +91,31 @@ const categoryConfig: Record<string, CategoryConfig> = {
       "mma set",
       "no gi bjj bundle",
       "apertos no gi set"
+    ]
+  },
+  "apparel": {
+    displayName: "Apparel & Accessories",
+    categoryFilter: ["Outerwear", "Tops", "Accessories"],
+    description:
+      "Apertos apparel built for the gym bag, warm-ups and everyday wear. Clean monochrome designs engineered for athletes who train hard and dress with intention — from heavyweight hoodies to training tees.",
+    features: [
+      "Premium heavyweight fabrics",
+      "Monochrome APERTOS design",
+      "Built for the mat and the street",
+      "Sizes S–2XL"
+    ],
+    metaTitle: "Fightwear Apparel & Accessories UK | Apertos Fightwear",
+    metaDescription:
+      "Apertos apparel and accessories for combat sports athletes. Premium hoodies, training tees and more. UK-based fightwear brand.",
+    metaKeywords: [
+      "bjj hoodie uk",
+      "mma hoodie",
+      "combat sports apparel uk",
+      "fightwear hoodie",
+      "bjj clothing uk",
+      "mma clothing",
+      "apertos hoodie",
+      "grappling apparel uk"
     ]
   }
 };
@@ -153,7 +178,7 @@ export default async function CategoryPage({
   }
 
   const categoryProducts = products.filter(
-    (product) => product.category === config.categoryFilter
+    (product) => config.categoryFilter.includes(product.category)
   );
 
   return (

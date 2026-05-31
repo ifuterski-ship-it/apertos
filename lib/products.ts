@@ -36,7 +36,7 @@ export const products: Product[] = [
     id: "apertos-the-original-rashguard",
     name: "Apertos The Original Rashguard",
     price: 34.99,
-    priceLabel: "\u00A334.99",
+    priceLabel: "£34.99",
     image: "/products/rashguard-back.png",
     images: ["/products/rashguard-back.png", "/products/rashguard-front.png"],
     sizes: ["S", "M", "L", "XL", "2XL"],
@@ -65,7 +65,7 @@ export const products: Product[] = [
     id: "apertos-the-original-shorts",
     name: "Apertos The Original Shorts",
     price: 34.99,
-    priceLabel: "\u00A334.99",
+    priceLabel: "£34.99",
     image: "/products/shorts-back.png",
     images: ["/products/shorts-back.png", "/products/shorts-front.png"],
     sizes: ["S", "M", "L", "XL", "2XL"],
@@ -94,7 +94,7 @@ export const products: Product[] = [
     id: "apertos-the-original-no-gi-set",
     name: "Apertos The Original No Gi Set",
     price: 59.99,
-    priceLabel: "\u00A359.99",
+    priceLabel: "£59.99",
     image: "/products/nogi-front.jpg",
     images: [
       "/products/nogi-front.jpg",
@@ -170,7 +170,11 @@ export const products: Product[] = [
 ];
 
 export function getFeaturedProducts() {
-  return products;
+  return products.filter((p) => p.id === "apertos-the-original-no-gi-set");
+}
+
+export function getApparelProducts() {
+  return products.filter((p) => p.category === "Outerwear");
 }
 
 export function getProductById(id: string) {
