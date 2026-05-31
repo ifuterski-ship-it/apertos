@@ -11,15 +11,15 @@ export function ProductCard({ product }: { product: Product }) {
   const inWishlist = has(product.id);
 
   return (
-    <div className="group overflow-hidden rounded-[1.75rem] border border-white/10 bg-white/[0.03] transition duration-500 hover:-translate-y-1 hover:border-white/20 hover:bg-white/[0.05]">
+    <div className="group overflow-hidden rounded-[1.75rem] border border-white/10 bg-panel transition duration-500 hover:-translate-y-1 hover:border-white/20">
       <div className="relative">
         {product.isBestSeller ? (
-          <div className="absolute left-4 top-4 z-10 bg-white px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.3em] text-black">
+          <div className="absolute left-4 top-4 z-10 bg-crimson px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.3em] text-white">
             Best Seller
           </div>
         ) : null}
         {product.isComingSoon ? (
-          <div className="absolute left-4 top-4 z-10 bg-white px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.3em] text-black">
+          <div className="absolute left-4 top-4 z-10 bg-crimson px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.3em] text-white">
             Coming Soon
           </div>
         ) : null}
@@ -29,14 +29,15 @@ export function ProductCard({ product }: { product: Product }) {
             onClick={() => toggle(product.id)}
             className={`absolute right-4 top-4 z-10 inline-flex items-center justify-center rounded-full border p-2 transition ${
               inWishlist
-                ? "border-red-400/60 bg-red-500/20 text-red-300"
-                : "border-white/20 bg-black/35 text-neutral-200 hover:border-white/50 hover:text-white"
+                ? "border-crimson/60 bg-crimson/20 text-crimson"
+                : "border-white/20 bg-black/50 text-neutral-200 hover:border-white/50 hover:text-white"
             }`}
             aria-label={inWishlist ? `Remove ${product.name} from wishlist` : `Add ${product.name} to wishlist`}
           >
             <Heart className={`h-4 w-4 ${inWishlist ? "fill-current" : ""}`} />
           </button>
         ) : null}
+
         <Link href={`/product/${product.id}`} className="block">
           <div className="relative aspect-[4/5] overflow-hidden bg-white">
             {product.isComingSoon ? (
@@ -57,25 +58,33 @@ export function ProductCard({ product }: { product: Product }) {
                 />
               </div>
             )}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-            <div className="absolute inset-x-0 bottom-0 p-6">
-              <p className="text-xs uppercase tracking-[0.4em] text-white/70">{product.category}</p>
-              <h3 className="font-display text-3xl uppercase tracking-[0.08em]">{product.name}</h3>
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+            <div className="absolute inset-x-0 bottom-0 p-5">
+              <p className="text-[10px] uppercase tracking-[0.4em] text-white/60">{product.category}</p>
+              <h3 className="font-display text-2xl uppercase tracking-[0.08em] text-white">{product.name}</h3>
             </div>
           </div>
         </Link>
       </div>
-      <div className="space-y-4 p-6">
-        <div className="flex items-center justify-between gap-4">
-          <div>
-            <p className="text-sm uppercase tracking-[0.25em] text-neutral-300">{product.shortDescription}</p>
-            <p className="mt-2 text-lg font-semibold">{product.priceLabel}</p>
-          </div>
+
+      <div className="p-5 space-y-4">
+        <div className="flex items-center justify-between">
+          <p className="text-sm uppercase tracking-[0.2em] text-neutral-400">{product.shortDescription}</p>
+          <p className="text-lg font-semibold text-white">{product.priceLabel}</p>
+        </div>
+
+        <div className="grid grid-cols-2 gap-2">
           <Link
             href={`/product/${product.id}`}
-            className="border border-white/20 px-4 py-2 text-xs uppercase tracking-[0.3em] transition hover:border-white hover:bg-white hover:text-black"
+            className="flex items-center justify-center border border-white/15 bg-black py-3 text-[11px] font-semibold uppercase tracking-[0.25em] text-white transition hover:border-white/40 hover:bg-white/5"
           >
-            {product.isComingSoon ? "Learn More" : "View Product"}
+            {product.isComingSoon ? "Coming Soon" : "Add To Cart"}
+          </Link>
+          <Link
+            href={`/product/${product.id}`}
+            className="flex items-center justify-center bg-crimson py-3 text-[11px] font-semibold uppercase tracking-[0.25em] text-white transition hover:bg-crimson/85"
+          >
+            Size Guide
           </Link>
         </div>
       </div>

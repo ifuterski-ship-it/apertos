@@ -121,41 +121,37 @@ export default function ShopPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(storeSchema) }}
       />
 
-      {/* Hero — description lives here, not floating above cards */}
-      <div className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-8 md:p-12">
-        <p className="text-xs uppercase tracking-[0.45em] text-muted">Shop</p>
-        <h1 className="mt-4 font-display text-4xl uppercase tracking-[0.08em] md:text-6xl">
+      {/* Hero */}
+      <div className="rounded-[1.75rem] border border-white/10 bg-panel p-8 md:p-12">
+        <p className="text-[10px] uppercase tracking-[0.55em] text-crimson">Shop</p>
+        <h1 className="mt-3 font-display text-5xl uppercase tracking-[0.06em] md:text-7xl">
           The Apertos Collection
         </h1>
+        <p className="mt-4 max-w-2xl text-sm uppercase leading-7 tracking-[0.2em] text-neutral-400">
+          Premium BJJ rash guards, MMA shorts and no-gi sets built for grapplers who train seriously.
+        </p>
       </div>
 
       {/* Category cards */}
-      <div className="grid gap-6 md:grid-cols-3">
-        <div className="rounded-[1.75rem] border border-white/10 bg-white/[0.03] p-6">
-          <h2 className="font-display text-2xl uppercase tracking-[0.08em]">Rash Guards</h2>
-          <p className="mt-3 text-sm uppercase leading-7 tracking-[0.18em] text-neutral-300">
-            Compression-style BJJ rash guards built for no-gi drilling, mat durability and clean
-            performance fit.
-          </p>
-        </div>
-        <div className="rounded-[1.75rem] border border-white/10 bg-white/[0.03] p-6">
-          <h2 className="font-display text-2xl uppercase tracking-[0.08em]">MMA Shorts</h2>
-          <p className="mt-3 text-sm uppercase leading-7 tracking-[0.18em] text-neutral-300">
-            Lightweight MMA shorts made for grappling movement, sparring comfort and everyday
-            combat sports training.
-          </p>
-        </div>
-        <div className="rounded-[1.75rem] border border-white/10 bg-white/[0.03] p-6">
-          <h2 className="font-display text-2xl uppercase tracking-[0.08em]">No-Gi Sets</h2>
-          <p className="mt-3 text-sm uppercase leading-7 tracking-[0.18em] text-neutral-300">
-            Matching no-gi sets that pair rash guards and shorts for athletes who want a complete
-            premium fightwear look.
-          </p>
-        </div>
+      <div className="grid gap-4 md:grid-cols-3">
+        {[
+          { title: "Rash Guards", desc: "Compression-style BJJ rash guards built for no-gi drilling, mat durability and clean performance fit." },
+          { title: "MMA Shorts", desc: "Lightweight MMA shorts made for grappling movement, sparring comfort and everyday combat sports training." },
+          { title: "No-Gi Sets", desc: "Matching no-gi sets that pair rash guards and shorts for athletes who want a complete premium fightwear look." }
+        ].map(({ title, desc }) => (
+          <div key={title} className="rounded-[1.5rem] border border-white/10 bg-panel p-6">
+            <div className="mb-3 h-0.5 w-8 bg-crimson" />
+            <h2 className="font-display text-2xl uppercase tracking-[0.08em]">{title}</h2>
+            <p className="mt-3 text-sm uppercase leading-7 tracking-[0.18em] text-neutral-400">{desc}</p>
+          </div>
+        ))}
       </div>
 
       {/* Products */}
-      <ProductGrid products={products} />
+      <div className="space-y-3">
+        <p className="text-[10px] uppercase tracking-[0.55em] text-crimson">All Products</p>
+        <ProductGrid products={products} />
+      </div>
     </div>
   );
 }

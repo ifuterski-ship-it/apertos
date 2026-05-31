@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { Layers, Ruler, Zap } from "lucide-react";
 import { ProductGrid } from "@/components/products/product-grid";
-import { SectionHeading } from "@/components/ui/section-heading";
 import { getFeaturedProducts } from "@/lib/products";
 import { absoluteUrl, siteKeywords } from "@/lib/site";
 
@@ -33,35 +33,19 @@ const homepageKeywords = [
 ];
 
 export const metadata: Metadata = {
-  title: {
-    absolute: homepageTitle
-  },
+  title: { absolute: homepageTitle },
   description: homepageDescription,
   keywords: homepageKeywords,
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: { index: true, follow: true }
-  },
-  alternates: {
-    canonical: absoluteUrl("/")
-  },
+  robots: { index: true, follow: true, googleBot: { index: true, follow: true } },
+  alternates: { canonical: absoluteUrl("/") },
   openGraph: {
     title: homepageTitle,
-    description:
-      "Premium fightwear designed for grapplers, strikers, and combat sports athletes. Shop rash guards, MMA shorts, and no-gi sets at apertosfightwear.com",
+    description: "Premium fightwear designed for grapplers, strikers, and combat sports athletes.",
     url: absoluteUrl("/"),
     type: "website",
     siteName: "Apertos Fightwear",
     locale: "en_GB",
-    images: [
-      {
-        url: absoluteUrl("/products/nogi-lifestyle.jpeg"),
-        width: 1200,
-        height: 1800,
-        alt: "Apertos Fightwear no-gi set — rash guard and shorts"
-      }
-    ]
+    images: [{ url: absoluteUrl("/products/nogi-lifestyle.jpeg"), width: 1200, height: 1800, alt: "Apertos Fightwear no-gi set" }]
   },
   twitter: {
     card: "summary_large_image",
@@ -85,7 +69,7 @@ const faqItems = [
   {
     question: "What Sizes Do You Stock?",
     answer:
-      "Apertos Fightwear is available in sizes XS through 3XL across all product categories. Size charts are available on each product page."
+      "Apertos Fightwear is available in sizes S through 2XL across all product categories. Size charts are available on each product page."
   },
   {
     question: "How Do I Care For Apertos Rash Guards And Shorts?",
@@ -99,6 +83,24 @@ const faqItems = [
   }
 ];
 
+const featureCards = [
+  {
+    icon: Layers,
+    title: "Fabric",
+    description: "85% polyester, 15% spandex — 4-way stretch, moisture-wicking performance material built for hard rounds and mat durability."
+  },
+  {
+    icon: Ruler,
+    title: "Fit",
+    description: "Compression-cut for maximum movement, locked-in feel and zero bunching under the gi or during scrambles."
+  },
+  {
+    icon: Zap,
+    title: "Design",
+    description: "Clean monochrome silhouette engineered for competition focus. Sharp lines, zero excess."
+  }
+];
+
 export default function HomePage() {
   const featuredProducts = getFeaturedProducts();
 
@@ -107,8 +109,7 @@ export default function HomePage() {
     "@type": "Organization",
     name: "Apertos Fightwear",
     url: "https://apertosfightwear.com",
-    description:
-      "Premium BJJ rash guards, MMA shorts, and no-gi sets engineered for grapplers, strikers, and high-output combat sports athletes.",
+    description: "Premium BJJ rash guards, MMA shorts, and no-gi sets engineered for grapplers, strikers, and high-output combat sports athletes.",
     logo: absoluteUrl("/logo-mark.png"),
     email: "info@apertosfightwear.com",
     sameAs: ["https://instagram.com/apertos.fightwear", "https://www.tiktok.com/@apertos.fightwear"]
@@ -119,12 +120,7 @@ export default function HomePage() {
     "@type": "WebSite",
     name: "Apertos Fightwear",
     url: "https://apertosfightwear.com",
-    description: homepageDescription,
-    potentialAction: {
-      "@type": "SearchAction",
-      target: "https://apertosfightwear.com/shop?q={search_term_string}",
-      "query-input": "required name=search_term_string"
-    }
+    description: homepageDescription
   };
 
   const faqSchema = {
@@ -133,100 +129,88 @@ export default function HomePage() {
     mainEntity: faqItems.map((item) => ({
       "@type": "Question",
       name: item.question,
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: item.answer
-      }
+      acceptedAnswer: { "@type": "Answer", text: item.answer }
     }))
   };
 
   return (
-    <div className="space-y-24 pb-24">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
-      />
+    <div className="space-y-20 pb-24">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
 
-      {/* Hero */}
-      <section className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-panel/70 px-6 py-20 shadow-luxe md:px-10 md:py-28">
-        <div className="absolute inset-0 bg-grain opacity-80" />
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/60 to-transparent" />
-        <div className="absolute -right-10 top-1/2 hidden h-[420px] w-[420px] -translate-y-1/2 opacity-[0.09] lg:block">
-          <Image src="/logo-mark.png" alt="" fill sizes="420px" className="object-contain" />
-        </div>
-        <div className="relative mx-auto flex max-w-4xl animate-float-in flex-col items-center space-y-8 text-center">
-          <div className="space-y-5">
-            <div className="mx-auto relative h-24 w-24 overflow-hidden rounded-full border border-white/10 bg-black shadow-luxe">
-              <Image
-                src="/logo-mark.png"
-                alt="Apertos Fightwear logo"
-                fill
-                sizes="96px"
-                className="object-cover opacity-90"
-              />
-            </div>
-            <p className="text-sm uppercase tracking-[0.5em] text-muted">Premium Combat Sports</p>
-            <h1 className="font-display text-5xl uppercase leading-none tracking-[0.08em] md:text-7xl">
-              Apertos Fightwear — BJJ &amp; MMA Gear Built For High-Output Training
-            </h1>
-            <p className="mx-auto max-w-3xl text-sm uppercase leading-7 tracking-[0.2em] text-neutral-300">
-              Apertos Fightwear is a premium combat sports brand offering compression-style BJJ rash
-              guards, lightweight MMA fight shorts, and matching no-gi sets. Every piece is engineered
-              for mat durability, full range of motion, and clean performance fit — built for grapplers,
-              strikers, and athletes who train seriously.
-            </p>
-          </div>
-          <p className="text-[11px] uppercase tracking-[0.35em] text-neutral-500">
-            Trusted by grapplers across the UK
-          </p>
-          <Link
-            href="/shop"
-            className="inline-flex items-center border border-white px-6 py-3 text-sm font-semibold uppercase tracking-[0.35em] transition hover:bg-white hover:text-black"
-          >
-            Shop Now
-          </Link>
-        </div>
-      </section>
-
-      {/* Discipline */}
-      <section className="grid gap-8 lg:grid-cols-[1.4fr_1fr]">
-        <div className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-8 md:p-12">
-          <SectionHeading
-            eyebrow="Discipline"
-            title="Built For Athletes Who Perform Under Pressure"
-            description="Precision-cut essentials, engineered for the ritual of hard rounds, sharp focus, and quiet confidence."
+      {/* ── Hero ── */}
+      <section className="relative -mx-4 overflow-hidden sm:-mx-6 lg:-mx-8">
+        <div className="relative min-h-[88vh] flex items-center">
+          <Image
+            src="/products/nogi-lifestyle.jpeg"
+            alt="BJJ athlete wearing Apertos Fightwear no-gi set"
+            fill
+            sizes="100vw"
+            className="object-cover object-center"
+            priority
           />
-        </div>
-        <div className="relative flex items-end overflow-hidden rounded-[2rem] border border-white/10 bg-gradient-to-br from-white/[0.08] to-transparent p-8">
-          <div className="absolute right-0 top-0 h-36 w-36 opacity-[0.08]">
-            <Image src="/logo-mark.png" alt="" fill sizes="144px" className="object-contain" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/55 to-black" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/40 to-transparent" />
+
+          <div className="relative z-10 mx-auto w-full max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
+            <p className="mb-5 text-[11px] uppercase tracking-[0.55em] text-crimson">
+              Apertos Fightwear — Premium Combat Sports
+            </p>
+            <h1 className="font-display text-6xl uppercase leading-none tracking-[0.04em] text-white sm:text-7xl md:text-8xl lg:text-9xl">
+              Premium<br />No-Gi.<br />
+              <span className="text-crimson">Built For</span><br />Scrambles.
+            </h1>
+            <p className="mt-8 max-w-md text-sm uppercase leading-7 tracking-[0.2em] text-neutral-300">
+              BJJ rash guards, MMA shorts and no-gi sets engineered for grapplers who train seriously.
+            </p>
+            <div className="mt-10 flex flex-wrap gap-4">
+              <Link
+                href="/shop"
+                className="inline-flex items-center bg-crimson px-7 py-4 text-xs font-semibold uppercase tracking-[0.3em] text-white transition hover:bg-crimson/85"
+              >
+                Shop Performance Gear
+              </Link>
+              <Link
+                href="/product/apertos-essential-hoodie"
+                className="inline-flex items-center border border-crimson px-7 py-4 text-xs font-semibold uppercase tracking-[0.3em] text-white transition hover:bg-crimson/10"
+              >
+                Shop Lifestyle &amp; Accessories
+              </Link>
+            </div>
           </div>
-          <p className="relative text-sm uppercase leading-7 tracking-[0.28em] text-neutral-300">
-            Minimal silhouettes. Competition-ready function. A premium uniform for training days and fight nights.
-          </p>
         </div>
       </section>
 
-      {/* Featured products */}
+      {/* ── Feature cards ── */}
+      <section className="grid gap-5 md:grid-cols-3">
+        {featureCards.map(({ icon: Icon, title, description }) => (
+          <div
+            key={title}
+            className="rounded-[1.75rem] border border-white/10 bg-panel p-8 space-y-4"
+          >
+            <div className="inline-flex items-center justify-center rounded-full border border-crimson/30 bg-crimson/10 p-3">
+              <Icon className="h-5 w-5 text-crimson" />
+            </div>
+            <h3 className="font-display text-2xl uppercase tracking-[0.15em]">{title}</h3>
+            <p className="text-sm uppercase leading-7 tracking-[0.18em] text-neutral-400">{description}</p>
+          </div>
+        ))}
+      </section>
+
+      {/* ── Featured products ── */}
       <section className="space-y-8">
-        <SectionHeading
-          eyebrow="Featured"
-          title="The Original Collection"
-          description="Premium BJJ rash guards, MMA shorts and no-gi sets designed to keep the storefront clean, focused, and ready to ship."
-        />
+        <div>
+          <p className="text-xs uppercase tracking-[0.55em] text-crimson">Collection</p>
+          <h2 className="mt-3 font-display text-4xl uppercase tracking-[0.08em] md:text-5xl">
+            The Apertos Collection
+          </h2>
+        </div>
         <ProductGrid products={featuredProducts} />
       </section>
 
-      {/* Category cards — stripped to title + arrow, link to collection pages */}
-      <section className="grid gap-6 lg:grid-cols-3">
+      {/* ── Category links ── */}
+      <section className="grid gap-5 lg:grid-cols-3">
         {[
           { href: "/shop/rash-guards", label: "Rash Guards", eyebrow: "Performance Top" },
           { href: "/shop/mma-shorts", label: "MMA Shorts", eyebrow: "Training Bottoms" },
@@ -235,47 +219,43 @@ export default function HomePage() {
           <Link
             key={href}
             href={href}
-            className="group flex items-center justify-between rounded-[2rem] border border-white/10 bg-white/[0.03] p-8 transition hover:border-white/30 hover:bg-white/[0.06]"
+            className="group flex items-center justify-between rounded-[1.75rem] border border-white/10 bg-panel p-7 transition hover:border-crimson/40 hover:bg-panel/80"
           >
             <div>
-              <p className="text-xs uppercase tracking-[0.45em] text-muted">{eyebrow}</p>
-              <h2 className="mt-2 font-display text-3xl uppercase tracking-[0.08em]">{label}</h2>
+              <p className="text-[10px] uppercase tracking-[0.45em] text-crimson">{eyebrow}</p>
+              <h2 className="mt-2 font-display text-2xl uppercase tracking-[0.08em]">{label}</h2>
             </div>
-            <span className="text-2xl text-neutral-500 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-white">
+            <span className="text-xl text-neutral-600 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-crimson">
               →
             </span>
           </Link>
         ))}
       </section>
 
-      {/* Lifestyle image — no-gi set */}
-      <section className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr]">
-        <div className="relative min-h-[520px] overflow-hidden rounded-[2rem] border border-white/10 bg-black">
+      {/* ── Lifestyle image — no-gi set ── */}
+      <section className="grid gap-6 lg:grid-cols-2">
+        <div className="relative min-h-[520px] overflow-hidden rounded-[1.75rem] border border-white/10 bg-black">
           <Image
             src="/products/nogi-lifestyle.jpeg"
-            alt="BJJ athlete wearing Apertos Fightwear no-gi set — matching rash guard and fight shorts"
+            alt="BJJ athlete wearing Apertos Fightwear no-gi set"
             fill
             sizes="(min-width: 1024px) 50vw, 100vw"
             className="object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
         </div>
-        <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.03] p-8 md:p-12">
-          <div className="absolute -right-8 top-0 h-40 w-40 opacity-[0.08]">
-            <Image src="/logo-mark.png" alt="" fill sizes="160px" className="object-contain" />
-          </div>
-          <div className="relative flex h-full flex-col justify-center space-y-6">
-            <p className="text-xs uppercase tracking-[0.45em] text-muted">On The Mat</p>
-            <h2 className="font-display text-4xl uppercase tracking-[0.08em] md:text-6xl">
+        <div className="relative overflow-hidden rounded-[1.75rem] border border-white/10 bg-panel p-8 md:p-12">
+          <div className="flex h-full flex-col justify-center space-y-6">
+            <p className="text-[10px] uppercase tracking-[0.55em] text-crimson">On The Mat</p>
+            <h2 className="font-display text-4xl uppercase tracking-[0.08em] md:text-5xl">
               Built To Look Sharp Under Pressure
             </h2>
-            <p className="max-w-2xl text-sm uppercase leading-7 tracking-[0.22em] text-neutral-300">
-              The original no-gi set worn the way it was designed to feel: clean lines, locked-in movement, and a
-              competition-ready silhouette that stands out without losing discipline.
+            <p className="max-w-md text-sm uppercase leading-7 tracking-[0.22em] text-neutral-400">
+              The original no-gi set worn the way it was designed to feel — clean lines, locked-in movement, and a competition-ready silhouette.
             </p>
             <Link
               href="/product/apertos-the-original-no-gi-set"
-              className="inline-flex w-fit items-center border border-white px-6 py-3 text-sm font-semibold uppercase tracking-[0.35em] transition hover:bg-white hover:text-black"
+              className="inline-flex w-fit items-center bg-crimson px-6 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-white transition hover:bg-crimson/85"
             >
               View The Set
             </Link>
@@ -283,80 +263,70 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Lifestyle image — training */}
-      <section className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
-        <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.03] p-8 md:p-12">
-          <div className="absolute -left-10 bottom-0 h-44 w-44 opacity-[0.08]">
-            <Image src="/logo-mark.png" alt="" fill sizes="176px" className="object-contain" />
-          </div>
-          <div className="relative flex h-full flex-col justify-center space-y-6">
-            <p className="text-xs uppercase tracking-[0.45em] text-muted">Movement</p>
-            <h2 className="font-display text-4xl uppercase tracking-[0.08em] md:text-6xl">
+      {/* ── Lifestyle image — training ── */}
+      <section className="grid gap-6 lg:grid-cols-2">
+        <div className="relative overflow-hidden rounded-[1.75rem] border border-white/10 bg-panel p-8 md:p-12">
+          <div className="flex h-full flex-col justify-center space-y-6">
+            <p className="text-[10px] uppercase tracking-[0.55em] text-crimson">Movement</p>
+            <h2 className="font-display text-4xl uppercase tracking-[0.08em] md:text-5xl">
               Designed For Scrambles, Pressure And Control
             </h2>
-            <p className="max-w-2xl text-sm uppercase leading-7 tracking-[0.22em] text-neutral-300">
-              Every seam, panel and silhouette is built to stay composed when the pace changes. The no-gi set is made
-              to move hard and still look refined.
+            <p className="max-w-md text-sm uppercase leading-7 tracking-[0.22em] text-neutral-400">
+              Every seam, panel and silhouette is built to stay composed when the pace changes.
             </p>
             <Link
               href="/shop"
-              className="inline-flex w-fit items-center border border-white px-6 py-3 text-sm font-semibold uppercase tracking-[0.35em] transition hover:bg-white hover:text-black"
+              className="inline-flex w-fit items-center border border-crimson px-6 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-white transition hover:bg-crimson/10"
             >
               Shop The Collection
             </Link>
           </div>
         </div>
-        <div className="relative min-h-[520px] overflow-hidden rounded-[2rem] border border-white/10 bg-black">
+        <div className="relative min-h-[520px] overflow-hidden rounded-[1.75rem] border border-white/10 bg-black">
           <Image
             src="/products/nogi-lifestyle-2.jpeg"
-            alt="BJJ athlete training in Apertos Fightwear no-gi set during no-gi grappling session"
+            alt="BJJ athlete training in Apertos Fightwear no-gi set"
             fill
             sizes="(min-width: 1024px) 50vw, 100vw"
             className="object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/10 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
         </div>
       </section>
 
-      {/* FAQ */}
+      {/* ── FAQ ── */}
       <section className="space-y-8">
         <div>
-          <p className="text-xs uppercase tracking-[0.5em] text-muted">FAQ</p>
-          <h2 className="mt-4 font-display text-4xl uppercase tracking-[0.08em] md:text-5xl">
+          <p className="text-xs uppercase tracking-[0.55em] text-crimson">FAQ</p>
+          <h2 className="mt-3 font-display text-4xl uppercase tracking-[0.08em] md:text-5xl">
             Frequently Asked Questions
           </h2>
         </div>
-        <div className="space-y-4">
+        <div className="space-y-3">
           {faqItems.map((item) => (
-            <div
-              key={item.question}
-              className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-8"
-            >
+            <div key={item.question} className="rounded-[1.5rem] border border-white/10 bg-panel p-7">
               <h3 className="font-display text-xl uppercase tracking-[0.08em]">{item.question}</h3>
-              <p className="mt-4 text-sm uppercase leading-7 tracking-[0.18em] text-neutral-300">
-                {item.answer}
-              </p>
+              <p className="mt-4 text-sm uppercase leading-7 tracking-[0.18em] text-neutral-400">{item.answer}</p>
             </div>
           ))}
         </div>
       </section>
 
-      {/* Social */}
-      <section className="rounded-[2rem] border border-white/10 bg-white/[0.03] px-6 py-16 text-center md:px-12">
-        <p className="text-xs uppercase tracking-[0.5em] text-muted">Follow Us</p>
-        <h2 className="mt-4 font-display text-4xl uppercase tracking-[0.08em] md:text-5xl">
+      {/* ── Social ── */}
+      <section className="rounded-[1.75rem] border border-white/10 bg-panel px-6 py-16 text-center md:px-12">
+        <p className="text-[10px] uppercase tracking-[0.55em] text-crimson">Follow Us</p>
+        <h2 className="mt-3 font-display text-4xl uppercase tracking-[0.08em] md:text-5xl">
           Follow Us On The Mat
         </h2>
-        <p className="mx-auto mt-4 max-w-xl text-sm uppercase leading-7 tracking-[0.2em] text-neutral-300">
-          See how athletes are training in Apertos gear. Follow us on TikTok for behind-the-scenes, training clips, and
-          new drops.
+        <p className="mx-auto mt-4 max-w-xl text-sm uppercase leading-7 tracking-[0.2em] text-neutral-400">
+          See how athletes are training in Apertos gear. Follow us on TikTok for behind-the-scenes, training clips, and new drops.
         </p>
         <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
           <a
             href="https://www.tiktok.com/@apertos.fightwear"
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center border border-white px-6 py-3 text-sm font-semibold uppercase tracking-[0.35em] transition hover:bg-white hover:text-black"
+            className="inline-flex items-center bg-crimson px-6 py-3 text-xs font-semibold uppercase tracking-[0.35em] text-white transition hover:bg-crimson/85"
           >
             TikTok @apertos.fightwear
           </a>
@@ -364,7 +334,7 @@ export default function HomePage() {
             href="https://instagram.com/apertos.fightwear"
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center border border-white/20 px-6 py-3 text-sm uppercase tracking-[0.35em] transition hover:border-white hover:text-white"
+            className="inline-flex items-center border border-white/20 px-6 py-3 text-xs uppercase tracking-[0.35em] transition hover:border-white hover:text-white"
           >
             Instagram @apertos.fightwear
           </a>

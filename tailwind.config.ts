@@ -9,11 +9,12 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        canvas: "#0A0A0A",
+        canvas: "#000000",
         panel: "#111111",
         ink: "#F5F5F5",
         muted: "#A3A3A3",
-        line: "#2A2A2A"
+        line: "#2A2A2A",
+        crimson: "#DC143C"
       },
       fontFamily: {
         display: ["Impact", "Haettenschweiler", "Arial Narrow Bold", "sans-serif"],

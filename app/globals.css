@@ -12,9 +12,6 @@ html {
 
 body {
   @apply bg-canvas text-ink font-sans antialiased;
-  background-image:
-    radial-gradient(circle at top, rgba(255, 255, 255, 0.08), transparent 24%),
-    linear-gradient(180deg, #090909 0%, #050505 100%);
 }
 
 * {
