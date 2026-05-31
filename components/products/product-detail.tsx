@@ -8,6 +8,7 @@ import { Product, SizeGuideBlock } from "@/lib/products";
 import { ProductInventoryBySize } from "@/lib/inventory";
 import { trackEvent } from "@/lib/analytics";
 import { useCart } from "@/components/cart/cart-provider";
+import { WaitlistForm } from "@/components/products/waitlist-form";
 
 function Stars({ rating }: { rating: number }) {
   return (
@@ -95,8 +96,10 @@ export function ProductDetail({
   reviewSummary?: { average: number; count: number } | null;
 }) {
   const [added, setAdded] = useState(false);
+  const [selectedColour, setSelectedColour] = useState(product.colours?.[0] ?? null);
   const galleryImages = useMemo(() => product.images ?? [product.image], [product.image, product.images]);
-  const [activeImage, setActiveImage] = useState(galleryImages[0]);
+  const colourImageIndex = selectedColour && product.colours ? product.colours.indexOf(selectedColour) : 0;
+  const [activeImage, setActiveImage] = useState(galleryImages[Math.max(colourImageIndex, 0)]);
   const [selectedSize, setSelectedSize] = useState(product.sizes[0]);
   const [isZoomOpen, setIsZoomOpen] = useState(false);
   const [zoomOrigin, setZoomOrigin] = useState("50% 50%");
@@ -109,7 +112,7 @@ export function ProductDetail({
     isOutOfStock: false,
     message: "Stock unavailable"
   };
-  const isOutOfStock = selectedInventory.isOutOfStock;
+  const isOutOfStock = selectedInventory.isOutOfStock && !product.isComingSoon;
   const isLowStock =
     !isOutOfStock &&
     selectedInventory.stock !== null &&
@@ -268,6 +271,33 @@ export function ProductDetail({
             </div>
           </div>
 
+          {/* Colour selector */}
+          {product.colours && product.colours.length > 0 ? (
+            <div className="space-y-3">
+              <p className="text-xs uppercase tracking-[0.35em] text-muted">Select Colour</p>
+              <div className="flex flex-wrap gap-3">
+                {product.colours.map((colour, i) => {
+                  const active = colour === selectedColour;
+                  return (
+                    <button
+                      key={colour}
+                      type="button"
+                      onClick={() => {
+                        setSelectedColour(colour);
+                        if (galleryImages[i]) setActiveImage(galleryImages[i]);
+                      }}
+                      className={`min-h-[44px] min-w-20 border px-4 py-3 text-xs uppercase tracking-[0.35em] transition ${
+                        active ? "border-white bg-white text-black" : "border-white/15 hover:border-white/50"
+                      }`}
+                    >
+                      {colour}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ) : null}
+
           {/* Size selector */}
           <div className="space-y-3">
             <div className="flex items-center justify-between gap-4">
@@ -276,7 +306,7 @@ export function ProductDetail({
             <div className="flex flex-wrap gap-3">
               {product.sizes.map((size) => {
                 const active = size === selectedSize;
-                const disabled = Boolean(inventoryBySize[size]?.isOutOfStock);
+                const disabled = !product.isComingSoon && Boolean(inventoryBySize[size]?.isOutOfStock);
                 return (
                   <button
                     key={size}
@@ -296,26 +326,43 @@ export function ProductDetail({
 
           {/* Buttons — desktop/tablet */}
           <div className="hidden space-y-3 sm:block">
-            <button
-              type="button"
-              onClick={handleBuyNow}
-              disabled={isOutOfStock}
-              className="block min-h-[56px] w-full bg-white px-6 py-4 text-center text-sm font-semibold uppercase tracking-[0.35em] text-black transition hover:bg-neutral-100 disabled:cursor-not-allowed disabled:bg-neutral-700 disabled:text-neutral-400"
-            >
-              {isOutOfStock ? "Out Of Stock" : "Buy Now"}
-            </button>
-            {checkoutMessage ? (
-              <p className="text-xs uppercase leading-6 tracking-[0.2em] text-neutral-300">{checkoutMessage}</p>
-            ) : null}
-            <button
-              type="button"
-              onClick={handleAddToCart}
-              disabled={isOutOfStock}
-              className="min-h-[52px] w-full border border-white/20 px-6 py-4 text-sm font-semibold uppercase tracking-[0.35em] text-neutral-300 transition hover:border-white hover:text-white disabled:cursor-not-allowed disabled:border-neutral-700 disabled:text-neutral-600"
-            >
-              {addToCartLabel}
-            </button>
+            {product.isComingSoon ? (
+              <button
+                type="button"
+                disabled
+                className="block min-h-[56px] w-full cursor-not-allowed bg-neutral-800 px-6 py-4 text-center text-sm font-semibold uppercase tracking-[0.35em] text-neutral-500"
+              >
+                Coming Soon
+              </button>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  onClick={handleBuyNow}
+                  disabled={isOutOfStock}
+                  className="block min-h-[56px] w-full bg-white px-6 py-4 text-center text-sm font-semibold uppercase tracking-[0.35em] text-black transition hover:bg-neutral-100 disabled:cursor-not-allowed disabled:bg-neutral-700 disabled:text-neutral-400"
+                >
+                  {isOutOfStock ? "Out Of Stock" : "Buy Now"}
+                </button>
+                {checkoutMessage ? (
+                  <p className="text-xs uppercase leading-6 tracking-[0.2em] text-neutral-300">{checkoutMessage}</p>
+                ) : null}
+                <button
+                  type="button"
+                  onClick={handleAddToCart}
+                  disabled={isOutOfStock}
+                  className="min-h-[52px] w-full border border-white/20 px-6 py-4 text-sm font-semibold uppercase tracking-[0.35em] text-neutral-300 transition hover:border-white hover:text-white disabled:cursor-not-allowed disabled:border-neutral-700 disabled:text-neutral-600"
+                >
+                  {addToCartLabel}
+                </button>
+              </>
+            )}
           </div>
+
+          {/* Waitlist — coming soon products */}
+          {product.isComingSoon ? (
+            <WaitlistForm product={product.id} />
+          ) : null}
 
           {/* Accordions */}
           <div className="space-y-2">
@@ -366,21 +413,31 @@ export function ProductDetail({
         </div>
       </div>
 
-      {/* ── Sticky mobile Add to Cart ── */}
+      {/* ── Sticky mobile CTA ── */}
       <div className="fixed bottom-0 left-0 right-0 z-30 border-t border-white/10 bg-canvas/96 p-4 backdrop-blur-xl sm:hidden">
         <div className="mx-auto flex max-w-7xl items-center gap-3 px-0">
           <div className="min-w-0 flex-1">
             <p className="truncate font-display text-base uppercase tracking-[0.06em]">{product.name}</p>
             <p className="text-sm font-semibold">{product.priceLabel}</p>
           </div>
-          <button
-            type="button"
-            onClick={handleAddToCart}
-            disabled={isOutOfStock}
-            className="min-h-[50px] shrink-0 border border-white bg-white px-5 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-black transition hover:bg-transparent hover:text-white disabled:border-neutral-600 disabled:bg-neutral-900 disabled:text-neutral-500"
-          >
-            {addToCartLabel}
-          </button>
+          {product.isComingSoon ? (
+            <button
+              type="button"
+              disabled
+              className="min-h-[50px] shrink-0 cursor-not-allowed border border-neutral-700 bg-neutral-900 px-5 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-neutral-500"
+            >
+              Coming Soon
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={handleAddToCart}
+              disabled={isOutOfStock}
+              className="min-h-[50px] shrink-0 border border-white bg-white px-5 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-black transition hover:bg-transparent hover:text-white disabled:border-neutral-600 disabled:bg-neutral-900 disabled:text-neutral-500"
+            >
+              {addToCartLabel}
+            </button>
+          )}
         </div>
       </div>
 

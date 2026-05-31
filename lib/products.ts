@@ -19,6 +19,7 @@ export type Product = {
   image: string;
   images?: string[];
   sizes: string[];
+  colours?: string[];
   category: string;
   shortDescription: string;
   description: string;
@@ -27,14 +28,15 @@ export type Product = {
   material?: string;
   careInstructions?: string;
   isBestSeller?: boolean;
+  isComingSoon?: boolean;
 };
 
 export const products: Product[] = [
   {
     id: "apertos-the-original-rashguard",
     name: "Apertos The Original Rashguard",
-    price: 29.99,
-    priceLabel: "\u00A329.99",
+    price: 34.99,
+    priceLabel: "\u00A334.99",
     image: "/products/rashguard-back.png",
     images: ["/products/rashguard-back.png", "/products/rashguard-front.png"],
     sizes: ["S", "M", "L", "XL", "2XL"],
@@ -62,8 +64,8 @@ export const products: Product[] = [
   {
     id: "apertos-the-original-shorts",
     name: "Apertos The Original Shorts",
-    price: 29.99,
-    priceLabel: "\u00A329.99",
+    price: 34.99,
+    priceLabel: "\u00A334.99",
     image: "/products/shorts-back.png",
     images: ["/products/shorts-back.png", "/products/shorts-front.png"],
     sizes: ["S", "M", "L", "XL", "2XL"],
@@ -91,8 +93,8 @@ export const products: Product[] = [
   {
     id: "apertos-the-original-no-gi-set",
     name: "Apertos The Original No Gi Set",
-    price: 49.99,
-    priceLabel: "\u00A349.99",
+    price: 59.99,
+    priceLabel: "\u00A359.99",
     image: "/products/nogi-front.jpg",
     images: [
       "/products/nogi-front.jpg",
@@ -130,6 +132,37 @@ export const products: Product[] = [
           { size: "L", waist: "32-34 in", length: "17.5 in" },
           { size: "XL", waist: "34-36 in", length: "18 in" },
           { size: "2XL", waist: "36-38 in", length: "18.5 in" }
+        ]
+      }
+    ]
+  },
+  {
+    id: "apertos-essential-hoodie",
+    name: "Apertos Essential Hoodie",
+    price: 49.99,
+    priceLabel: "£49.99",
+    image: "/products/hoodie-grey.png",
+    images: ["/products/hoodie-grey.png", "/products/hoodie-black.png"],
+    sizes: ["S", "M", "L", "XL", "2XL"],
+    colours: ["Grey", "Black"],
+    category: "Outerwear",
+    shortDescription: "Premium combat sports hoodie",
+    shippingWeightLb: 1.5,
+    description:
+      "A clean, heavyweight hoodie built for the gym bag, mat warm-up and everyday wear in the Apertos monochrome style.",
+    material: "80% Cotton, 20% Polyester — heavyweight fleece, brushed interior",
+    careInstructions: "Machine wash cold 30°C · Tumble dry low · Do not iron print",
+    isComingSoon: true,
+    sizeGuides: [
+      {
+        title: "Hoodie Size Guide",
+        note: "Relaxed fit. Size down for a more fitted look.",
+        rows: [
+          { size: "S", chest: "38-40 in", length: "26 in" },
+          { size: "M", chest: "40-42 in", length: "27 in" },
+          { size: "L", chest: "42-44 in", length: "28 in" },
+          { size: "XL", chest: "44-46 in", length: "29 in" },
+          { size: "2XL", chest: "46-48 in", length: "30 in" }
         ]
       }
     ]

@@ -10,13 +10,14 @@ type InventoryRow = {
 
 type BaseInventoryProductId = "rashguard" | "shorts";
 
-type InventoryState = Record<
-  BaseInventoryProductId,
-  {
-    totalStock: number;
-    hasBaseRow: boolean;
-  }
->;
+type InventoryProductState = {
+  totalStock: number;
+  hasBaseRow: boolean;
+  stockBySize: Record<string, number>;
+  hasSizeRows: boolean;
+};
+
+type InventoryState = Record<BaseInventoryProductId, InventoryProductState>;
 
 export type ProductInventoryStatus = {
   stock: number | null;
@@ -61,6 +62,28 @@ function getBaseInventoryRequirements(items: OrderItem[]) {
   return requirements;
 }
 
+type SizeRequirement = { productId: BaseInventoryProductId; size: string; quantity: number };
+
+function getSizeInventoryRequirements(items: OrderItem[]): SizeRequirement[] {
+  const map = new Map<string, SizeRequirement>();
+
+  for (const item of items) {
+    const baseProducts = getBaseInventoryProductsForProduct(item.productId);
+
+    for (const baseProduct of baseProducts) {
+      const key = `${baseProduct}/${item.size}`;
+      const existing = map.get(key);
+      if (existing) {
+        existing.quantity += item.quantity;
+      } else {
+        map.set(key, { productId: baseProduct, size: item.size, quantity: item.quantity });
+      }
+    }
+  }
+
+  return [...map.values()];
+}
+
 async function fetchInventoryRows(baseProductIds: BaseInventoryProductId[]) {
   if (!hasSupabaseAdminEnv || baseProductIds.length === 0) {
     return [] as InventoryRow[];
@@ -87,14 +110,8 @@ async function fetchInventoryRows(baseProductIds: BaseInventoryProductId[]) {
 
 function createInventoryState(rows: InventoryRow[]): InventoryState {
   const state: InventoryState = {
-    rashguard: {
-      totalStock: fallbackProductStock.rashguard,
-      hasBaseRow: false
-    },
-    shorts: {
-      totalStock: fallbackProductStock.shorts,
-      hasBaseRow: false
-    }
+    rashguard: { totalStock: fallbackProductStock.rashguard, hasBaseRow: false, stockBySize: {}, hasSizeRows: false },
+    shorts: { totalStock: fallbackProductStock.shorts, hasBaseRow: false, stockBySize: {}, hasSizeRows: false }
   };
 
   const groupedRows = new Map<BaseInventoryProductId, InventoryRow[]>();
@@ -113,6 +130,7 @@ function createInventoryState(rows: InventoryRow[]): InventoryState {
   for (const productId of Object.keys(state) as BaseInventoryProductId[]) {
     const productRows = groupedRows.get(productId) ?? [];
     const baseRows = productRows.filter((row) => !row.size);
+    const sizeRows = productRows.filter((row) => !!row.size);
 
     if (baseRows.length > 0) {
       state[productId] = {
@@ -120,18 +138,26 @@ function createInventoryState(rows: InventoryRow[]): InventoryState {
           baseRows.reduce((total, row) => total + Math.max(row.stock ?? 0, 0), 0),
           0
         ),
-        hasBaseRow: true
+        hasBaseRow: true,
+        stockBySize: {},
+        hasSizeRows: false
       };
       continue;
     }
 
-    if (productRows.length > 0) {
+    if (sizeRows.length > 0) {
+      const stockBySize: Record<string, number> = {};
+      for (const row of sizeRows) {
+        if (row.size) stockBySize[row.size] = Math.max(row.stock ?? 0, 0);
+      }
       state[productId] = {
         totalStock: Math.max(
-          productRows.reduce((total, row) => total + Math.max(row.stock ?? 0, 0), 0),
+          Object.values(stockBySize).reduce((a, b) => a + b, 0),
           0
         ),
-        hasBaseRow: false
+        hasBaseRow: false,
+        stockBySize,
+        hasSizeRows: true
       };
     }
   }
@@ -181,8 +207,28 @@ function createInventoryStatus(product: Product, inventoryState: InventoryState)
 }
 
 function createInventoryBySize(product: Product, inventoryState: InventoryState): ProductInventoryBySize {
-  const status = createInventoryStatus(product, inventoryState);
-  return Object.fromEntries(product.sizes.map((size) => [size, status]));
+  const baseProducts = getBaseInventoryProductsForProduct(product.id);
+  const allHaveSizeRows = baseProducts.length > 0 && baseProducts.every((id) => inventoryState[id].hasSizeRows);
+
+  if (!allHaveSizeRows) {
+    const status = createInventoryStatus(product, inventoryState);
+    return Object.fromEntries(product.sizes.map((size) => [size, status]));
+  }
+
+  return Object.fromEntries(
+    product.sizes.map((size) => {
+      const stockForSize = Math.min(...baseProducts.map((id) => inventoryState[id].stockBySize[size] ?? 0));
+
+      if (stockForSize <= 0) {
+        return [size, { stock: 0, isOutOfStock: true, message: "Out of stock" } satisfies ProductInventoryStatus];
+      }
+
+      return [
+        size,
+        { stock: stockForSize, isOutOfStock: false, message: `${stockForSize} available now` } satisfies ProductInventoryStatus
+      ];
+    })
+  );
 }
 
 export async function assertInventoryAvailable(items: OrderItem[]) {
@@ -190,11 +236,21 @@ export async function assertInventoryAvailable(items: OrderItem[]) {
   const rows = await fetchInventoryRows([...requirements.keys()]);
   const inventoryState = createInventoryState(rows);
 
-  for (const [productId, quantity] of requirements.entries()) {
-    const availableStock = inventoryState[productId].totalStock;
+  const allHaveSizeRows = [...requirements.keys()].every((id) => inventoryState[id].hasSizeRows);
 
-    if (availableStock < quantity) {
-      throw new Error(`Not enough ${productId} stock is available right now.`);
+  if (allHaveSizeRows) {
+    for (const { productId, size, quantity } of getSizeInventoryRequirements(items)) {
+      const available = inventoryState[productId].stockBySize[size] ?? 0;
+      if (available < quantity) {
+        throw new Error(`Not enough ${productId} stock in size ${size} is available right now.`);
+      }
+    }
+  } else {
+    for (const [productId, quantity] of requirements.entries()) {
+      const availableStock = inventoryState[productId].totalStock;
+      if (availableStock < quantity) {
+        throw new Error(`Not enough ${productId} stock is available right now.`);
+      }
     }
   }
 }
@@ -226,35 +282,53 @@ export async function decrementInventoryForOrder(order: OrderRecord) {
   }
 
   const supabase = createAdminClient();
+  const allHaveSizeRows = [...requirements.keys()].every((id) => inventoryState[id].hasSizeRows);
 
-  for (const [productId, quantity] of requirements.entries()) {
-    const currentStock = inventoryState[productId].totalStock;
-    const nextStock = Math.max(currentStock - quantity, 0);
+  if (allHaveSizeRows) {
+    for (const { productId, size, quantity } of getSizeInventoryRequirements(order.parsedItemsPayload.items)) {
+      const currentStock = inventoryState[productId].stockBySize[size] ?? 0;
+      const nextStock = Math.max(currentStock - quantity, 0);
 
-    if (inventoryState[productId].hasBaseRow) {
       const { error } = await supabase
         .from("inventory")
         .update({ stock: nextStock })
         .eq("product_id", productId)
-        .is("size", null);
+        .eq("size", size);
 
       if (error) {
         throw new Error(error.message);
       }
-    } else {
-      const { error } = await supabase.from("inventory").upsert(
-        {
-          product_id: productId,
-          stock: nextStock,
-          size: null
-        },
-        {
-          onConflict: "product_id,size"
-        }
-      );
+    }
+  } else {
+    for (const [productId, quantity] of requirements.entries()) {
+      const currentStock = inventoryState[productId].totalStock;
+      const nextStock = Math.max(currentStock - quantity, 0);
 
-      if (error) {
-        throw new Error(error.message);
+      if (inventoryState[productId].hasBaseRow) {
+        const { error } = await supabase
+          .from("inventory")
+          .update({ stock: nextStock })
+          .eq("product_id", productId)
+          .is("size", null);
+
+        if (error) {
+          throw new Error(error.message);
+        }
+      } else {
+        const { error } = await supabase.from("inventory").upsert(
+          {
+            product_id: productId,
+            stock: nextStock,
+            size: null
+          },
+          {
+            onConflict: "product_id,size"
+          }
+        );
+
+        if (error) {
+          throw new Error(error.message);
+        }
       }
     }
   }
@@ -267,6 +341,18 @@ export async function getProductWithInventoryStatus(productId: string) {
 
   if (!product) {
     return null;
+  }
+
+  if (product.isComingSoon) {
+    const comingSoonStatus: ProductInventoryStatus = {
+      stock: 0,
+      isOutOfStock: true,
+      message: "Coming Soon"
+    };
+    return {
+      product,
+      inventoryBySize: Object.fromEntries(product.sizes.map((size) => [size, comingSoonStatus]))
+    };
   }
 
   const rows = await fetchInventoryRows(getBaseInventoryProductsForProduct(product.id));
