@@ -30,32 +30,17 @@ const shopKeywords = [
 ];
 
 export const metadata: Metadata = {
-  title: {
-    absolute: shopTitle
-  },
+  title: { absolute: shopTitle },
   description: shopDescription,
   keywords: shopKeywords,
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: { index: true, follow: true }
-  },
-  alternates: {
-    canonical: absoluteUrl("/shop")
-  },
+  robots: { index: true, follow: true, googleBot: { index: true, follow: true } },
+  alternates: { canonical: absoluteUrl("/shop") },
   openGraph: {
     title: shopTitle,
     description: shopDescription,
     url: absoluteUrl("/shop"),
     type: "website",
-    images: [
-      {
-        url: absoluteUrl("/products/nogi-lifestyle.jpeg"),
-        width: 1200,
-        height: 1800,
-        alt: "Apertos Fightwear — BJJ rash guards, MMA shorts and no-gi sets"
-      }
-    ]
+    images: [{ url: absoluteUrl("/products/nogi-lifestyle.jpeg"), width: 1200, height: 1800, alt: "Apertos Fightwear — BJJ rash guards, MMA shorts and no-gi sets" }]
   },
   twitter: {
     card: "summary_large_image",
@@ -88,51 +73,35 @@ export default function ShopPage() {
       "@type": "OfferCatalog",
       name: "Apertos Fightwear Product Range",
       itemListElement: [
-        {
-          "@type": "OfferCatalog",
-          name: "BJJ Rash Guards",
-          description:
-            "Compression-style BJJ rash guards built for no-gi drilling, mat durability and clean performance fit."
-        },
-        {
-          "@type": "OfferCatalog",
-          name: "MMA Shorts",
-          description:
-            "Lightweight MMA shorts made for grappling movement, sparring comfort and everyday combat sports training."
-        },
-        {
-          "@type": "OfferCatalog",
-          name: "No-Gi Sets",
-          description:
-            "Matching no-gi sets that pair rash guards and shorts for athletes who want a complete premium fightwear look."
-        }
+        { "@type": "OfferCatalog", name: "BJJ Rash Guards", description: "Compression-style BJJ rash guards built for no-gi drilling, mat durability and clean performance fit." },
+        { "@type": "OfferCatalog", name: "MMA Shorts", description: "Lightweight MMA shorts made for grappling movement, sparring comfort and everyday combat sports training." },
+        { "@type": "OfferCatalog", name: "No-Gi Sets", description: "Matching no-gi sets that pair rash guards and shorts for athletes who want a complete premium fightwear look." }
       ]
     },
-    sameAs: [
-      "https://www.tiktok.com/@apertos.fightwear",
-      "https://instagram.com/apertos.fightwear"
-    ]
+    sameAs: ["https://www.tiktok.com/@apertos.fightwear", "https://instagram.com/apertos.fightwear"]
   };
 
   return (
     <div className="space-y-10 pb-24">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(storeSchema) }}
-      />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(storeSchema) }} />
 
       {/* Hero */}
-      <div className="rounded-[1.75rem] border border-white/10 bg-panel p-8 md:p-12">
-        <p className="text-[10px] uppercase tracking-[0.55em] text-crimson">Shop</p>
-        <h1 className="mt-3 font-display text-5xl uppercase tracking-[0.06em] md:text-7xl">
-          The Apertos Collection
+      <div className="py-10 text-center">
+        <h1 className="font-display text-6xl uppercase tracking-[0.06em] text-white sm:text-7xl md:text-8xl lg:text-9xl">
+          The Apertos<br />Collection
         </h1>
-        <p className="mt-4 max-w-2xl text-sm uppercase leading-7 tracking-[0.2em] text-neutral-400">
+        <p className="mx-auto mt-6 max-w-xl text-sm uppercase leading-7 tracking-[0.22em] text-neutral-400">
           Premium BJJ rash guards, MMA shorts and no-gi sets built for grapplers who train seriously.
         </p>
       </div>
 
-      {/* Category cards */}
+      {/* Products */}
+      <div className="space-y-3">
+        <p className="text-[10px] uppercase tracking-[0.55em] text-crimson">All Products</p>
+        <ProductGrid products={products} />
+      </div>
+
+      {/* Category cards — below products for SEO */}
       <div className="grid gap-4 md:grid-cols-3">
         {[
           { title: "Rash Guards", desc: "Compression-style BJJ rash guards built for no-gi drilling, mat durability and clean performance fit." },
@@ -145,12 +114,6 @@ export default function ShopPage() {
             <p className="mt-3 text-sm uppercase leading-7 tracking-[0.18em] text-neutral-400">{desc}</p>
           </div>
         ))}
-      </div>
-
-      {/* Products */}
-      <div className="space-y-3">
-        <p className="text-[10px] uppercase tracking-[0.55em] text-crimson">All Products</p>
-        <ProductGrid products={products} />
       </div>
     </div>
   );

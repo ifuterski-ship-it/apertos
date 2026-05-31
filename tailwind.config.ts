@@ -24,8 +24,7 @@ const config: Config = {
         luxe: "0 20px 80px rgba(255,255,255,0.08)"
       },
       backgroundImage: {
-        grain:
-          "radial-gradient(circle at top, rgba(255,255,255,0.14), transparent 35%), linear-gradient(135deg, rgba(255,255,255,0.06), transparent 50%)"
+        grain: "radial-gradient(circle at top, rgba(255,255,255,0.14), transparent 35%), linear-gradient(135deg, rgba(255,255,255,0.06), transparent 50%)"
       },
       keyframes: {
         floatIn: {
