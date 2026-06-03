@@ -1,4 +1,4 @@
-import type { OrderItem, OrderShippingLabel } from "@/lib/orders";
+import type { OrderItem, OrderShippingAddress, OrderShippingLabel } from "@/lib/orders";
 import { siteName } from "@/lib/site";
 
 function renderEmailShell({
@@ -76,7 +76,7 @@ export function renderOrderConfirmationEmail({
         </tbody>
       </table>
       <p style="margin:0">Order total ${amountTotal !== null ? `£${(amountTotal / 100).toFixed(2)}` : "Paid in full"}</p>
-      <p style="margin:18px 0 0">We’ll email you again as soon as your shipment is moving.</p>
+      <p style="margin:18px 0 0">We'll email you again as soon as your shipment is moving.</p>
     `,
     footer: "Apertos Fightwear"
   });
@@ -150,7 +150,7 @@ export function renderNewsletterWelcomeEmail(email: string) {
     title: "Subscribed To Apertos News",
     body: `
       <p style="margin:0 0 18px">${email} is now on the APERTOS news list.</p>
-      <p style="margin:0 0 18px">You’ll hear first about product drops, no-gi releases, and future training-focused updates.</p>
+      <p style="margin:0 0 18px">You'll hear first about product drops, no-gi releases, and future training-focused updates.</p>
       <p style="margin:0">Expect clean, occasional emails only when there is something worth opening.</p>
     `,
     footer: "Apertos Fightwear"
@@ -166,5 +166,69 @@ export function renderNewsletterInternalEmail(email: string) {
       <p style="margin:0">${email}</p>
     `,
     footer: "Apertos Fightwear"
+  });
+}
+
+export function renderPodFulfillmentEmail({
+  sessionId,
+  podItems,
+  shippingAddress
+}: {
+  sessionId: string;
+  podItems: OrderItem[];
+  shippingAddress: OrderShippingAddress | null;
+}) {
+  const addr = shippingAddress;
+  const addressLines = [
+    addr?.name,
+    addr?.address1,
+    addr?.address2,
+    addr?.city,
+    addr?.state,
+    addr?.postalCode,
+    addr?.country
+  ]
+    .filter(Boolean)
+    .join("<br />");
+
+  const itemRows = podItems
+    .map(
+      (item) => `
+        <tr>
+          <td style="padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.08)">${item.name}</td>
+          <td style="padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.08);text-align:center">${item.colour ?? "—"}</td>
+          <td style="padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.08);text-align:center">${item.size}</td>
+          <td style="padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.08);text-align:center">${item.quantity}</td>
+        </tr>
+      `
+    )
+    .join("");
+
+  return renderEmailShell({
+    eyebrow: "POD Fulfillment Required",
+    title: "Submit To Tapstitch",
+    body: `
+      <p style="margin:0 0 24px;color:#dc143c;font-size:13px">A customer has ordered a print-on-demand item. Submit this order to Tapstitch now.</p>
+
+      <table style="width:100%;border-collapse:collapse;margin:0 0 24px">
+        <thead>
+          <tr style="color:#8f8f8f;font-size:11px;letter-spacing:0.28em">
+            <th style="padding:0 0 10px;text-align:left">Product</th>
+            <th style="padding:0 0 10px;text-align:center">Colour</th>
+            <th style="padding:0 0 10px;text-align:center">Size</th>
+            <th style="padding:0 0 10px;text-align:center">Qty</th>
+          </tr>
+        </thead>
+        <tbody>${itemRows}</tbody>
+      </table>
+
+      <p style="margin:0 0 8px;font-size:12px;color:#8f8f8f;letter-spacing:0.28em;text-transform:uppercase">Ship To</p>
+      <p style="margin:0 0 24px;line-height:1.8">${addressLines || "Address not available"}</p>
+      ${addr?.phone ? `<p style="margin:0 0 8px">Phone: ${addr.phone}</p>` : ""}
+      ${addr?.email ? `<p style="margin:0 0 24px">Email: ${addr.email}</p>` : ""}
+
+      <p style="margin:0;color:#8f8f8f;font-size:11px">Order ref: ${sessionId}</p>
+    `,
+    footer: "Apertos Fightwear — POD Fulfillment Alert"
   });
 }

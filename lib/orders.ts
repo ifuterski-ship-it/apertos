@@ -6,6 +6,7 @@ export type OrderItem = {
   name: string;
   quantity: number;
   size: string;
+  colour?: string;
   price: number;
 };
 
@@ -112,6 +113,7 @@ function sanitizeOrderItem(item: unknown): OrderItem | null {
     name: value.name,
     quantity: value.quantity,
     size: value.size,
+    ...(typeof value.colour === "string" ? { colour: value.colour } : {}),
     price: value.price
   };
 }

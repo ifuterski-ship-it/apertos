@@ -9,6 +9,7 @@ type CheckoutItem = {
   productId: string;
   quantity: number;
   size: string;
+  colour?: string;
 };
 
 type ShippingOption = {
@@ -51,7 +52,7 @@ export async function POST(request: Request) {
       return [];
     }
 
-    return [{ product, quantity: item.quantity, size: item.size }];
+    return [{ product, quantity: item.quantity, size: item.size, colour: item.colour }];
   });
 
   if (!normalizedItems.length) {
@@ -77,14 +78,16 @@ export async function POST(request: Request) {
   const allowedCountries =
     getAllowedShippingCountries() as Stripe.Checkout.SessionCreateParams.ShippingAddressCollection.AllowedCountry[];
 
-  const productLineItems = normalizedItems.map(({ product, quantity, size }) => ({
+  const productLineItems = normalizedItems.map(({ product, quantity, size, colour }) => ({
     quantity,
     price_data: {
       currency: "gbp",
       unit_amount: Math.round(product.price * 100),
       product_data: {
         name: product.name,
-        description: `${product.category} / Size ${size}`,
+        description: colour
+          ? `${product.category} / Size ${size} / ${colour}`
+          : `${product.category} / Size ${size}`,
         images: [`${origin}${product.image}`]
       }
     }
@@ -118,11 +121,12 @@ export async function POST(request: Request) {
     line_items: [...productLineItems, ...shippingLineItem],
     metadata: {
       items: JSON.stringify(
-        normalizedItems.map(({ product, quantity, size }) => ({
+        normalizedItems.map(({ product, quantity, size, colour }) => ({
           productId: product.id,
           name: product.name,
           quantity,
           size,
+          ...(colour ? { colour } : {}),
           price: product.price
         }))
       ),
