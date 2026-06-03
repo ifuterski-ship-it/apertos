@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { sendEmail } from "@/lib/email";
-import { renderOrderConfirmationEmail } from "@/lib/email-templates";
-import { ordersFromEmail } from "@/lib/email-config";
+import { renderOrderConfirmationEmail, renderPodFulfillmentEmail } from "@/lib/email-templates";
+import { ordersFromEmail, podFulfillmentEmail } from "@/lib/email-config";
 import { decrementInventoryForOrder } from "@/lib/inventory";
 import { buildOrderItemsPayload, getOrderForAdmin, recordOrder } from "@/lib/orders";
+import { products } from "@/lib/products";
 import { getStripe } from "@/lib/stripe";
 import { hasSupabaseAdminEnv } from "@/lib/supabase/admin";
 
@@ -15,6 +16,7 @@ type ParsedItem = {
   name: string;
   quantity: number;
   size: string;
+  colour?: string;
   price: number;
 };
 
@@ -103,6 +105,24 @@ async function handleCheckoutSession(
         sessionId: session.id,
         items,
         amountTotal: session.amount_total ?? null
+      })
+    });
+  }
+
+  const podItems = items.filter((item) => {
+    const product = products.find((p) => p.id === item.productId);
+    return product?.category === "Outerwear";
+  });
+
+  if (podItems.length > 0) {
+    await sendEmail({
+      to: podFulfillmentEmail,
+      from: ordersFromEmail,
+      subject: `[ACTION REQUIRED] Tapstitch Order — ${podItems.map((i) => i.name).join(", ")}`,
+      html: renderPodFulfillmentEmail({
+        sessionId: session.id,
+        podItems,
+        shippingAddress
       })
     });
   }

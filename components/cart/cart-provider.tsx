@@ -11,11 +11,12 @@ export type CartItem = {
   quantity: number;
   image: string;
   size: string;
+  colour?: string;
 };
 
 type CartContextValue = {
   items: CartItem[];
-  addItem: (product: Product, size: string) => void;
+  addItem: (product: Product, size: string, colour?: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
   removeItem: (id: string) => void;
   clearCart: () => void;
@@ -53,8 +54,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, [isHydrated, items]);
 
   const value = useMemo<CartContextValue>(() => {
-    const addItem = (product: Product, size: string) => {
-      const cartId = `${product.id}-${size}`;
+    const addItem = (product: Product, size: string, colour?: string) => {
+      const cartId = colour ? `${product.id}-${size}-${colour}` : `${product.id}-${size}`;
 
       setItems((currentItems) => {
         const existingItem = currentItems.find((item) => item.id === cartId);
@@ -74,7 +75,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
             price: product.price,
             quantity: 1,
             image: product.image,
-            size
+            size,
+            ...(colour ? { colour } : {})
           }
         ];
       });

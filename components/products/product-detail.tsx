@@ -147,7 +147,7 @@ export function ProductDetail({
 
   const handleAddToCart = () => {
     if (isOutOfStock) return;
-    addItem(product, selectedSize);
+    addItem(product, selectedSize, selectedColour ?? undefined);
     trackEvent("add_to_cart", {
       currency: "GBP",
       value: product.price,
@@ -164,7 +164,7 @@ export function ProductDetail({
 
   const handleBuyNow = () => {
     if (isOutOfStock) { setCheckoutMessage("This product is currently out of stock."); return; }
-    addItem(product, selectedSize);
+    addItem(product, selectedSize, selectedColour ?? undefined);
     router.push("/checkout");
   };
 
