@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { hasSupabaseEnv } from "@/lib/supabase/config";
 import { useCart } from "@/components/cart/cart-provider";
+import { products } from "@/lib/products";
 import type { ShipEngineRate } from "@/lib/shipengine";
 
 type Address = {
@@ -35,6 +36,10 @@ export function CheckoutForm({ allowedCountries }: { allowedCountries: string[] 
   const router = useRouter();
   const { items, subtotal, isHydrated } = useCart();
   const supabase = useMemo(() => (hasSupabaseEnv ? createClient() : null), []);
+  const isPodOnly = items.length > 0 && items.every((item) => {
+    const product = products.find((p) => p.id === item.productId);
+    return product?.category === "Outerwear";
+  });
 
   const [address, setAddress] = useState<Address>({
     name: "",
@@ -76,6 +81,7 @@ export function CheckoutForm({ allowedCountries }: { allowedCountries: string[] 
 
   const selectedRate = rates?.find((r) => r.rateId === selectedRateId) ?? null;
   const totalWithShipping = subtotal + (selectedRate ? selectedRate.amountPence / 100 : 0);
+  const canCheckout = isPodOnly ? addressComplete : Boolean(selectedRate);
 
   const setField =
     (field: keyof Address) =>
@@ -134,9 +140,29 @@ export function CheckoutForm({ allowedCountries }: { allowedCountries: string[] 
   };
 
   const handleCheckout = async () => {
-    if (!selectedRate) return;
+    if (!canCheckout) return;
     setIsCheckingOut(true);
     setCheckoutError(null);
+
+    const shippingAddress = {
+      name: address.name,
+      email: address.email,
+      phone: address.phone || null,
+      address1: address.address1,
+      address2: address.address2 || null,
+      city: address.city,
+      state: address.state || null,
+      postalCode: address.postalCode,
+      country: address.country
+    };
+
+    const shippingOption = isPodOnly
+      ? { rateId: "pod-included", displayName: "Shipping Included", amountPence: 0, address: shippingAddress }
+      : selectedRate
+        ? { rateId: selectedRate.rateId, displayName: selectedRate.displayName, amountPence: selectedRate.amountPence, address: shippingAddress }
+        : null;
+
+    if (!shippingOption) return;
 
     try {
       const res = await fetch("/api/stripe/checkout", {
@@ -147,24 +173,10 @@ export function CheckoutForm({ allowedCountries }: { allowedCountries: string[] 
           items: items.map((item) => ({
             productId: item.productId,
             quantity: item.quantity,
-            size: item.size
+            size: item.size,
+            ...(item.colour ? { colour: item.colour } : {})
           })),
-          shipping: {
-            rateId: selectedRate.rateId,
-            displayName: selectedRate.displayName,
-            amountPence: selectedRate.amountPence,
-            address: {
-              name: address.name,
-              email: address.email,
-              phone: address.phone || null,
-              address1: address.address1,
-              address2: address.address2 || null,
-              city: address.city,
-              state: address.state || null,
-              postalCode: address.postalCode,
-              country: address.country
-            }
-          }
+          shipping: shippingOption
         })
       });
 
@@ -250,22 +262,30 @@ export function CheckoutForm({ allowedCountries }: { allowedCountries: string[] 
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={handleGetRates}
-            disabled={!addressComplete || isFetchingRates}
-            className="w-full border border-white px-6 py-4 text-sm font-semibold uppercase tracking-[0.35em] transition hover:bg-white hover:text-black disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {isFetchingRates ? "Fetching Rates..." : "Get Shipping Rates"}
-          </button>
+          {isPodOnly ? (
+            <div className="rounded-[1rem] border border-white/10 bg-white/[0.03] px-5 py-4 text-sm uppercase tracking-[0.2em] text-neutral-300">
+              Shipping included — delivered by our print partner
+            </div>
+          ) : (
+            <>
+              <button
+                type="button"
+                onClick={handleGetRates}
+                disabled={!addressComplete || isFetchingRates}
+                className="w-full border border-white px-6 py-4 text-sm font-semibold uppercase tracking-[0.35em] transition hover:bg-white hover:text-black disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {isFetchingRates ? "Fetching Rates..." : "Get Shipping Rates"}
+              </button>
 
-          {ratesError ? (
-            <p className="text-sm uppercase tracking-[0.18em] text-red-300">{ratesError}</p>
-          ) : null}
+              {ratesError ? (
+                <p className="text-sm uppercase tracking-[0.18em] text-red-300">{ratesError}</p>
+              ) : null}
+            </>
+          )}
         </section>
 
         {/* Step 2: Rate selection */}
-        {rates && rates.length > 0 ? (
+        {!isPodOnly && rates && rates.length > 0 ? (
           <section className="space-y-5 rounded-[1.75rem] border border-white/10 bg-white/[0.03] p-6">
             <div className="space-y-1">
               <p className="text-xs uppercase tracking-[0.45em] text-muted">Step 2</p>
@@ -325,11 +345,13 @@ export function CheckoutForm({ allowedCountries }: { allowedCountries: string[] 
           <div className="flex items-center justify-between text-neutral-300">
             <span>Shipping</span>
             <span>
-              {selectedRate
-                ? selectedRate.amountPence === 0
-                  ? "Free"
-                  : `£${(selectedRate.amountPence / 100).toFixed(2)}`
-                : "—"}
+              {isPodOnly
+                ? "Included"
+                : selectedRate
+                  ? selectedRate.amountPence === 0
+                    ? "Free"
+                    : `£${(selectedRate.amountPence / 100).toFixed(2)}`
+                  : "—"}
             </span>
           </div>
         </div>
@@ -346,7 +368,7 @@ export function CheckoutForm({ allowedCountries }: { allowedCountries: string[] 
         <button
           type="button"
           onClick={handleCheckout}
-          disabled={!selectedRate || isCheckingOut}
+          disabled={!canCheckout || isCheckingOut}
           className="w-full border border-white px-5 py-4 text-xs font-semibold uppercase tracking-[0.35em] transition hover:bg-white hover:text-black disabled:cursor-not-allowed disabled:opacity-60"
         >
           {isCheckingOut ? "Starting Payment..." : "Proceed to Payment"}
