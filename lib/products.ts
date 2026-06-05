@@ -141,8 +141,13 @@ export const products: Product[] = [
     name: "Apertos Essential Hoodie",
     price: 50,
     priceLabel: "£50.00",
-    image: "/products/hoodie-grey.png",
-    images: ["/products/hoodie-grey.png", "/products/hoodie-black.png"],
+    image: "/products/hoodie-grey-front.png",
+    images: [
+      "/products/hoodie-grey-front.png",
+      "/products/hoodie-black-front.png",
+      "/products/hoodie-grey-back.png",
+      "/products/hoodie-black-back.png"
+    ],
     sizes: ["S", "M", "L", "XL", "2XL"],
     colours: ["Grey", "Black"],
     category: "Outerwear",
