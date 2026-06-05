@@ -140,7 +140,6 @@ export async function POST(request: Request) {
     }
   };
 
-  // Only collect shipping address via Stripe if no address was provided from our checkout form
   if (!shipping) {
     sessionParams.shipping_address_collection = { allowed_countries: allowedCountries };
   }

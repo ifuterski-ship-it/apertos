@@ -169,9 +169,6 @@ export async function POST(request: Request) {
 
   if (event.type === "payment_intent.succeeded") {
     const paymentIntent = event.data.object as Stripe.PaymentIntent;
-    // Look up the Checkout Session associated with this payment intent.
-    // recordOrder uses upsert on stripe_checkout_session_id, so calling this
-    // after checkout.session.completed has already fired is safe and idempotent.
     const sessions = await stripe.checkout.sessions.list({
       payment_intent: paymentIntent.id,
       limit: 1
