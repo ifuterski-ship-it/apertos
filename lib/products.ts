@@ -157,7 +157,6 @@ export const products: Product[] = [
       "A clean, heavyweight hoodie built for the gym bag, mat warm-up and everyday wear in the Apertos monochrome style.",
     material: "80% Cotton, 20% Polyester — heavyweight fleece, brushed interior",
     careInstructions: "Machine wash cold 30°C · Tumble dry low · Do not iron print",
-    isComingSoon: true,
     sizeGuides: [
       {
         title: "Hoodie Size Guide",
