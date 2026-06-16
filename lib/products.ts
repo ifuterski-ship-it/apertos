@@ -139,8 +139,8 @@ export const products: Product[] = [
   {
     id: "apertos-essential-hoodie",
     name: "Apertos Essential Hoodie",
-    price: 50,
-    priceLabel: "£50.00",
+    price: 45,
+    priceLabel: "£45.00",
     image: "/products/hoodie-grey-front.jpeg",
     images: [
       "/products/hoodie-grey-front.jpeg",
