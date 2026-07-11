@@ -201,6 +201,9 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
           >
             @apertos.fightwear
           </a>
+          <Link href="/privacy-policy" className="transition hover:text-white">
+            Privacy Policy
+          </Link>
           <span>Apertos Est. 2026</span>
         </div>
       </footer>
