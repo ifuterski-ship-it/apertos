@@ -35,8 +35,8 @@ export const products: Product[] = [
   {
     id: "apertos-the-original-rashguard",
     name: "Apertos The Original Rashguard",
-    price: 34.99,
-    priceLabel: "\u00A334.99",
+    price: 25,
+    priceLabel: "\u00A325.00",
     image: "/products/rashguard-back.png",
     images: ["/products/rashguard-back.png", "/products/rashguard-front.png"],
     sizes: ["S", "M", "L", "XL", "2XL"],
@@ -64,8 +64,8 @@ export const products: Product[] = [
   {
     id: "apertos-the-original-shorts",
     name: "Apertos The Original Shorts",
-    price: 34.99,
-    priceLabel: "\u00A334.99",
+    price: 25,
+    priceLabel: "\u00A325.00",
     image: "/products/shorts-back.png",
     images: ["/products/shorts-back.png", "/products/shorts-front.png"],
     sizes: ["S", "M", "L", "XL", "2XL"],
@@ -93,8 +93,8 @@ export const products: Product[] = [
   {
     id: "apertos-the-original-no-gi-set",
     name: "Apertos The Original No Gi Set",
-    price: 59.99,
-    priceLabel: "\u00A359.99",
+    price: 45,
+    priceLabel: "\u00A345.00",
     image: "/products/nogi-front.jpg",
     images: [
       "/products/nogi-front.jpg",
@@ -139,8 +139,8 @@ export const products: Product[] = [
   {
     id: "apertos-essential-hoodie",
     name: "Apertos Essential Hoodie",
-    price: 45,
-    priceLabel: "£45.00",
+    price: 40,
+    priceLabel: "£40.00",
     image: "/products/hoodie-grey-front.jpeg",
     images: [
       "/products/hoodie-grey-front.jpeg",
