@@ -6,7 +6,9 @@ import { ordersFromEmail, podFulfillmentEmail } from "@/lib/email-config";
 import { decrementInventoryForOrder } from "@/lib/inventory";
 import { buildOrderItemsPayload, getOrderForAdmin, recordOrder } from "@/lib/orders";
 import { products } from "@/lib/products";
+import { createReviewToken } from "@/lib/reviews";
 import { getStripe } from "@/lib/stripe";
+import { absoluteUrl } from "@/lib/site";
 import { hasSupabaseAdminEnv } from "@/lib/supabase/admin";
 
 export const runtime = "nodejs";
@@ -95,6 +97,18 @@ async function handleCheckoutSession(
     }
   }
 
+  let reviewUrl: string | undefined;
+  if (email && items.length > 0) {
+    const reviewProducts = items
+      .filter((item, index, arr) => arr.findIndex((i) => i.productId === item.productId) === index)
+      .map((item) => {
+        const product = products.find((p) => p.id === item.productId);
+        return { id: item.productId, name: item.name, image: product?.image ?? "" };
+      });
+    const token = await createReviewToken(session.id, email, reviewProducts);
+    if (token) reviewUrl = absoluteUrl(`/review/${token}`);
+  }
+
   if (email) {
     await sendEmail({
       to: email,
@@ -104,7 +118,8 @@ async function handleCheckoutSession(
         customerEmail: email,
         sessionId: session.id,
         items,
-        amountTotal: session.amount_total ?? null
+        amountTotal: session.amount_total ?? null,
+        reviewUrl
       })
     });
   }
