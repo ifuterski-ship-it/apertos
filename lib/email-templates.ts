@@ -49,13 +49,28 @@ export function renderOrderConfirmationEmail({
   customerEmail,
   sessionId,
   items,
-  amountTotal
+  amountTotal,
+  reviewUrl
 }: {
   customerEmail: string;
   sessionId: string;
   items: OrderItem[];
   amountTotal: number | null;
+  reviewUrl?: string;
 }) {
+  const reviewBlock = reviewUrl
+    ? `
+      <p style="margin:28px 0 8px;color:#a3a3a3;font-size:11px;letter-spacing:0.3em;text-transform:uppercase">Leave A Review</p>
+      <p style="margin:0 0 12px;font-size:13px;line-height:1.7;letter-spacing:0.08em">Enjoyed your order? Leave a verified review — your link is unique to this purchase.</p>
+      <p style="margin:0 0 24px">
+        <a href="${reviewUrl}"
+          style="display:inline-block;background:#ffffff;color:#000000;padding:12px 24px;text-decoration:none;text-transform:uppercase;letter-spacing:0.3em;font-size:11px;font-weight:600">
+          Write A Review
+        </a>
+      </p>
+    `
+    : "";
+
   return renderEmailShell({
     eyebrow: siteName,
     title: "Order Confirmed",
@@ -77,6 +92,7 @@ export function renderOrderConfirmationEmail({
       </table>
       <p style="margin:0">Order total ${amountTotal !== null ? `£${(amountTotal / 100).toFixed(2)}` : "Paid in full"}</p>
       <p style="margin:18px 0 0">We'll email you again as soon as your shipment is moving.</p>
+      ${reviewBlock}
     `,
     footer: "Apertos Fightwear"
   });

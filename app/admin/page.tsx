@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { GenerateLabelButton } from "@/app/admin/generate-label-button";
+import { ReviewModeration } from "@/app/admin/review-moderation";
 import { hasAdminEmailsConfigured, requireAdminUser } from "@/lib/admin-auth";
 import { getOrdersForAdmin } from "@/lib/orders";
+import { getPendingReviews } from "@/lib/reviews";
 import { hasShipEngineEnv } from "@/lib/shipengine";
 import { hasSupabaseAdminEnv } from "@/lib/supabase/admin";
 import { getSupabaseEnvDiagnostics } from "@/lib/supabase/env-diagnostics";
@@ -49,6 +51,7 @@ export default async function AdminPage() {
   let orders = [] as Awaited<ReturnType<typeof getOrdersForAdmin>>;
   let ordersError: string | null = null;
   const diagnostics = getSupabaseEnvDiagnostics();
+  const pendingReviews = await getPendingReviews().catch(() => []);
 
   try {
     orders = await getOrdersForAdmin();
@@ -210,6 +213,23 @@ export default async function AdminPage() {
           })}
         </div>
       )}
+
+      {/* Reviews moderation */}
+      <div className="space-y-6 rounded-[2rem] border border-white/10 bg-white/[0.03] p-8">
+        <div>
+          <p className="text-xs uppercase tracking-[0.45em] text-muted">Reviews</p>
+          <h2 className="mt-4 font-display text-4xl uppercase tracking-[0.08em]">
+            Pending Approval
+            {pendingReviews.length > 0 ? (
+              <span className="ml-4 text-2xl text-neutral-400">({pendingReviews.length})</span>
+            ) : null}
+          </h2>
+          <p className="mt-2 text-sm uppercase leading-7 tracking-[0.2em] text-neutral-400">
+            These are verified purchase reviews waiting for your approval before going live.
+          </p>
+        </div>
+        <ReviewModeration initialReviews={pendingReviews} />
+      </div>
     </div>
   );
 }
