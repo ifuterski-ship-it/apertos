@@ -170,6 +170,107 @@ export const products: Product[] = [
         ]
       }
     ]
+  },
+  {
+    id: "apertos-sakura-dragon-no-gi-set",
+    name: "Apertos Sakura Dragon No Gi Set",
+    price: 45,
+    priceLabel: "£45.00",
+    image: "/products/rashguard-back.png",
+    images: ["/products/rashguard-back.png", "/products/shorts-back.png"],
+    sizes: ["S", "M", "L", "XL", "2XL"],
+    category: "Bundle",
+    shortDescription: "Sakura Dragon rashguard and shorts set",
+    shippingWeightLb: 1,
+    description:
+      "The Sakura Dragon no gi set pairs the Sakura Dragon rashguard and shorts in one premium combat-sports package.",
+    material: "85% Polyester, 15% Spandex — 4-way stretch, moisture-wicking performance fabric",
+    careInstructions: "Machine wash cold 30°C · Do not tumble dry · Hang dry · Do not iron print",
+    isComingSoon: true,
+    sizeGuides: [
+      {
+        title: "Rashguard Size Guide",
+        note: "Compression top measurements for the set.",
+        rows: [
+          { size: "S", chest: "34-36 in", length: "25 in" },
+          { size: "M", chest: "36-38 in", length: "26 in" },
+          { size: "L", chest: "38-40 in", length: "27 in" },
+          { size: "XL", chest: "40-42 in", length: "28 in" },
+          { size: "2XL", chest: "42-44 in", length: "29 in" }
+        ]
+      },
+      {
+        title: "Shorts Size Guide",
+        note: "Waist and outseam measurements for the shorts in the set.",
+        rows: [
+          { size: "S", waist: "28-30 in", length: "16.5 in" },
+          { size: "M", waist: "30-32 in", length: "17 in" },
+          { size: "L", waist: "32-34 in", length: "17.5 in" },
+          { size: "XL", waist: "34-36 in", length: "18 in" },
+          { size: "2XL", waist: "36-38 in", length: "18.5 in" }
+        ]
+      }
+    ]
+  },
+  {
+    id: "apertos-sakura-dragon-rashguard",
+    name: "Apertos Sakura Dragon Rashguard",
+    price: 25,
+    priceLabel: "£25.00",
+    image: "/products/rashguard-back.png",
+    images: ["/products/rashguard-back.png", "/products/rashguard-front.png"],
+    sizes: ["S", "M", "L", "XL", "2XL"],
+    category: "Performance Top",
+    shortDescription: "Sakura Dragon compression rashguard",
+    shippingWeightLb: 0.45,
+    description:
+      "The Sakura Dragon rashguard brings bold detail to the performance core, built for hard mat sessions with the same APERTOS compression standard.",
+    material: "85% Polyester, 15% Spandex — 4-way stretch, moisture-wicking performance fabric",
+    careInstructions: "Machine wash cold 30°C · Do not tumble dry · Hang dry · Do not iron print",
+    isComingSoon: true,
+    sizeGuides: [
+      {
+        title: "Rashguard Size Guide",
+        note: "Measured for a compression fit. Size up for a more relaxed feel.",
+        rows: [
+          { size: "S", chest: "34-36 in", length: "25 in" },
+          { size: "M", chest: "36-38 in", length: "26 in" },
+          { size: "L", chest: "38-40 in", length: "27 in" },
+          { size: "XL", chest: "40-42 in", length: "28 in" },
+          { size: "2XL", chest: "42-44 in", length: "29 in" }
+        ]
+      }
+    ]
+  },
+  {
+    id: "apertos-sakura-dragon-shorts",
+    name: "Apertos Sakura Dragon Shorts",
+    price: 25,
+    priceLabel: "£25.00",
+    image: "/products/shorts-back.png",
+    images: ["/products/shorts-back.png", "/products/shorts-front.png"],
+    sizes: ["S", "M", "L", "XL", "2XL"],
+    category: "Training Bottoms",
+    shortDescription: "Sakura Dragon fight-ready shorts",
+    shippingWeightLb: 0.55,
+    description:
+      "Sakura Dragon shorts built for grappling and striking with the same APERTOS lightweight 4-way stretch construction.",
+    material: "85% Polyester, 15% Spandex — lightweight 4-way stretch, quick-dry",
+    careInstructions: "Machine wash cold 30°C · Do not tumble dry · Hang dry",
+    isComingSoon: true,
+    sizeGuides: [
+      {
+        title: "Shorts Size Guide",
+        note: "Waist measurements are based on the elastic waistband at its natural resting fit.",
+        rows: [
+          { size: "S", waist: "28-30 in", length: "16.5 in" },
+          { size: "M", waist: "30-32 in", length: "17 in" },
+          { size: "L", waist: "32-34 in", length: "17.5 in" },
+          { size: "XL", waist: "34-36 in", length: "18 in" },
+          { size: "2XL", waist: "36-38 in", length: "18.5 in" }
+        ]
+      }
+    ]
   }
 ];
 
