@@ -48,7 +48,6 @@ async function resendStatus() {
       headers: { Authorization: `Bearer ${key}` },
       signal: AbortSignal.timeout(5000)
     });
-    // 401 = bad key (error); 403 = valid key with restricted scope (ok); 200 = ok
     const ok = res.status === 200 || res.status === 403;
     return { status: ok ? ("ok" as ServiceStatus) : ("error" as ServiceStatus) };
   } catch {

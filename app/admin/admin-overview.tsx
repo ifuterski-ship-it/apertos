@@ -192,15 +192,28 @@ export function AdminOverview() {
               </div>
               {data.vercel.latestDeployment ? (
                 <div className="space-y-1.5 text-xs uppercase leading-6 tracking-[0.18em] text-neutral-300">
-                  <p>State: {data.vercel.latestDeployment.state}</p>
+                  <p>
+                    State:{" "}
+                    <span className={data.vercel.latestDeployment.state === "READY" ? "text-emerald-400" : data.vercel.latestDeployment.state === "ERROR" ? "text-red-400" : "text-amber-400"}>
+                      {data.vercel.latestDeployment.state}
+                    </span>
+                  </p>
                   <p>
                     Deployed:{" "}
                     {new Date(data.vercel.latestDeployment.createdAt).toLocaleString("en-GB")}
                   </p>
+                  <a
+                    href={`https://${data.vercel.latestDeployment.url}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="block truncate text-neutral-400 underline underline-offset-2 hover:text-white"
+                  >
+                    {data.vercel.latestDeployment.url}
+                  </a>
                 </div>
               ) : data.vercel.status === "unconfigured" ? (
                 <p className="text-xs uppercase tracking-[0.18em] text-neutral-500">
-                  Add VERCEL_TOKEN and VERCEL_PROJECT_ID to enable.
+                  Add VERCEL_TOKEN + VERCEL_PROJECT_ID env vars to enable.
                 </p>
               ) : null}
             </Card>
