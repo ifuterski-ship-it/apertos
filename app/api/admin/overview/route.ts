@@ -48,7 +48,8 @@ async function resendStatus() {
       headers: { Authorization: `Bearer ${key}` },
       signal: AbortSignal.timeout(5000)
     });
-    return { status: res.ok ? ("ok" as ServiceStatus) : ("error" as ServiceStatus) };
+    const ok = res.status === 200 || res.status === 403;
+    return { status: ok ? ("ok" as ServiceStatus) : ("error" as ServiceStatus) };
   } catch {
     return { status: "error" as ServiceStatus };
   }
