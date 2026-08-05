@@ -303,6 +303,11 @@ export function ProductDetail({
             <div className="flex items-center justify-between gap-4">
               <p className="text-xs uppercase tracking-[0.35em] text-muted">Select Size</p>
             </div>
+            {!product.isComingSoon && (product.category === "Performance Top" || product.category === "Bundle") && (
+              <p className="text-[11px] uppercase leading-5 tracking-[0.22em] text-amber-400/80">
+                Rash guards fit compression — size down if between sizes.
+              </p>
+            )}
             <div className="flex flex-wrap gap-3">
               {product.sizes.map((size) => {
                 const active = size === selectedSize;

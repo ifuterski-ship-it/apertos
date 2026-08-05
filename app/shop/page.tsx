@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { ProductGrid } from "@/components/products/product-grid";
-import { products } from "@/lib/products";
+import { getProductsWithFlags } from "@/lib/product-flags";
 import { absoluteUrl } from "@/lib/site";
 
 const shopTitle = "Apertos Fightwear | BJJ Rash Guards, MMA Shorts & No-Gi Sets UK";
@@ -65,7 +65,9 @@ export const metadata: Metadata = {
   }
 };
 
-export default function ShopPage() {
+export default async function ShopPage() {
+  const allProducts = await getProductsWithFlags();
+  const visibleProducts = allProducts.filter((p) => !p.isComingSoon);
   const storeSchema = {
     "@context": "https://schema.org",
     "@type": "SportingGoodsStore",
@@ -134,7 +136,7 @@ export default function ShopPage() {
       {/* Products */}
       <div className="space-y-3">
         <p className="text-[10px] uppercase tracking-[0.55em] text-crimson">All Products</p>
-        <ProductGrid products={products} />
+        <ProductGrid products={visibleProducts} />
       </div>
 
       {/* Category cards — below products for SEO */}

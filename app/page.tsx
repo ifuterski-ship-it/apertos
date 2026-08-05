@@ -9,28 +9,7 @@ import { absoluteUrl, siteKeywords } from "@/lib/site";
 const homepageTitle = "Apertos Fightwear | BJJ Rash Guards, MMA Shorts & No-Gi Sets";
 const homepageDescription =
   "Apertos Fightwear makes compression-style BJJ rash guards, lightweight MMA shorts, and matching no-gi sets built for grappling, striking, and high-output training.";
-const homepageKeywords = [
-  ...siteKeywords,
-  "bjj rash guard",
-  "no gi rash guard",
-  "mma shorts",
-  "bjj shorts",
-  "judo rashguard",
-  "no-gi sets",
-  "fightwear uk",
-  "bjj gear uk",
-  "grappling shorts",
-  "compression rash guard bjj",
-  "bjj clothing uk",
-  "mma clothing uk",
-  "no gi bjj uk",
-  "grappling gear uk",
-  "bjj rash guard uk",
-  "mma gear uk",
-  "bjj training gear",
-  "combat sports apparel uk",
-  "no gi training"
-];
+const homepageKeywords = siteKeywords;
 
 export const metadata: Metadata = {
   title: { absolute: homepageTitle },

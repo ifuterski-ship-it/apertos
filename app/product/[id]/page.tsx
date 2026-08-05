@@ -138,6 +138,17 @@ export default async function ProductPage({
       "@type": "Brand",
       name: "Apertos Fightwear"
     },
+    ...(reviewSummary && reviewSummary.count > 0
+      ? {
+          aggregateRating: {
+            "@type": "AggregateRating",
+            ratingValue: reviewSummary.average.toFixed(1),
+            reviewCount: reviewSummary.count,
+            bestRating: "5",
+            worstRating: "1"
+          }
+        }
+      : {}),
     offers: {
       "@type": "Offer",
       priceCurrency: "GBP",
