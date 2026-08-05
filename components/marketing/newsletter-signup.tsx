@@ -31,7 +31,7 @@ export function NewsletterSignup() {
         return;
       }
 
-      setMessage("You’re in. Check your inbox for your APERTOS news confirmation.");
+      setMessage("You're in. Use code WELCOME10 at checkout for 10% off your first order.");
       setEmail("");
     } catch {
       setError("Unable to join APERTOS news right now.");
@@ -43,9 +43,9 @@ export function NewsletterSignup() {
   return (
     <div className="w-full max-w-sm space-y-3">
       <div className="space-y-1">
-        <p className="text-[11px] uppercase tracking-[0.36em] text-neutral-400">Apertos News</p>
+        <p className="text-[11px] uppercase tracking-[0.36em] text-neutral-400">Get 10% Off Your First Order</p>
         <p className="text-[11px] uppercase leading-6 tracking-[0.24em] text-neutral-500">
-          Drop updates, product news and release alerts.
+          Join for drop updates, release alerts and an exclusive welcome discount.
         </p>
       </div>
       <form onSubmit={handleSubmit} className="flex flex-col gap-3 sm:flex-row">

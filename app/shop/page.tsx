@@ -67,7 +67,7 @@ export const metadata: Metadata = {
 
 export default async function ShopPage() {
   const allProducts = await getProductsWithFlags();
-
+  const visibleProducts = allProducts.filter((p) => !p.isComingSoon);
   const storeSchema = {
     "@context": "https://schema.org",
     "@type": "SportingGoodsStore",
@@ -136,7 +136,7 @@ export default async function ShopPage() {
       {/* Products */}
       <div className="space-y-3">
         <p className="text-[10px] uppercase tracking-[0.55em] text-crimson">All Products</p>
-        <ProductGrid products={allProducts} />
+        <ProductGrid products={visibleProducts} />
       </div>
 
       {/* Category cards — below products for SEO */}
