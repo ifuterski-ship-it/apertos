@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { AdminOverview } from "@/app/admin/admin-overview";
+import { DeleteOrderButton } from "@/app/admin/delete-order-button";
 import { GenerateLabelButton } from "@/app/admin/generate-label-button";
 import { ReviewModeration } from "@/app/admin/review-moderation";
 import { hasAdminEmailsConfigured, requireAdminUser } from "@/lib/admin-auth";
@@ -152,6 +153,8 @@ export default async function AdminPage() {
                       ))}
                     </div>
                   </div>
+
+                  <DeleteOrderButton sessionId={order.stripeCheckoutSessionId} />
                 </div>
 
                 <div className="space-y-5 rounded-[1.5rem] border border-white/10 bg-black/20 p-5">
