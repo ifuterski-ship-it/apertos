@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ProductDetail } from "@/components/products/product-detail";
 import { ProductReviews } from "@/components/products/product-reviews";
-import { getProductWithInventoryStatus } from "@/lib/inventory";
+import { getProductWithInventoryAndFlags } from "@/lib/product-flags";
 import { products } from "@/lib/products";
 import { createAdminClient, hasSupabaseAdminEnv } from "@/lib/supabase/admin";
 import { absoluteUrl } from "@/lib/site";
@@ -17,7 +17,7 @@ export async function generateMetadata({
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   const { id } = await params;
-  const productWithInventory = await getProductWithInventoryStatus(id);
+  const productWithInventory = await getProductWithInventoryAndFlags(id);
 
   if (!productWithInventory) {
     return {};
@@ -78,7 +78,7 @@ export default async function ProductPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const productWithInventory = await getProductWithInventoryStatus(id);
+  const productWithInventory = await getProductWithInventoryAndFlags(id);
 
   if (!productWithInventory) {
     notFound();
