@@ -69,6 +69,8 @@ export const metadata: Metadata = {
 export default async function ShopPage() {
   const allProducts = await getProductsWithFlags();
   const visibleProducts = allProducts.filter((p) => !p.isComingSoon);
+  const performanceProducts = visibleProducts.filter((p) => p.category !== "Outerwear");
+  const lifestyleProducts = visibleProducts.filter((p) => p.category === "Outerwear");
   const storeSchema = {
     "@context": "https://schema.org",
     "@type": "SportingGoodsStore",
@@ -149,11 +151,19 @@ export default async function ShopPage() {
         </p>
       </div>
 
-      {/* Products */}
+      {/* Performance products */}
       <div className="space-y-3">
-        <p className="text-[10px] uppercase tracking-[0.55em] text-crimson">All Products</p>
-        <ProductGrid products={visibleProducts} />
+        <p className="text-[10px] uppercase tracking-[0.55em] text-crimson">Performance Gear</p>
+        <ProductGrid products={performanceProducts} />
       </div>
+
+      {/* Lifestyle / Apparel */}
+      {lifestyleProducts.length > 0 && (
+        <div className="space-y-3">
+          <p className="text-[10px] uppercase tracking-[0.55em] text-crimson">Lifestyle & Apparel</p>
+          <ProductGrid products={lifestyleProducts} />
+        </div>
+      )}
 
       {/* Category cards — below products for SEO */}
       <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4">
