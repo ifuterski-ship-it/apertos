@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { absoluteUrl } from "@/lib/site";
 
 const blogTitle = "What Is A No-Gi Set? | Apertos Fightwear";
@@ -40,12 +41,27 @@ export default function WhatIsANoGiSetPage() {
     mainEntityOfPage: absoluteUrl("/blogs/what-is-a-no-gi-set")
   };
 
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: absoluteUrl("/") },
+      { "@type": "ListItem", position: 2, name: "Blog", item: absoluteUrl("/blogs") },
+      { "@type": "ListItem", position: 3, name: "What Is A No-Gi Set?", item: absoluteUrl("/blogs/what-is-a-no-gi-set") }
+    ]
+  };
+
   return (
     <div className="space-y-12 pb-24">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
       />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+      <Breadcrumbs crumbs={[{ label: "Home", href: "/" }, { label: "Blog", href: "/blogs" }, { label: "What Is A No-Gi Set?" }]} />
       <section className="space-y-5 rounded-[2rem] border border-white/10 bg-white/[0.03] p-8 md:p-12">
         <p className="text-xs uppercase tracking-[0.45em] text-muted">Apertos Journal</p>
         <h1 className="font-display text-4xl uppercase tracking-[0.08em] md:text-6xl">What Is A No-Gi Set?</h1>
