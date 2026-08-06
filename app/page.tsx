@@ -213,8 +213,8 @@ export default function HomePage() {
       <section className="grid gap-6 lg:grid-cols-2">
         <div className="relative min-h-[520px] overflow-hidden rounded-[1.75rem] border border-white/10 bg-black">
           <Image
-            src="/products/nogi-lifestyle.jpeg"
-            alt="BJJ athlete wearing Apertos Fightwear no-gi set"
+            src="/products/nogi-front.jpg"
+            alt="Apertos Fightwear no-gi set front view"
             fill
             sizes="(min-width: 1024px) 50vw, 100vw"
             className="object-cover"

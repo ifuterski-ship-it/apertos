@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { absoluteUrl } from "@/lib/site";
 
 const blogTitle = "What Are MMA Shorts? | Apertos Fightwear";
@@ -40,12 +41,27 @@ export default function WhatAreMmaShortsPage() {
     mainEntityOfPage: absoluteUrl("/blogs/what-are-mma-shorts")
   };
 
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: absoluteUrl("/") },
+      { "@type": "ListItem", position: 2, name: "Blog", item: absoluteUrl("/blogs") },
+      { "@type": "ListItem", position: 3, name: "What Are MMA Shorts?", item: absoluteUrl("/blogs/what-are-mma-shorts") }
+    ]
+  };
+
   return (
     <div className="space-y-12 pb-24">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
       />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+      <Breadcrumbs crumbs={[{ label: "Home", href: "/" }, { label: "Blog", href: "/blogs" }, { label: "What Are MMA Shorts?" }]} />
       <section className="space-y-5 rounded-[2rem] border border-white/10 bg-white/[0.03] p-8 md:p-12">
         <p className="text-xs uppercase tracking-[0.45em] text-muted">Apertos Journal</p>
         <h1 className="font-display text-4xl uppercase tracking-[0.08em] md:text-6xl">What Are MMA Shorts?</h1>

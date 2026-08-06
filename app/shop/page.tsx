@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { ProductGrid } from "@/components/products/product-grid";
 import { getProductsWithFlags } from "@/lib/product-flags";
 import { absoluteUrl } from "@/lib/site";
@@ -116,12 +117,27 @@ export default async function ShopPage() {
     ]
   };
 
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: absoluteUrl("/") },
+      { "@type": "ListItem", position: 2, name: "Shop", item: absoluteUrl("/shop") }
+    ]
+  };
+
   return (
     <div className="space-y-10 pb-24">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(storeSchema) }}
       />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+
+      <Breadcrumbs crumbs={[{ label: "Home", href: "/" }, { label: "Shop" }]} />
 
       {/* Hero */}
       <div className="py-10 text-center">
