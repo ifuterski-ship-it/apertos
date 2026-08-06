@@ -17,6 +17,7 @@ type OverviewData = {
   vercel?: {
     status: ServiceStatus;
     latestDeployment?: { state: string; url: string; createdAt: number } | null;
+    debug?: string | null;
   };
   shipengine?: { status: ServiceStatus };
   supabase?: {
@@ -215,6 +216,9 @@ export function AdminOverview() {
                 <p className="text-xs uppercase tracking-[0.18em] text-neutral-500">
                   Add VERCEL_TOKEN + VERCEL_PROJECT_ID env vars to enable.
                 </p>
+              ) : null}
+              {data.vercel.debug ? (
+                <p className="text-[10px] leading-5 tracking-[0.1em] text-red-400/70">{data.vercel.debug}</p>
               ) : null}
             </Card>
           )}
