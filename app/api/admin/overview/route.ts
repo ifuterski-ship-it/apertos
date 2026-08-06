@@ -58,29 +58,45 @@ async function resendStatus() {
 async function vercelStatus() {
   const token = process.env.VERCEL_TOKEN;
   const projectId = process.env.VERCEL_PROJECT_ID;
-  if (!token || !projectId) return { status: "unconfigured" as ServiceStatus, latestDeployment: null };
+  if (!token || !projectId) return { status: "unconfigured" as ServiceStatus, latestDeployment: null, debug: null };
+
+  const teamId = process.env.VERCEL_TEAM_ID ?? null;
 
   try {
+    const params = new URLSearchParams({ projectId, limit: "1", target: "production" });
+    if (teamId) params.set("teamId", teamId);
+
     const res = await fetch(
-      `https://api.vercel.com/v6/deployments?projectId=${projectId}&limit=1&target=production`,
+      `https://api.vercel.com/v6/deployments?${params.toString()}`,
       {
         headers: { Authorization: `Bearer ${token}` },
-        signal: AbortSignal.timeout(5000)
+        signal: AbortSignal.timeout(8000)
       }
     );
     const data = (await res.json()) as {
       deployments?: Array<{ state: string; url: string; createdAt: number }>;
+      error?: { code: string; message: string };
     };
+
+    if (!res.ok) {
+      return {
+        status: "error" as ServiceStatus,
+        latestDeployment: null,
+        debug: `HTTP ${res.status}: ${data.error?.message ?? "unknown error"}`
+      };
+    }
+
     const latest = data.deployments?.[0] ?? null;
 
     return {
       status: (latest?.state === "READY" ? "ok" : latest?.state === "ERROR" ? "error" : "ok") as ServiceStatus,
       latestDeployment: latest
         ? { state: latest.state, url: latest.url, createdAt: latest.createdAt }
-        : null
+        : null,
+      debug: latest ? null : "No production deployments found"
     };
-  } catch {
-    return { status: "error" as ServiceStatus, latestDeployment: null };
+  } catch (err) {
+    return { status: "error" as ServiceStatus, latestDeployment: null, debug: String(err) };
   }
 }
 
