@@ -1,5 +1,6 @@
 import { createAdminClient, hasSupabaseAdminEnv } from "@/lib/supabase/admin";
 import { getProductById, Product } from "@/lib/products";
+import { isProductComingSoon } from "@/lib/product-availability";
 import { OrderItem, OrderRecord, markInventoryAdjustedForOrder } from "@/lib/orders";
 
 type InventoryRow = {
@@ -343,7 +344,7 @@ export async function getProductWithInventoryStatus(productId: string) {
     return null;
   }
 
-  if (product.isComingSoon) {
+  if (isProductComingSoon(product)) {
     const comingSoonStatus: ProductInventoryStatus = {
       stock: 0,
       isOutOfStock: true,

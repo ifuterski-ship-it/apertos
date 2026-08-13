@@ -9,6 +9,8 @@ import { ProductInventoryBySize } from "@/lib/inventory";
 import { trackEvent } from "@/lib/analytics";
 import { useCart } from "@/components/cart/cart-provider";
 import { WaitlistForm } from "@/components/products/waitlist-form";
+import { LaunchCountdown } from "@/components/products/launch-countdown";
+import { formatLaunchDate, isProductComingSoon } from "@/lib/product-availability";
 
 function Stars({ rating }: { rating: number }) {
   return (
@@ -107,12 +109,13 @@ export function ProductDetail({
   const { addItem } = useCart();
   const router = useRouter();
   const hasTrackedProductView = useRef(false);
+  const comingSoon = isProductComingSoon(product);
   const selectedInventory = inventoryBySize[selectedSize] ?? {
     stock: null,
     isOutOfStock: false,
     message: "Stock unavailable"
   };
-  const isOutOfStock = selectedInventory.isOutOfStock && !product.isComingSoon;
+  const isOutOfStock = selectedInventory.isOutOfStock && !comingSoon;
   const isLowStock =
     !isOutOfStock &&
     selectedInventory.stock !== null &&
@@ -303,7 +306,7 @@ export function ProductDetail({
             <div className="flex items-center justify-between gap-4">
               <p className="text-xs uppercase tracking-[0.35em] text-muted">Select Size</p>
             </div>
-            {!product.isComingSoon && (product.category === "Performance Top" || product.category === "Bundle") && (
+            {!comingSoon && (product.category === "Performance Top" || product.category === "Bundle") && (
               <p className="text-[11px] uppercase leading-5 tracking-[0.22em] text-amber-400/80">
                 Rash guards fit compression — size down if between sizes.
               </p>
@@ -311,7 +314,7 @@ export function ProductDetail({
             <div className="flex flex-wrap gap-3">
               {product.sizes.map((size) => {
                 const active = size === selectedSize;
-                const disabled = !product.isComingSoon && Boolean(inventoryBySize[size]?.isOutOfStock);
+                const disabled = !comingSoon && Boolean(inventoryBySize[size]?.isOutOfStock);
                 return (
                   <button
                     key={size}
@@ -331,7 +334,7 @@ export function ProductDetail({
 
           {/* Buttons — desktop/tablet */}
           <div className="hidden space-y-3 sm:block">
-            {product.isComingSoon ? (
+            {comingSoon ? (
               <button
                 type="button"
                 disabled
@@ -365,8 +368,18 @@ export function ProductDetail({
           </div>
 
           {/* Waitlist — coming soon products */}
-          {product.isComingSoon ? (
-            <WaitlistForm product={product.id} />
+          {comingSoon ? (
+            <div className="space-y-4">
+              {product.launchAt ? (
+                <div className="rounded-[1.5rem] border border-crimson/30 bg-crimson/5 p-6">
+                  <p className="mb-4 text-xs uppercase tracking-[0.35em] text-neutral-300">
+                    Launching {formatLaunchDate(product.launchAt)}
+                  </p>
+                  <LaunchCountdown launchAt={product.launchAt} />
+                </div>
+              ) : null}
+              <WaitlistForm product={product.id} />
+            </div>
           ) : null}
 
           {/* Accordions */}
@@ -425,7 +438,7 @@ export function ProductDetail({
             <p className="truncate font-display text-base uppercase tracking-[0.06em]">{product.name}</p>
             <p className="text-sm font-semibold">{product.priceLabel}</p>
           </div>
-          {product.isComingSoon ? (
+          {comingSoon ? (
             <button
               type="button"
               disabled

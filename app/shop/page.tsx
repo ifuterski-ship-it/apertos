@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { ProductGrid } from "@/components/products/product-grid";
+import { getUpcomingDropProducts, isProductComingSoon } from "@/lib/product-availability";
 import { getProductsWithFlags } from "@/lib/product-flags";
 import { absoluteUrl } from "@/lib/site";
 
@@ -68,7 +69,8 @@ export const metadata: Metadata = {
 
 export default async function ShopPage() {
   const allProducts = await getProductsWithFlags();
-  const visibleProducts = allProducts.filter((p) => !p.isComingSoon);
+  const visibleProducts = allProducts.filter((p) => !isProductComingSoon(p));
+  const upcomingDrops = getUpcomingDropProducts(allProducts);
   const performanceProducts = visibleProducts.filter((p) => p.category !== "Outerwear");
   const lifestyleProducts = visibleProducts.filter((p) => p.category === "Outerwear");
   const storeSchema = {
@@ -150,6 +152,14 @@ export default async function ShopPage() {
           Premium BJJ rash guards, MMA shorts and no-gi sets built for grapplers who train seriously.
         </p>
       </div>
+
+      {/* Upcoming drops */}
+      {upcomingDrops.length > 0 && (
+        <div className="space-y-3">
+          <p className="text-[10px] uppercase tracking-[0.55em] text-crimson">Upcoming Drops</p>
+          <ProductGrid products={upcomingDrops} />
+        </div>
+      )}
 
       {/* Performance products */}
       <div className="space-y-3">

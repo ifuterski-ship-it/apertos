@@ -29,6 +29,7 @@ export type Product = {
   careInstructions?: string;
   isBestSeller?: boolean;
   isComingSoon?: boolean;
+  launchAt?: string;
 };
 
 export const products: Product[] = [
@@ -173,20 +174,21 @@ export const products: Product[] = [
   },
   {
     id: "apertos-sakura-dragon-no-gi-set",
-    name: "Apertos Sakura Dragon No Gi Set",
-    price: 45,
-    priceLabel: "£45.00",
+    name: "Sakura Dragon",
+    price: 50,
+    priceLabel: "£50.00",
     image: "/products/coming-soon.svg",
     images: ["/products/coming-soon.svg"],
     sizes: ["S", "M", "L", "XL", "2XL"],
     category: "Bundle",
-    shortDescription: "Sakura Dragon rashguard and shorts set",
+    shortDescription: "Limited Sakura Dragon no-gi drop",
     shippingWeightLb: 1,
     description:
-      "The Sakura Dragon no gi set pairs the Sakura Dragon rashguard and shorts in one premium combat-sports package.",
+      "The Sakura Dragon no gi set pairs a bold Sakura Dragon rashguard and shorts in one premium APERTOS drop.",
     material: "85% Polyester, 15% Spandex — 4-way stretch, moisture-wicking performance fabric",
     careInstructions: "Machine wash cold 30°C · Do not tumble dry · Hang dry · Do not iron print",
     isComingSoon: true,
+    launchAt: "2026-09-03T00:00:00+01:00",
     sizeGuides: [
       {
         title: "Rashguard Size Guide",
@@ -276,6 +278,10 @@ export const products: Product[] = [
 
 export function getFeaturedProducts() {
   return products.filter((p) => p.id === "apertos-the-original-no-gi-set");
+}
+
+export function getSakuraDragonProduct() {
+  return products.find((p) => p.id === "apertos-sakura-dragon-no-gi-set") ?? null;
 }
 
 export function getApparelProducts() {

@@ -4,11 +4,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { Heart } from "lucide-react";
 import { useWishlist } from "@/components/wishlist/wishlist-provider";
+import { LaunchCountdown } from "@/components/products/launch-countdown";
+import { isProductComingSoon } from "@/lib/product-availability";
 import { Product } from "@/lib/products";
 
 export function ProductCard({ product }: { product: Product }) {
   const { has, toggle } = useWishlist();
   const inWishlist = has(product.id);
+  const comingSoon = isProductComingSoon(product);
 
   return (
     <div className="group overflow-hidden rounded-[1.75rem] border border-white/10 bg-panel transition duration-500 hover:-translate-y-1 hover:border-white/20">
@@ -18,12 +21,12 @@ export function ProductCard({ product }: { product: Product }) {
             Best Seller
           </div>
         ) : null}
-        {product.isComingSoon ? (
+        {comingSoon ? (
           <div className="absolute left-4 top-4 z-10 bg-crimson px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.3em] text-white">
             Coming Soon
           </div>
         ) : null}
-        {!product.isComingSoon ? (
+        {!comingSoon ? (
           <button
             type="button"
             onClick={() => toggle(product.id)}
@@ -40,7 +43,7 @@ export function ProductCard({ product }: { product: Product }) {
 
         <Link href={`/product/${product.id}`} className="block">
           <div className="relative aspect-[4/5] overflow-hidden bg-[#0d0d0d]">
-            {product.isComingSoon ? (
+            {comingSoon ? (
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <div className="relative h-16 w-16 opacity-20">
                   <Image src="/logo-mark.png" alt="" fill sizes="64px" className="object-contain" />
@@ -73,12 +76,16 @@ export function ProductCard({ product }: { product: Product }) {
           <p className="text-lg font-semibold text-white">{product.priceLabel}</p>
         </div>
 
+        {comingSoon && product.launchAt ? (
+          <LaunchCountdown launchAt={product.launchAt} />
+        ) : null}
+
         <div className="grid grid-cols-2 gap-2">
           <Link
             href={`/product/${product.id}`}
             className="flex items-center justify-center border border-white/15 bg-black py-3 text-[11px] font-semibold uppercase tracking-[0.25em] text-white transition hover:border-white/40 hover:bg-white/5"
           >
-            {product.isComingSoon ? "Coming Soon" : "Add To Cart"}
+            {comingSoon ? "Coming Soon" : "Add To Cart"}
           </Link>
           <Link
             href={`/product/${product.id}`}

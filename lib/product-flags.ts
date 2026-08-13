@@ -1,5 +1,6 @@
 import { createAdminClient, hasSupabaseAdminEnv } from "@/lib/supabase/admin";
 import { products, type Product } from "@/lib/products";
+import { isProductComingSoon } from "@/lib/product-availability";
 import { getProductWithInventoryStatus } from "@/lib/inventory";
 
 export async function getProductFlags(): Promise<Map<string, boolean>> {
@@ -33,9 +34,10 @@ export async function getProductWithInventoryAndFlags(productId: string) {
 
   if (!flags.has(productId)) return result;
 
-  const comingSoon = flags.get(productId)!;
+  const comingSoon = flags.has(productId) ? flags.get(productId)! : result.product.isComingSoon ?? false;
   const product = { ...result.product, isComingSoon: comingSoon };
-  const inventoryBySize = comingSoon
+  const effectiveComingSoon = isProductComingSoon(product);
+  const inventoryBySize = effectiveComingSoon
     ? Object.fromEntries(
         product.sizes.map((size) => [size, { stock: 0, isOutOfStock: true, message: "Coming Soon" }])
       )
