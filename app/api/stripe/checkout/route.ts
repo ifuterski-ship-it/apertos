@@ -113,6 +113,7 @@ export async function POST(request: Request) {
 
   const sessionParams: Stripe.Checkout.SessionCreateParams = {
     mode: "payment",
+    allow_promotion_codes: true,
     customer_email: customerEmail,
     billing_address_collection: "required",
     phone_number_collection: { enabled: true },

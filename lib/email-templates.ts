@@ -1,10 +1,20 @@
 import type { OrderItem, OrderShippingAddress, OrderShippingLabel } from "@/lib/orders";
 import { siteName, siteUrl } from "@/lib/site";
 
-const siteHost = siteUrl.replace(/^https?:\/\//, "");
+function renderSiteButton(label = "Visit The Store") {
+  return `
+    <a href="${siteUrl}"
+      style="display:inline-block;background:#ffffff;color:#000000;padding:14px 28px;text-decoration:none;text-transform:uppercase;letter-spacing:0.3em;font-size:12px;font-weight:600;border-radius:2px">
+      ${label}
+    </a>
+  `;
+}
 
-function renderSiteFooter(label = siteName) {
-  return `${label} · <a href="${siteUrl}" style="color:#f5f5f5;text-decoration:underline">${siteHost}</a>`;
+function renderSiteFooter(footerLabel = siteName) {
+  return `
+    <p style="margin:28px 0 16px;text-align:center">${renderSiteButton()}</p>
+    <p style="margin:0;text-align:center;color:#8f8f8f;font-size:11px;letter-spacing:0.3em;text-transform:uppercase">${footerLabel}</p>
+  `;
 }
 
 function renderEmailShell({
@@ -26,11 +36,13 @@ function renderEmailShell({
         </p>
         ${
           title
-            ? `<h1 style="margin:0 0 20px;font-size:34px;line-height:1.1;text-transform:uppercase;color:#ffffff">${title}</h1>`
+            ? `<h1 style="margin:0 0 20px;font-size:34px;line-height:1.1;text-transform:uppercase;color:#ffffff">
+                <a href="${siteUrl}" style="color:#ffffff;text-decoration:none">${title}</a>
+              </h1>`
             : ""
         }
         <div style="font-size:14px;line-height:1.9;letter-spacing:0.08em;text-transform:uppercase;color:#d4d4d4">${body}</div>
-        <p style="margin:28px 0 0;color:#8f8f8f;font-size:11px;letter-spacing:0.3em;text-transform:uppercase">${renderSiteFooter(footer)}</p>
+        ${renderSiteFooter(footer)}
       </div>
     </div>
   `;
