@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { defaultContactEmail, supportFromEmail } from "@/lib/email-config";
 import { sendEmail } from "@/lib/email";
+import { wrapEmailHtml } from "@/lib/email-templates";
 
 export async function POST(request: Request) {
   const { name, email, message } = (await request.json()) as {
@@ -17,14 +18,14 @@ export async function POST(request: Request) {
     to: defaultContactEmail,
     subject: `APERTOS Contact Form: ${name}`,
     from: supportFromEmail,
-    html: `
-      <div style="background:#050505;color:#f5f5f5;padding:40px;font-family:Arial,sans-serif">
-        <p style="letter-spacing:0.4em;text-transform:uppercase;color:#a3a3a3;font-size:12px">APERTOS CONTACT</p>
+    html: wrapEmailHtml(
+      `
         <p><strong>Name:</strong> ${name}</p>
         <p><strong>Email:</strong> ${email}</p>
         <p style="margin-top:20px;line-height:1.8;color:#d4d4d4">${message.replace(/\n/g, "<br />")}</p>
-      </div>
-    `
+      `,
+      "APERTOS CONTACT"
+    )
   });
 
   return NextResponse.json(result, { status: result.ok ? 200 : 500 });

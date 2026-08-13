@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { sendEmail } from "@/lib/email";
 import { renderOrderConfirmationEmail, renderPodFulfillmentEmail } from "@/lib/email-templates";
-import { ordersFromEmail, podFulfillmentEmail } from "@/lib/email-config";
+import { ordersFromEmail, podFulfillmentEmail, trustpilotBccEmail } from "@/lib/email-config";
 import { decrementInventoryForOrder } from "@/lib/inventory";
 import { buildOrderItemsPayload, getOrderForAdmin, recordOrder } from "@/lib/orders";
 import { products } from "@/lib/products";
@@ -113,6 +113,7 @@ async function handleCheckoutSession(
     await sendEmail({
       to: email,
       from: ordersFromEmail,
+      ...(trustpilotBccEmail ? { bcc: trustpilotBccEmail } : {}),
       subject: "Your APERTOS Order Confirmation",
       html: renderOrderConfirmationEmail({
         customerEmail: email,

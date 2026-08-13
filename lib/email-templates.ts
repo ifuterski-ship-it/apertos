@@ -1,5 +1,11 @@
 import type { OrderItem, OrderShippingAddress, OrderShippingLabel } from "@/lib/orders";
-import { siteName } from "@/lib/site";
+import { siteName, siteUrl } from "@/lib/site";
+
+const siteHost = siteUrl.replace(/^https?:\/\//, "");
+
+function renderSiteFooter(label = siteName) {
+  return `${label} · <a href="${siteUrl}" style="color:#f5f5f5;text-decoration:underline">${siteHost}</a>`;
+}
 
 function renderEmailShell({
   eyebrow,
@@ -8,24 +14,33 @@ function renderEmailShell({
   footer
 }: {
   eyebrow: string;
-  title: string;
+  title?: string;
   body: string;
   footer?: string;
 }) {
   return `
     <div style="background:#020202;color:#f5f5f5;padding:40px 24px;font-family:Arial,sans-serif">
       <div style="max-width:640px;margin:0 auto;border:1px solid rgba(255,255,255,0.08);background:#0a0a0a;padding:40px;border-radius:28px">
-        <p style="margin:0 0 18px;letter-spacing:0.42em;text-transform:uppercase;color:#a3a3a3;font-size:12px">${eyebrow}</p>
-        <h1 style="margin:0 0 20px;font-size:34px;line-height:1.1;text-transform:uppercase;color:#ffffff">${title}</h1>
-        <div style="font-size:14px;line-height:1.9;letter-spacing:0.08em;text-transform:uppercase;color:#d4d4d4">${body}</div>
+        <p style="margin:0 0 18px;letter-spacing:0.42em;text-transform:uppercase;color:#a3a3a3;font-size:12px">
+          <a href="${siteUrl}" style="color:#a3a3a3;text-decoration:none">${eyebrow}</a>
+        </p>
         ${
-          footer
-            ? `<p style="margin:28px 0 0;color:#8f8f8f;font-size:11px;letter-spacing:0.3em;text-transform:uppercase">${footer}</p>`
+          title
+            ? `<h1 style="margin:0 0 20px;font-size:34px;line-height:1.1;text-transform:uppercase;color:#ffffff">${title}</h1>`
             : ""
         }
+        <div style="font-size:14px;line-height:1.9;letter-spacing:0.08em;text-transform:uppercase;color:#d4d4d4">${body}</div>
+        <p style="margin:28px 0 0;color:#8f8f8f;font-size:11px;letter-spacing:0.3em;text-transform:uppercase">${renderSiteFooter(footer)}</p>
       </div>
     </div>
   `;
+}
+
+export function wrapEmailHtml(content: string, eyebrow = siteName) {
+  return renderEmailShell({
+    eyebrow,
+    body: content
+  });
 }
 
 function renderOrderItemRows(items: OrderItem[]) {
@@ -93,8 +108,7 @@ export function renderOrderConfirmationEmail({
       <p style="margin:0">Order total ${amountTotal !== null ? `£${(amountTotal / 100).toFixed(2)}` : "Paid in full"}</p>
       <p style="margin:18px 0 0">We'll email you again as soon as your shipment is moving.</p>
       ${reviewBlock}
-    `,
-    footer: "Apertos Fightwear"
+    `
   });
 }
 
@@ -155,8 +169,7 @@ export function renderShippingNotificationEmail({
       ${trackingBlock}
       <p style="margin:0 0 8px;color:#a3a3a3">Carrier: ${shippingLabel.provider ?? "Shipping partner"}</p>
       <p style="margin:0;color:#a3a3a3">Service: ${shippingLabel.serviceLevel ?? "Standard"}</p>
-    `,
-    footer: "Apertos Fightwear"
+    `
   });
 }
 
@@ -168,8 +181,7 @@ export function renderNewsletterWelcomeEmail(email: string) {
       <p style="margin:0 0 18px">${email} is now on the APERTOS news list.</p>
       <p style="margin:0 0 18px">You'll hear first about product drops, no-gi releases, and future training-focused updates.</p>
       <p style="margin:0">Expect clean, occasional emails only when there is something worth opening.</p>
-    `,
-    footer: "Apertos Fightwear"
+    `
   });
 }
 
@@ -180,8 +192,7 @@ export function renderNewsletterInternalEmail(email: string) {
     body: `
       <p style="margin:0 0 18px">A new APERTOS news signup has been captured.</p>
       <p style="margin:0">${email}</p>
-    `,
-    footer: "Apertos Fightwear"
+    `
   });
 }
 

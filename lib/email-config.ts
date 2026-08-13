@@ -9,3 +9,4 @@ export const supportFromEmail =
   process.env.RESEND_FROM_SUPPORT || "APERTOS Support <onboarding@resend.dev>";
 export const newsFromEmail =
   process.env.RESEND_FROM_NEWS || "Apertos Fightwear <orders@apertosfightwear.com>";
+export const trustpilotBccEmail = process.env.TRUSTPILOT_BCC_EMAIL?.trim() || null;
