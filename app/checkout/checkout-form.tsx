@@ -372,7 +372,7 @@ export function CheckoutForm({ allowedCountries }: { allowedCountries: string[] 
             type="text"
             value={promotionCode}
             onChange={(event) => {
-              setPromotionCode(event.target.value.toUpperCase());
+              setPromotionCode(event.target.value);
               setCheckoutError(null);
             }}
             placeholder="WELCOME10"

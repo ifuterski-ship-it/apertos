@@ -35,13 +35,19 @@ async function resolvePromotionCode(stripe: Stripe, code: string) {
     return null;
   }
 
-  const { data } = await stripe.promotionCodes.list({
-    code: normalized,
-    active: true,
-    limit: 1
-  });
+  for (const candidate of [normalized, normalized.toUpperCase(), normalized.toLowerCase()]) {
+    const { data } = await stripe.promotionCodes.list({
+      code: candidate,
+      active: true,
+      limit: 1
+    });
 
-  return data[0] ?? null;
+    if (data[0]) {
+      return data[0];
+    }
+  }
+
+  return null;
 }
 
 export async function POST(request: Request) {
@@ -165,7 +171,11 @@ export async function POST(request: Request) {
     const promotion = await resolvePromotionCode(stripe, trimmedPromotionCode);
     if (!promotion) {
       return NextResponse.json(
-        { ok: false, message: "That promotion code is invalid or expired." },
+        {
+          ok: false,
+          message:
+            "That promotion code is invalid or expired. In Stripe, create a Promotion code linked to your coupon (Coupons alone are not enough)."
+        },
         { status: 400 }
       );
     }
