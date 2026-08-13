@@ -64,7 +64,8 @@ export async function POST(
           customerName: shippingAddress?.name ?? null,
           trackingNumber: shippingLabel.trackingNumber,
           shippingLabel
-        })
+        }),
+        bcc: "apertosfightwear.com+b01d885355@invite.trustpilot.com"
       });
     }
 

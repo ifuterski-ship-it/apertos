@@ -8,6 +8,7 @@ export type SendEmailInput = {
   subject: string;
   html: string;
   from?: string;
+  bcc?: string | string[];
 };
 
 export async function sendEmail(input: SendEmailInput) {
@@ -23,7 +24,8 @@ export async function sendEmail(input: SendEmailInput) {
     from: input.from ?? "APERTOS <onboarding@resend.dev>",
     to: input.to,
     subject: input.subject,
-    html: input.html
+    html: input.html,
+    bcc: input.bcc
   });
 
   return {
