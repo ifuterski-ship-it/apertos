@@ -29,38 +29,16 @@ type ShippingOption = {
   };
 };
 
-async function resolvePromotionCode(stripe: Stripe, code: string) {
-  const normalized = code.trim();
-  if (!normalized) {
-    return null;
-  }
-
-  for (const candidate of [normalized, normalized.toUpperCase(), normalized.toLowerCase()]) {
-    const { data } = await stripe.promotionCodes.list({
-      code: candidate,
-      active: true,
-      limit: 1
-    });
-
-    if (data[0]) {
-      return data[0];
-    }
-  }
-
-  return null;
-}
-
 export async function POST(request: Request) {
   const stripe = getStripe();
   if (!stripe) {
     return NextResponse.json({ ok: false, message: "Stripe is not configured." }, { status: 500 });
   }
 
-  const { items, email, shipping, promotionCode } = (await request.json()) as {
+  const { items, email, shipping } = (await request.json()) as {
     items?: CheckoutItem[];
     email?: string;
     shipping?: ShippingOption;
-    promotionCode?: string;
   };
 
   if (!items?.length) {
@@ -132,10 +110,10 @@ export async function POST(request: Request) {
       : [];
 
   const customerEmail = shipping?.address?.email || email || undefined;
-  const trimmedPromotionCode = promotionCode?.trim() ?? "";
 
   const sessionParams: Stripe.Checkout.SessionCreateParams = {
     mode: "payment",
+    allow_promotion_codes: true,
     customer_email: customerEmail,
     billing_address_collection: "required",
     phone_number_collection: { enabled: true },
@@ -165,24 +143,6 @@ export async function POST(request: Request) {
 
   if (!shipping) {
     sessionParams.shipping_address_collection = { allowed_countries: allowedCountries };
-  }
-
-  if (trimmedPromotionCode) {
-    const promotion = await resolvePromotionCode(stripe, trimmedPromotionCode);
-    if (!promotion) {
-      return NextResponse.json(
-        {
-          ok: false,
-          message:
-            "That promotion code is invalid or expired. In Stripe, create a Promotion code linked to your coupon (Coupons alone are not enough)."
-        },
-        { status: 400 }
-      );
-    }
-
-    sessionParams.discounts = [{ promotion_code: promotion.id }];
-  } else {
-    sessionParams.allow_promotion_codes = true;
   }
 
   const session = await stripe.checkout.sessions.create(sessionParams);

@@ -59,7 +59,6 @@ export function CheckoutForm({ allowedCountries }: { allowedCountries: string[] 
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [ratesError, setRatesError] = useState<string | null>(null);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
-  const [promotionCode, setPromotionCode] = useState("");
 
   useEffect(() => {
     if (!supabase) return;
@@ -177,8 +176,7 @@ export function CheckoutForm({ allowedCountries }: { allowedCountries: string[] 
             size: item.size,
             ...(item.colour ? { colour: item.colour } : {})
           })),
-          shipping: shippingOption,
-          ...(promotionCode.trim() ? { promotionCode: promotionCode.trim() } : {})
+          shipping: shippingOption
         })
       });
 
@@ -363,27 +361,9 @@ export function CheckoutForm({ allowedCountries }: { allowedCountries: string[] 
           <span>£{totalWithShipping.toFixed(2)}</span>
         </div>
 
-        <div className="space-y-2">
-          <label htmlFor="promotion-code" className={labelClass}>
-            Promotion Code
-          </label>
-          <input
-            id="promotion-code"
-            type="text"
-            value={promotionCode}
-            onChange={(event) => {
-              setPromotionCode(event.target.value);
-              setCheckoutError(null);
-            }}
-            placeholder="WELCOME10"
-            className={inputClass}
-            autoComplete="off"
-            spellCheck={false}
-          />
-          <p className="text-[11px] uppercase leading-5 tracking-[0.18em] text-neutral-400">
-            Enter your code here before proceeding to payment.
-          </p>
-        </div>
+        <p className="text-[11px] uppercase leading-5 tracking-[0.18em] text-neutral-400">
+          Have a discount code? Enter it on the Stripe payment page after clicking proceed.
+        </p>
 
         {checkoutError ? (
           <p className="text-xs uppercase leading-6 tracking-[0.2em] text-red-300">{checkoutError}</p>
