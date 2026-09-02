@@ -14,7 +14,7 @@ const config: Config = {
         ink: "#F5F5F5",
         muted: "#A3A3A3",
         line: "#2A2A2A",
-        crimson: "#DC143C"
+        crimson: "#0A84FF"
       },
       fontFamily: {
         display: ["Impact", "Haettenschweiler", "Arial Narrow Bold", "sans-serif"],
