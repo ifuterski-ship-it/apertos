@@ -220,7 +220,10 @@ export const products: Product[] = [
     price: 25,
     priceLabel: "£25.00",
     image: "/products/sakura-dragon-rashguard-front.jpeg",
-    images: ["/products/sakura-dragon-rashguard-front.jpeg"],
+    images: [
+      "/products/sakura-dragon-rashguard-front.jpeg",
+      "/products/sakura-dragon-rashguard-back.jpeg"
+    ],
     sizes: ["S", "M", "L", "XL", "2XL"],
     category: "Performance Top",
     shortDescription: "Sakura Dragon compression rashguard",
