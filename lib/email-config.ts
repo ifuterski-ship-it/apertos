@@ -1,4 +1,4 @@
-export const defaultContactEmail = process.env.CONTACT_EMAIL || "ifuterski@icloud.com";
+export const defaultContactEmail = process.env.CONTACT_EMAIL || "business@apertosfightwear.com";
 export const newsletterNotifyEmail = process.env.NEWSLETTER_NOTIFY_EMAIL || defaultContactEmail;
 export const podFulfillmentEmail = process.env.POD_FULFILLMENT_EMAIL || defaultContactEmail;
 export const welcomeFromEmail =

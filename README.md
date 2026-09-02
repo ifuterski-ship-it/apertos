@@ -29,7 +29,7 @@ npm run dev
 - Stripe shipping address collection can be limited with `STRIPE_SHIPPING_COUNTRIES`.
 - Shippo label purchasing uses `SHIPPO_API_KEY` plus the `SHIPPO_FROM_*` sender address variables.
 - Resend can be enabled with `RESEND_API_KEY`.
-- Contact emails default to `CONTACT_EMAIL` and fall back to `ifuterski@icloud.com`.
+- Contact emails default to `CONTACT_EMAIL` and fall back to `business@apertosfightwear.com`.
 - Sender identities can be separated with `RESEND_FROM_WELCOME`, `RESEND_FROM_ORDERS`, and `RESEND_FROM_SUPPORT`.
 - The app is kept intentionally simple so it still runs locally without external services configured.
 
