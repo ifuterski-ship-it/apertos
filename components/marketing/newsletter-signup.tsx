@@ -31,7 +31,7 @@ export function NewsletterSignup() {
         return;
       }
 
-      setMessage("You're in. Use code WELCOME10 at checkout for 10% off your first order.");
+      setMessage("Check your email and confirm your subscription to get your 10% off code.");
       setEmail("");
     } catch {
       setError("Unable to join APERTOS news right now.");

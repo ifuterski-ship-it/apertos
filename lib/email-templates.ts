@@ -185,14 +185,37 @@ export function renderShippingNotificationEmail({
   });
 }
 
-export function renderNewsletterWelcomeEmail(email: string) {
+export function renderNewsletterWelcomeEmail(email: string, verifyUrl: string) {
   return renderEmailShell({
     eyebrow: siteName,
-    title: "Subscribed To Apertos News",
+    title: "Confirm Your APERTOS Subscription",
     body: `
-      <p style="margin:0 0 18px">${email} is now on the APERTOS news list.</p>
-      <p style="margin:0 0 18px">You'll hear first about product drops, no-gi releases, and future training-focused updates.</p>
-      <p style="margin:0">Expect clean, occasional emails only when there is something worth opening.</p>
+      <p style="margin:0 0 18px">Thanks for joining APERTOS, ${email}.</p>
+      <p style="margin:0 0 18px">To finish subscribing and unlock your exclusive 10% discount code for your first order, please confirm your email address.</p>
+      <div style="margin:0 0 18px;text-align:center">
+        <a href="${verifyUrl}" style="display:inline-block;background:#0a84ff;color:#ffffff;padding:14px 28px;text-decoration:none;text-transform:uppercase;letter-spacing:0.2em;font-size:12px;font-weight:600;border-radius:2px">
+          Confirm My Email
+        </a>
+      </div>
+      <p style="margin:0 0 18px;color:#a3a3a3;font-size:12px">Button not working? Copy and paste this link into your browser:</p>
+      <p style="margin:0 0 18px;word-break:break-all;color:#0a84ff;font-size:12px">${verifyUrl}</p>
+      <p style="margin:0">You'll then receive your discount code, plus first access to product drops and no-gi releases.</p>
+    `
+  });
+}
+
+export function renderNewsletterDiscountEmail(discountCode: string) {
+  return renderEmailShell({
+    eyebrow: siteName,
+    title: "Your 10% Off Code",
+    body: `
+      <p style="margin:0 0 18px">You're confirmed on the APERTOS list. Thanks for subscribing.</p>
+      <p style="margin:0 0 18px">Your exclusive 10% discount code for your first order is:</p>
+      <div style="margin:0 0 18px;padding:20px;border:1px solid rgba(10,132,255,0.5);background:rgba(10,132,255,0.08);text-align:center;border-radius:12px">
+        <span style="font-size:28px;letter-spacing:0.25em;font-weight:700;color:#0a84ff">${discountCode}</span>
+      </div>
+      <p style="margin:0 0 18px">Enter it at checkout to save 10% off your first order.</p>
+      <p style="margin:0">Keep an eye on your inbox for drop updates and no-gi releases.</p>
     `
   });
 }
