@@ -179,7 +179,7 @@ export const products: Product[] = [
     priceLabel: "£50.00",
     image: "/products/sakura-dragon-front.jpeg",
     images: ["/products/sakura-dragon-front.jpeg", "/products/sakura-dragon-back.jpeg"],
-    sizes: ["S", "M", "L", "XL", "2XL"],
+    sizes: ["XS", "S", "M", "L", "XL"],
     category: "Bundle",
     shortDescription: "Limited Sakura Dragon no-gi drop",
     shippingWeightLb: 1,
@@ -194,22 +194,22 @@ export const products: Product[] = [
         title: "Rashguard Size Guide",
         note: "Compression top measurements for the set.",
         rows: [
+          { size: "XS", chest: "32-34 in", length: "24 in" },
           { size: "S", chest: "34-36 in", length: "25 in" },
           { size: "M", chest: "36-38 in", length: "26 in" },
           { size: "L", chest: "38-40 in", length: "27 in" },
-          { size: "XL", chest: "40-42 in", length: "28 in" },
-          { size: "2XL", chest: "42-44 in", length: "29 in" }
+          { size: "XL", chest: "40-42 in", length: "28 in" }
         ]
       },
       {
         title: "Shorts Size Guide",
         note: "Waist and outseam measurements for the shorts in the set.",
         rows: [
+          { size: "XS", waist: "26-28 in", length: "15.5 in" },
           { size: "S", waist: "28-30 in", length: "16.5 in" },
           { size: "M", waist: "30-32 in", length: "17 in" },
           { size: "L", waist: "32-34 in", length: "17.5 in" },
-          { size: "XL", waist: "34-36 in", length: "18 in" },
-          { size: "2XL", waist: "36-38 in", length: "18.5 in" }
+          { size: "XL", waist: "34-36 in", length: "18 in" }
         ]
       }
     ]
@@ -217,14 +217,14 @@ export const products: Product[] = [
   {
     id: "apertos-sakura-dragon-rashguard",
     name: "Apertos Sakura Dragon Rashguard",
-    price: 25,
-    priceLabel: "£25.00",
+    price: 30,
+    priceLabel: "£30.00",
     image: "/products/sakura-dragon-rashguard-front.jpeg",
     images: [
       "/products/sakura-dragon-rashguard-front.jpeg",
       "/products/sakura-dragon-rashguard-back.jpeg"
     ],
-    sizes: ["S", "M", "L", "XL", "2XL"],
+    sizes: ["XS", "S", "M", "L", "XL"],
     category: "Performance Top",
     shortDescription: "Sakura Dragon compression rashguard",
     shippingWeightLb: 0.45,
@@ -239,11 +239,11 @@ export const products: Product[] = [
         title: "Rashguard Size Guide",
         note: "Measured for a compression fit. Size up for a more relaxed feel.",
         rows: [
+          { size: "XS", chest: "32-34 in", length: "24 in" },
           { size: "S", chest: "34-36 in", length: "25 in" },
           { size: "M", chest: "36-38 in", length: "26 in" },
           { size: "L", chest: "38-40 in", length: "27 in" },
-          { size: "XL", chest: "40-42 in", length: "28 in" },
-          { size: "2XL", chest: "42-44 in", length: "29 in" }
+          { size: "XL", chest: "40-42 in", length: "28 in" }
         ]
       }
     ]
@@ -251,14 +251,14 @@ export const products: Product[] = [
   {
     id: "apertos-sakura-dragon-shorts",
     name: "Apertos Sakura Dragon Shorts",
-    price: 25,
-    priceLabel: "£25.00",
+    price: 30,
+    priceLabel: "£30.00",
     image: "/products/sakura-dragon-shorts-front.jpeg",
     images: [
       "/products/sakura-dragon-shorts-front.jpeg",
       "/products/sakura-dragon-shorts-back.jpeg"
     ],
-    sizes: ["S", "M", "L", "XL", "2XL"],
+    sizes: ["XS", "S", "M", "L", "XL"],
     category: "Training Bottoms",
     shortDescription: "Sakura Dragon fight-ready shorts",
     shippingWeightLb: 0.55,
@@ -273,11 +273,11 @@ export const products: Product[] = [
         title: "Shorts Size Guide",
         note: "Waist measurements are based on the elastic waistband at its natural resting fit.",
         rows: [
+          { size: "XS", waist: "26-28 in", length: "15.5 in" },
           { size: "S", waist: "28-30 in", length: "16.5 in" },
           { size: "M", waist: "30-32 in", length: "17 in" },
           { size: "L", waist: "32-34 in", length: "17.5 in" },
-          { size: "XL", waist: "34-36 in", length: "18 in" },
-          { size: "2XL", waist: "36-38 in", length: "18.5 in" }
+          { size: "XL", waist: "34-36 in", length: "18 in" }
         ]
       }
     ]

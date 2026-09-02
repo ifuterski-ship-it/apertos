@@ -120,7 +120,7 @@ export function ProductDetail({
     !isOutOfStock &&
     selectedInventory.stock !== null &&
     selectedInventory.stock > 0 &&
-    selectedInventory.stock <= 5;
+    selectedInventory.stock <= 2;
   const categoryTaglines: Record<string, string> = {
     "Performance Top": "Compression-style BJJ rash guard built for no-gi drilling, mat durability and clean performance fit.",
     "Training Bottoms": "Lightweight MMA shorts made for grappling movement, sparring comfort and everyday combat sports training.",

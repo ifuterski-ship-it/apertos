@@ -9,7 +9,7 @@ type InventoryRow = {
   stock: number | null;
 };
 
-type BaseInventoryProductId = "rashguard" | "shorts";
+type BaseInventoryProductId = "rashguard" | "shorts" | "sakura-rashguard" | "sakura-shorts";
 
 type InventoryProductState = {
   totalStock: number;
@@ -30,7 +30,9 @@ export type ProductInventoryBySize = Record<string, ProductInventoryStatus>;
 
 const fallbackProductStock: Record<BaseInventoryProductId, number> = {
   rashguard: 9,
-  shorts: 9
+  shorts: 9,
+  "sakura-rashguard": 0,
+  "sakura-shorts": 0
 };
 
 function getBaseInventoryProductsForProduct(productId: string): BaseInventoryProductId[] {
@@ -44,6 +46,18 @@ function getBaseInventoryProductsForProduct(productId: string): BaseInventoryPro
 
   if (productId === "apertos-the-original-no-gi-set") {
     return ["rashguard", "shorts"];
+  }
+
+  if (productId === "apertos-sakura-dragon-rashguard") {
+    return ["sakura-rashguard"];
+  }
+
+  if (productId === "apertos-sakura-dragon-shorts") {
+    return ["sakura-shorts"];
+  }
+
+  if (productId === "apertos-sakura-dragon-no-gi-set") {
+    return ["sakura-rashguard", "sakura-shorts"];
   }
 
   return [];
@@ -112,17 +126,19 @@ async function fetchInventoryRows(baseProductIds: BaseInventoryProductId[]) {
 function createInventoryState(rows: InventoryRow[]): InventoryState {
   const state: InventoryState = {
     rashguard: { totalStock: fallbackProductStock.rashguard, hasBaseRow: false, stockBySize: {}, hasSizeRows: false },
-    shorts: { totalStock: fallbackProductStock.shorts, hasBaseRow: false, stockBySize: {}, hasSizeRows: false }
+    shorts: { totalStock: fallbackProductStock.shorts, hasBaseRow: false, stockBySize: {}, hasSizeRows: false },
+    "sakura-rashguard": { totalStock: fallbackProductStock["sakura-rashguard"], hasBaseRow: false, stockBySize: {}, hasSizeRows: false },
+    "sakura-shorts": { totalStock: fallbackProductStock["sakura-shorts"], hasBaseRow: false, stockBySize: {}, hasSizeRows: false }
   };
 
   const groupedRows = new Map<BaseInventoryProductId, InventoryRow[]>();
 
   for (const row of rows) {
-    if (row.product_id !== "rashguard" && row.product_id !== "shorts") {
+    const productId = row.product_id as BaseInventoryProductId;
+    if (!(productId in state)) {
       continue;
     }
 
-    const productId = row.product_id as BaseInventoryProductId;
     const currentRows = groupedRows.get(productId) ?? [];
     currentRows.push(row);
     groupedRows.set(productId, currentRows);
@@ -180,6 +196,13 @@ function getDisplayStock(product: Product, inventoryState: InventoryState) {
   return Math.min(...baseProducts.map((productId) => inventoryState[productId].totalStock));
 }
 
+function isSetProduct(product: Product) {
+  return (
+    product.id === "apertos-the-original-no-gi-set" ||
+    product.id === "apertos-sakura-dragon-no-gi-set"
+  );
+}
+
 function createInventoryStatus(product: Product, inventoryState: InventoryState): ProductInventoryStatus {
   const stock = getDisplayStock(product, inventoryState);
 
@@ -195,15 +218,18 @@ function createInventoryStatus(product: Product, inventoryState: InventoryState)
     return {
       stock: 0,
       isOutOfStock: true,
-      message: product.id === "apertos-the-original-no-gi-set" ? "No sets available" : "Out of stock"
+      message: isSetProduct(product) ? "No sets available" : "Out of stock"
     };
   }
+
+  const message = isSetProduct(product)
+    ? `${stock} ${stock === 1 ? "set" : "sets"} available`
+    : `${stock} available now`;
 
   return {
     stock,
     isOutOfStock: false,
-    message:
-      product.id === "apertos-the-original-no-gi-set" ? `${stock} sets available` : `${stock} available now`
+    message: stock <= 2 ? `Only ${stock} left — ${message}` : message
   };
 }
 
@@ -224,9 +250,17 @@ function createInventoryBySize(product: Product, inventoryState: InventoryState)
         return [size, { stock: 0, isOutOfStock: true, message: "Out of stock" } satisfies ProductInventoryStatus];
       }
 
+      const message = isSetProduct(product)
+        ? `${stockForSize} ${stockForSize === 1 ? "set" : "sets"} available`
+        : `${stockForSize} available now`;
+
       return [
         size,
-        { stock: stockForSize, isOutOfStock: false, message: `${stockForSize} available now` } satisfies ProductInventoryStatus
+        {
+          stock: stockForSize,
+          isOutOfStock: false,
+          message: stockForSize <= 2 ? `Only ${stockForSize} left — ${message}` : message
+        } satisfies ProductInventoryStatus
       ];
     })
   );
