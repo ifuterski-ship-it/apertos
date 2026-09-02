@@ -253,8 +253,11 @@ export const products: Product[] = [
     name: "Apertos Sakura Dragon Shorts",
     price: 25,
     priceLabel: "£25.00",
-    image: "/products/coming-soon.svg",
-    images: ["/products/coming-soon.svg"],
+    image: "/products/sakura-dragon-shorts-front.jpeg",
+    images: [
+      "/products/sakura-dragon-shorts-front.jpeg",
+      "/products/sakura-dragon-shorts-back.jpeg"
+    ],
     sizes: ["S", "M", "L", "XL", "2XL"],
     category: "Training Bottoms",
     shortDescription: "Sakura Dragon fight-ready shorts",
@@ -264,6 +267,7 @@ export const products: Product[] = [
     material: "85% Polyester, 15% Spandex — lightweight 4-way stretch, quick-dry",
     careInstructions: "Machine wash cold 30°C · Do not tumble dry · Hang dry",
     isComingSoon: true,
+    launchAt: "2026-09-03T00:00:00+01:00",
     sizeGuides: [
       {
         title: "Shorts Size Guide",
