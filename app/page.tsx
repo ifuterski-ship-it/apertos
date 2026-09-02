@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Layers, Ruler, Zap } from "lucide-react";
 import { ProductGrid } from "@/components/products/product-grid";
-import { getFeaturedProducts, getSakuraDragonProduct } from "@/lib/products";
+import { getFeaturedProducts, getSakuraDragonProducts } from "@/lib/products";
 import { absoluteUrl, siteKeywords } from "@/lib/site";
 
 const homepageTitle = "Apertos Fightwear | BJJ Rash Guards, MMA Shorts & No-Gi Sets";
@@ -82,7 +82,7 @@ const featureCards = [
 
 export default function HomePage() {
   const featuredProducts = getFeaturedProducts();
-  const sakuraDragon = getSakuraDragonProduct();
+  const sakuraDragon = getSakuraDragonProducts();
 
   const organizationSchema = {
     "@context": "https://schema.org",
@@ -176,7 +176,7 @@ export default function HomePage() {
       </section>
 
       {/* ── Featured products ── */}
-      {sakuraDragon ? (
+      {sakuraDragon.length > 0 ? (
         <section className="space-y-8">
           <div>
             <p className="text-xs uppercase tracking-[0.55em] text-crimson">Next Drop</p>
@@ -184,10 +184,10 @@ export default function HomePage() {
               Sakura Dragon
             </h2>
             <p className="mt-4 max-w-xl text-sm uppercase leading-7 tracking-[0.22em] text-neutral-400">
-              Limited no-gi drop landing 3 September. £50 set with live countdown until launch.
+              Limited no-gi drop landing 3 September. Live countdown until launch.
             </p>
           </div>
-          <ProductGrid products={[sakuraDragon]} />
+          <ProductGrid products={sakuraDragon} />
         </section>
       ) : null}
 

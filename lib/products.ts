@@ -233,6 +233,7 @@ export const products: Product[] = [
     material: "85% Polyester, 15% Spandex — 4-way stretch, moisture-wicking performance fabric",
     careInstructions: "Machine wash cold 30°C · Do not tumble dry · Hang dry · Do not iron print",
     isComingSoon: true,
+    launchAt: "2026-09-03T00:00:00+01:00",
     sizeGuides: [
       {
         title: "Rashguard Size Guide",
@@ -285,6 +286,10 @@ export function getFeaturedProducts() {
 
 export function getSakuraDragonProduct() {
   return products.find((p) => p.id === "apertos-sakura-dragon-no-gi-set") ?? null;
+}
+
+export function getSakuraDragonProducts() {
+  return products.filter((p) => p.id.startsWith("apertos-sakura-dragon"));
 }
 
 export function getApparelProducts() {
