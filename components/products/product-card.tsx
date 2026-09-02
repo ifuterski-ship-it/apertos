@@ -43,24 +43,15 @@ export function ProductCard({ product }: { product: Product }) {
 
         <Link href={`/product/${product.id}`} className="block">
           <div className="relative aspect-[4/5] overflow-hidden bg-[#0d0d0d]">
-            {comingSoon ? (
-              <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <div className="relative h-16 w-16 opacity-20">
-                  <Image src="/logo-mark.png" alt="" fill sizes="64px" className="object-contain" />
-                </div>
-                <p className="mt-4 text-[10px] uppercase tracking-[0.4em] text-neutral-600">Image Coming Soon</p>
-              </div>
-            ) : (
-              <div className="absolute inset-0 p-6 md:p-8">
-                <Image
-                  src={product.image}
-                  alt={product.name}
-                  fill
-                  sizes="(min-width: 1280px) 30vw, (min-width: 640px) 45vw, 100vw"
-                  className="object-contain transition duration-500 group-hover:scale-[1.04]"
-                />
-              </div>
-            )}
+            <div className="absolute inset-0 p-6 md:p-8">
+              <Image
+                src={product.image}
+                alt={product.name}
+                fill
+                sizes="(min-width: 1280px) 30vw, (min-width: 640px) 45vw, 100vw"
+                className="object-contain transition duration-500 group-hover:scale-[1.04]"
+              />
+            </div>
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
             <div className="absolute inset-x-0 bottom-0 p-5">
               <p className="text-[10px] uppercase tracking-[0.4em] text-white/50">{product.category}</p>
