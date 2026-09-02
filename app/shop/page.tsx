@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { ProductGrid } from "@/components/products/product-grid";
-import { getUpcomingDropProducts, isProductComingSoon } from "@/lib/product-availability";
 import { getProductsWithFlags } from "@/lib/product-flags";
 import { absoluteUrl } from "@/lib/site";
 
@@ -69,10 +68,11 @@ export const metadata: Metadata = {
 
 export default async function ShopPage() {
   const allProducts = await getProductsWithFlags();
-  const visibleProducts = allProducts.filter((p) => !isProductComingSoon(p));
-  const upcomingDrops = getUpcomingDropProducts(allProducts);
-  const performanceProducts = visibleProducts.filter((p) => p.category !== "Outerwear");
-  const lifestyleProducts = visibleProducts.filter((p) => p.category === "Outerwear");
+  const sakuraDragon = allProducts.filter((p) => p.id.startsWith("apertos-sakura-dragon"));
+  const ogProducts = allProducts.filter(
+    (p) => !p.id.startsWith("apertos-sakura-dragon") && p.category !== "Outerwear"
+  );
+  const lifestyleProducts = allProducts.filter((p) => p.category === "Outerwear");
   const storeSchema = {
     "@context": "https://schema.org",
     "@type": "SportingGoodsStore",
@@ -153,18 +153,18 @@ export default async function ShopPage() {
         </p>
       </div>
 
-      {/* Upcoming drops */}
-      {upcomingDrops.length > 0 && (
+      {/* Sakura Dragon collection */}
+      {sakuraDragon.length > 0 && (
         <div className="space-y-3">
-          <p className="text-[10px] uppercase tracking-[0.55em] text-crimson">Upcoming Drops</p>
-          <ProductGrid products={upcomingDrops} />
+          <p className="text-[10px] uppercase tracking-[0.55em] text-crimson">Sakura Dragon</p>
+          <ProductGrid products={sakuraDragon} />
         </div>
       )}
 
-      {/* Performance products */}
+      {/* OG Apertos collection */}
       <div className="space-y-3">
-        <p className="text-[10px] uppercase tracking-[0.55em] text-crimson">Performance Gear</p>
-        <ProductGrid products={performanceProducts} />
+        <p className="text-[10px] uppercase tracking-[0.55em] text-crimson">OG Apertos</p>
+        <ProductGrid products={ogProducts} />
       </div>
 
       {/* Lifestyle / Apparel */}

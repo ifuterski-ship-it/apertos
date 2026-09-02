@@ -296,6 +296,10 @@ export function getSakuraDragonProducts() {
   return products.filter((p) => p.id.startsWith("apertos-sakura-dragon"));
 }
 
+export function getOriginalProducts() {
+  return products.filter((p) => p.id.startsWith("apertos-the-original") || p.id === "apertos-essential-hoodie");
+}
+
 export function getApparelProducts() {
   return products.filter((p) => p.category === "Outerwear");
 }
