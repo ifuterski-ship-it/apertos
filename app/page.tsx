@@ -229,7 +229,7 @@ export default function HomePage() {
       <section className="grid gap-6 lg:grid-cols-2">
         <div className="relative min-h-[520px] overflow-hidden rounded-[1.75rem] border border-white/10 bg-black">
           <Image
-            src="/products/nogi-front.jpg"
+            src="/products/sakura-dragon-front.jpeg"
             alt="Apertos Fightwear no-gi set front view"
             fill
             sizes="(min-width: 1024px) 50vw, 100vw"
@@ -247,7 +247,7 @@ export default function HomePage() {
               The original no-gi set worn the way it was designed to feel — clean lines, locked-in movement, and a competition-ready silhouette.
             </p>
             <Link
-              href="/product/apertos-the-original-no-gi-set"
+              href="/product/apertos-sakura-dragon-no-gi-set"
               className="inline-flex w-fit items-center bg-crimson px-6 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-white transition hover:bg-crimson/85"
             >
               View The Set
