@@ -8,9 +8,7 @@ import { products } from "@/lib/products";
 import { createAdminClient, hasSupabaseAdminEnv } from "@/lib/supabase/admin";
 import { absoluteUrl } from "@/lib/site";
 
-export function generateStaticParams() {
-  return products.map((product) => ({ id: product.id }));
-}
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
   params
