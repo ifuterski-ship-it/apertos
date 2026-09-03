@@ -4,7 +4,32 @@ import { getProductById } from "@/lib/products";
 const SHIPENGINE_BASE_URL = "https://api.shipengine.com";
 const FREE_SHIPPING_THRESHOLD_PENCE = 4000;
 
-const defaultAllowedCountries = ["GB", "IE", "US", "CA", "FR", "DE", "ES", "IT", "NL", "BE", "PT"];
+const defaultAllowedCountries = [
+  "GB",
+  "IE",
+  "US",
+  "CA",
+  "AU",
+  "NZ",
+  "JP",
+  "FR",
+  "DE",
+  "ES",
+  "IT",
+  "NL",
+  "BE",
+  "PT",
+  "CH",
+  "AT",
+  "SE",
+  "NO",
+  "DK",
+  "FI",
+  "PL",
+  "CZ",
+  "GR",
+  "LU"
+];
 
 export function getAllowedShippingCountries() {
   const configured = (process.env.STRIPE_SHIPPING_COUNTRIES ?? "")
