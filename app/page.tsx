@@ -161,6 +161,43 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ── Our Fighters ── */}
+      <section className="space-y-8">
+        <div>
+          <p className="text-xs uppercase tracking-[0.55em] text-crimson">Our Fighters</p>
+          <h2 className="mt-3 font-display text-4xl uppercase tracking-[0.08em] md:text-5xl">
+            Representing Apertos
+          </h2>
+          <p className="mt-4 max-w-xl text-sm uppercase leading-7 tracking-[0.22em] text-neutral-400">
+            The athletes competing in Apertos Fightwear.
+          </p>
+        </div>
+        <Link
+          href="/fighters/abel-biju"
+          className="group flex gap-6 rounded-[1.75rem] border border-white/10 bg-panel p-5 transition hover:border-crimson/40 hover:bg-panel/80 md:max-w-xl"
+        >
+          <div className="relative h-44 w-44 shrink-0 overflow-hidden rounded-[1.25rem] border border-white/10 bg-black">
+            <Image
+              src="/fighters/abel-biju.jpg"
+              alt='Abel "The Ninja" Biju'
+              fill
+              sizes="176px"
+              className="object-cover object-top transition-transform duration-300 group-hover:scale-105"
+            />
+          </div>
+          <div className="flex flex-col justify-center space-y-3">
+            <p className="text-[10px] uppercase tracking-[0.45em] text-crimson">Sponsored Athlete</p>
+            <h3 className="font-display text-2xl uppercase tracking-[0.08em]">
+              Abel <span className="text-crimson">“The Ninja”</span> Biju
+            </h3>
+            <p className="text-xs uppercase tracking-[0.25em] text-neutral-400">Lions Gym Coventry · MMA</p>
+            <p className="inline-flex w-fit items-center text-xs font-semibold uppercase tracking-[0.3em] text-white transition group-hover:text-crimson">
+              View Profile <span className="ml-2 transition-transform duration-200 group-hover:translate-x-1">→</span>
+            </p>
+          </div>
+        </Link>
+      </section>
+
       {/* ── Feature cards ── */}
       <section className="grid gap-5 md:grid-cols-3">
         {featureCards.map(({ icon: Icon, title, description }) => (
