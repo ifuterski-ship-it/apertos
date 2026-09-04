@@ -137,17 +137,38 @@ export default async function AdminPage() {
             const payload = order.parsedItemsPayload;
             const shippingAddress = payload.shippingAddress;
             const shippingLabel = payload.shippingLabel;
+            const isPodOrder = payload.items.every((item) => {
+              const product = products.find((p) => p.id === item.productId);
+              return product?.category === "Outerwear";
+            });
+            const hasPodItems = payload.items.some((item) => {
+              const product = products.find((p) => p.id === item.productId);
+              return product?.category === "Outerwear";
+            });
 
             return (
               <div
                 key={order.stripeCheckoutSessionId}
-                className="grid gap-6 rounded-[2rem] border border-white/10 bg-white/[0.03] p-6 lg:grid-cols-[1.25fr_0.75fr]"
+                className={`grid gap-6 rounded-[2rem] border bg-white/[0.03] p-6 lg:grid-cols-[1.25fr_0.75fr] ${
+                  isPodOrder ? "border-amber-500/30" : "border-white/10"
+                }`}
               >
                 <div className="space-y-5">
                   <div className="space-y-2">
-                    <p className="text-xs uppercase tracking-[0.35em] text-neutral-400">
-                      {order.createdAt ? new Date(order.createdAt).toLocaleString("en-GB") : "Order"}
-                    </p>
+                    <div className="flex flex-wrap items-center gap-3">
+                      <p className="text-xs uppercase tracking-[0.35em] text-neutral-400">
+                        {order.createdAt ? new Date(order.createdAt).toLocaleString("en-GB") : "Order"}
+                      </p>
+                      {isPodOrder ? (
+                        <span className="border border-amber-500/40 bg-amber-500/10 px-2 py-1 text-[10px] uppercase tracking-[0.25em] text-amber-300">
+                          POD — Submit to Tapstitch
+                        </span>
+                      ) : hasPodItems ? (
+                        <span className="border border-amber-500/40 bg-amber-500/10 px-2 py-1 text-[10px] uppercase tracking-[0.25em] text-amber-300">
+                          Contains POD item
+                        </span>
+                      ) : null}
+                    </div>
                     <h2 className="font-display text-3xl uppercase tracking-[0.08em]">
                       {formatMoney(order.amountTotal, order.currency)}
                     </h2>
@@ -227,11 +248,19 @@ export default async function AdminPage() {
                     )}
                   </div>
 
-                  <GenerateLabelButton
-                    sessionId={order.stripeCheckoutSessionId}
-                    hasShippingAddress={Boolean(shippingAddress?.address1)}
-                    existingLabelUrl={shippingLabel?.labelUrl ?? null}
-                  />
+                  {isPodOrder ? (
+                    <div className="rounded-[1rem] border border-amber-500/20 bg-amber-500/[0.06] px-5 py-4">
+                      <p className="text-[11px] uppercase leading-6 tracking-[0.25em] text-amber-200">
+                        Submit this order to Tapstitch — no shipping label needed. The print partner handles production &amp; delivery.
+                      </p>
+                    </div>
+                  ) : (
+                    <GenerateLabelButton
+                      sessionId={order.stripeCheckoutSessionId}
+                      hasShippingAddress={Boolean(shippingAddress?.address1)}
+                      existingLabelUrl={shippingLabel?.labelUrl ?? null}
+                    />
+                  )}
                 </div>
               </div>
             );

@@ -36,6 +36,10 @@ export function CheckoutForm({ allowedCountries }: { allowedCountries: string[] 
   const router = useRouter();
   const { items, subtotal, isHydrated } = useCart();
   const supabase = useMemo(() => (hasSupabaseEnv ? createClient() : null), []);
+  const hasPodItems = items.some((item) => {
+    const product = products.find((p) => p.id === item.productId);
+    return product?.category === "Outerwear";
+  });
   const isPodOnly = items.length > 0 && items.every((item) => {
     const product = products.find((p) => p.id === item.productId);
     return product?.category === "Outerwear";
@@ -263,11 +267,26 @@ export function CheckoutForm({ allowedCountries }: { allowedCountries: string[] 
           </div>
 
           {isPodOnly ? (
-            <div className="rounded-[1rem] border border-white/10 bg-white/[0.03] px-5 py-4 text-sm uppercase tracking-[0.2em] text-neutral-300">
-              Shipping included — delivered by our print partner
+            <div className="space-y-2 rounded-[1rem] border border-amber-500/20 bg-amber-500/[0.06] px-5 py-4">
+              <p className="text-sm uppercase tracking-[0.2em] text-amber-200">
+                Shipping included — delivered by our print partner
+              </p>
+              <p className="text-[11px] uppercase leading-6 tracking-[0.28em] text-neutral-400">
+                This item is made to order. Production takes 7–14 business days before dispatch.
+              </p>
             </div>
           ) : (
             <>
+              {hasPodItems ? (
+                <div className="space-y-2 rounded-[1rem] border border-amber-500/20 bg-amber-500/[0.06] px-5 py-4">
+                  <p className="text-sm uppercase tracking-[0.2em] text-amber-200">
+                    This order ships in two parts
+                  </p>
+                  <p className="text-[11px] uppercase leading-6 tracking-[0.28em] text-neutral-400">
+                    Your hoodie is made to order (7–14 business days production) and ships separately from your in-stock gear.
+                  </p>
+                </div>
+              ) : null}
               <button
                 type="button"
                 onClick={handleGetRates}
@@ -364,6 +383,12 @@ export function CheckoutForm({ allowedCountries }: { allowedCountries: string[] 
         <p className="text-[11px] uppercase leading-5 tracking-[0.18em] text-neutral-400">
           Have a discount code? Enter it on the Stripe payment page after clicking proceed.
         </p>
+
+        {hasPodItems && !isPodOnly ? (
+          <p className="text-[11px] uppercase leading-5 tracking-[0.18em] text-amber-300/80">
+            Made-to-order items ship separately from in-stock gear and take 7–14 business days to produce.
+          </p>
+        ) : null}
 
         {checkoutError ? (
           <p className="text-xs uppercase leading-6 tracking-[0.2em] text-red-300">{checkoutError}</p>

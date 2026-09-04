@@ -8,6 +8,7 @@ import { ordersFromEmail } from "@/lib/email-config";
 import { decrementInventoryForOrder } from "@/lib/inventory";
 import { buildOrderItemsPayload, getOrderForAdmin, recordOrder } from "@/lib/orders";
 import { hasSupabaseAdminEnv } from "@/lib/supabase/admin";
+import { getProductById } from "@/lib/products";
 import type Stripe from "stripe";
 
 type MetadataItem = {
@@ -27,6 +28,7 @@ export default async function CheckoutSuccessPage({
   let customerEmail: string | null = null;
   let purchaseValue = 0;
   let purchaseCurrency = "GBP";
+  let hasPodItems = false;
   let purchaseItems: Array<{
     item_id: string;
     item_name: string;
@@ -44,6 +46,10 @@ export default async function CheckoutSuccessPage({
       customerEmail = session.customer_details?.email ?? session.customer_email ?? null;
       purchaseValue = (session.amount_total ?? 0) / 100;
       purchaseCurrency = (session.currency ?? "gbp").toUpperCase();
+      hasPodItems = metadataItems.some((item) => {
+        const product = getProductById(item.productId);
+        return product?.category === "Outerwear";
+      });
       purchaseItems = lineItems.data.map((item, index) => {
         const metadataItem = metadataItems[index];
 
@@ -183,6 +189,11 @@ export default async function CheckoutSuccessPage({
             ? `Your payment is complete and a confirmation will be sent to ${customerEmail}.`
             : "Your payment is complete and your APERTOS order is confirmed."}
         </p>
+        {hasPodItems ? (
+          <p className="mx-auto mt-4 max-w-2xl text-xs uppercase leading-6 tracking-[0.22em] text-amber-300/80">
+            Made-to-order items (hoodies) are printed by our production partner and ship separately. Please allow 7–14 business days for production before dispatch.
+          </p>
+        ) : null}
         <div className="mt-8 flex justify-center gap-4">
           <Link
             href="/shop"

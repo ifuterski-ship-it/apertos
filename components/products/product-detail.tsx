@@ -271,6 +271,15 @@ export function ProductDetail({
                   {product.material}
                 </p>
               ) : null}
+
+              {/* POD info */}
+              {product.category === "Outerwear" && (
+                <div className="rounded-[1.25rem] border border-amber-500/20 bg-amber-500/[0.06] px-5 py-4">
+                  <p className="text-[11px] uppercase leading-6 tracking-[0.25em] text-amber-200">
+                    Made to order — printed and shipped by our production partner. Please allow 7–14 business days for production.
+                  </p>
+                </div>
+              )}
             </div>
           </div>
 
@@ -417,16 +426,29 @@ export function ProductDetail({
                 </div>
               </div>
             </details>
-            <details className="group rounded-[1.5rem] border border-white/10 bg-white/[0.02]">
-              <summary className="flex cursor-pointer list-none items-center justify-between px-5 py-4">
-                <span className="text-[11px] uppercase tracking-[0.35em] text-neutral-400">Shipping</span>
-                <span className="text-neutral-500 transition-transform duration-200 group-open:rotate-45">+</span>
-              </summary>
-              <div className="space-y-1 px-5 pb-4">
-                <p className="text-[11px] uppercase leading-6 tracking-[0.3em] text-neutral-500">Free UK shipping on orders over £40 · Standard 2–5 working days</p>
-                <p className="text-[11px] uppercase leading-6 tracking-[0.3em] text-neutral-500">International shipping available to EU, US, CA and more</p>
-              </div>
-            </details>
+<details className="group rounded-[1.5rem] border border-white/10 bg-white/[0.02]">
+                <summary className="flex cursor-pointer list-none items-center justify-between px-5 py-4">
+                  <span className="text-[11px] uppercase tracking-[0.35em] text-neutral-400">Shipping</span>
+                  <span className="text-neutral-500 transition-transform duration-200 group-open:rotate-45">+</span>
+                </summary>
+                <div className="space-y-2 px-5 pb-4">
+                  {product.category === "Outerwear" ? (
+                    <>
+                      <p className="text-[11px] uppercase leading-6 tracking-[0.3em] text-neutral-500">
+                        Made to order — produced &amp; shipped by our print partner. Allow 7–14 business days for production before dispatch.
+                      </p>
+                      <p className="text-[11px] uppercase leading-6 tracking-[0.3em] text-neutral-500">
+                        Shipping is included for this item. If ordered with other products it ships separately.
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-[11px] uppercase leading-6 tracking-[0.3em] text-neutral-500">Free UK shipping on orders over £40 · Standard 2–5 working days</p>
+                      <p className="text-[11px] uppercase leading-6 tracking-[0.3em] text-neutral-500">International shipping available to EU, US, CA and more</p>
+                    </>
+                  )}
+                </div>
+              </details>
           </div>
         </div>
       </div>

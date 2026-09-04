@@ -1,5 +1,6 @@
 import type { OrderItem, OrderShippingAddress, OrderShippingLabel } from "@/lib/orders";
 import { siteName, siteUrl } from "@/lib/site";
+import { getProductById } from "@/lib/products";
 
 function renderSiteButton(label = "Visit The Store") {
   return `
@@ -98,6 +99,18 @@ export function renderOrderConfirmationEmail({
     `
     : "";
 
+  const hasPodItems = items.some((item) => {
+    const product = getProductById(item.productId);
+    return product?.category === "Outerwear";
+  });
+  const podNote = hasPodItems
+    ? `
+      <p style="margin:18px 0 0;color:#fbbf24;font-size:12px;line-height:1.7;letter-spacing:0.08em">
+        Made-to-order items (hoodies) are printed by our production partner and ship separately. Please allow 7–14 business days for production before dispatch.
+      </p>
+    `
+    : "";
+
   return renderEmailShell({
     eyebrow: siteName,
     title: "Order Confirmed",
@@ -119,6 +132,7 @@ export function renderOrderConfirmationEmail({
       </table>
       <p style="margin:0">Order total ${amountTotal !== null ? `£${(amountTotal / 100).toFixed(2)}` : "Paid in full"}</p>
       <p style="margin:18px 0 0">We'll email you again as soon as your shipment is moving.</p>
+      ${podNote}
       ${reviewBlock}
     `
   });
