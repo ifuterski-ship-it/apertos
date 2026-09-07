@@ -262,6 +262,27 @@ export default function HomePage() {
         ))}
       </section>
 
+      {/* ── Team Kits CTA ── */}
+      <section>
+        <Link
+          href="/team-kits"
+          className="group block rounded-[1.75rem] border border-crimson/30 bg-crimson/5 p-8 transition hover:border-crimson/60 hover:bg-crimson/10 sm:flex sm:items-center sm:justify-between sm:p-10"
+        >
+          <div className="space-y-3">
+            <p className="text-xs uppercase tracking-[0.55em] text-crimson">Custom</p>
+            <h2 className="font-display text-3xl uppercase tracking-[0.08em] md:text-4xl">
+              Team &amp; Club Kits
+            </h2>
+            <p className="max-w-lg text-sm uppercase leading-7 tracking-[0.2em] text-neutral-400">
+              Rash guards, hoodies and MMA shorts designed with your club. Min. 10 per item · ~6 weeks production.
+            </p>
+          </div>
+          <span className="mt-5 inline-flex items-center text-xs font-semibold uppercase tracking-[0.3em] text-crimson transition group-hover:text-white sm:mt-0">
+            Enquire Now <span className="ml-2 transition-transform duration-200 group-hover:translate-x-1">→</span>
+          </span>
+        </Link>
+      </section>
+
       {/* ── Lifestyle image — no-gi set ── */}
       <section className="grid gap-6 lg:grid-cols-2">
         <div className="relative min-h-[520px] overflow-hidden rounded-[1.75rem] border border-white/10 bg-black">
