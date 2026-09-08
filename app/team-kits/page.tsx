@@ -1,5 +1,6 @@
 import { TeamKitForm } from "@/app/team-kits/team-kit-form";
 import { SectionHeading } from "@/components/ui/section-heading";
+import Image from "next/image";
 
 const kitProducts = [
   {
@@ -42,6 +43,19 @@ export default function TeamKitsPage() {
           Build a custom kit for your team, club or academy — rash guards, hoodies and MMA shorts designed with you,
           made for you.
         </p>
+      </div>
+
+      {/* Team hero image */}
+      <div className="relative min-h-[380px] overflow-hidden rounded-[2rem] border border-white/10 bg-black sm:min-h-[460px]">
+        <Image
+          src="/fighters/team-kits-placeholder.jpg"
+          alt="Apertos custom team kits"
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
       </div>
 
       <section className="space-y-8">
@@ -94,7 +108,23 @@ export default function TeamKitsPage() {
           title="Start Your Kit"
           description="Tell us how many of each piece you need and we'll come back to you with a price."
         />
-        <div className="mx-auto max-w-3xl">
+        <div className="grid gap-6 lg:grid-cols-2 lg:items-start">
+          <div className="relative min-h-[320px] overflow-hidden rounded-[2rem] border border-white/10 bg-black sm:min-h-[420px]">
+            <Image
+              src="/fighters/team-kits-placeholder.jpg"
+              alt="Order your Apertos custom team kit"
+              fill
+              sizes="(min-width: 1024px) 50vw, 100vw"
+              className="object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+            <div className="absolute bottom-6 left-6 right-6">
+              <p className="font-display text-2xl uppercase tracking-[0.08em]">Your Kit, Your Colours</p>
+              <p className="mt-2 text-xs uppercase tracking-[0.25em] text-neutral-300">
+                Min. 10 per item · ~6 weeks production
+              </p>
+            </div>
+          </div>
           <TeamKitForm />
         </div>
       </section>
