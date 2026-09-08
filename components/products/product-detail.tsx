@@ -45,9 +45,15 @@ function SizeGuideTable({
       <div className="overflow-hidden rounded-[1.25rem] border border-white/10">
         <div className="grid grid-cols-4 bg-white/[0.04] px-4 py-3 text-[11px] uppercase tracking-[0.3em] text-neutral-400">
           <span>Size</span>
-          <span>Chest</span>
-          <span>Waist</span>
-          <span>Length</span>
+          {guide.rows.some((row) => row.height) ? (
+            <span className="col-span-3">Height</span>
+          ) : (
+            <>
+              <span>Chest</span>
+              <span>Waist</span>
+              <span>Length</span>
+            </>
+          )}
         </div>
         {guide.rows.map((row) => {
           const isSelected = row.size === selectedSize;
@@ -67,9 +73,15 @@ function SizeGuideTable({
               }`}
             >
               <span>{row.size}</span>
-              <span>{row.chest ?? "—"}</span>
-              <span>{row.waist ?? "—"}</span>
-              <span>{row.length ?? "—"}</span>
+              {row.height ? (
+                <span className="col-span-3">{row.height}</span>
+              ) : (
+                <>
+                  <span>{row.chest ?? "—"}</span>
+                  <span>{row.waist ?? "—"}</span>
+                  <span>{row.length ?? "—"}</span>
+                </>
+              )}
             </button>
           ) : (
             <div
@@ -77,9 +89,15 @@ function SizeGuideTable({
               className="grid grid-cols-4 border-t border-white/10 px-4 py-3 text-sm uppercase tracking-[0.18em] text-neutral-200"
             >
               <span>{row.size}</span>
-              <span>{row.chest ?? "—"}</span>
-              <span>{row.waist ?? "—"}</span>
-              <span>{row.length ?? "—"}</span>
+              {row.height ? (
+                <span className="col-span-3">{row.height}</span>
+              ) : (
+                <>
+                  <span>{row.chest ?? "—"}</span>
+                  <span>{row.waist ?? "—"}</span>
+                  <span>{row.length ?? "—"}</span>
+                </>
+              )}
             </div>
           );
         })}

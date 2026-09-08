@@ -3,6 +3,7 @@ export type SizeGuideRow = {
   chest?: string;
   waist?: string;
   length?: string;
+  height?: string;
 };
 
 export type SizeGuideBlock = {
@@ -168,6 +169,35 @@ export const products: Product[] = [
           { size: "L", chest: "42-44 in", length: "28 in" },
           { size: "XL", chest: "44-46 in", length: "29 in" },
           { size: "2XL", chest: "46-48 in", length: "30 in" }
+        ]
+      }
+    ]
+  },
+  {
+    id: "apertos-kids-hoodie",
+    name: "Apertos Kids Hoodie",
+    price: 40,
+    priceLabel: "£40.00",
+    image: "/products/kids-hoodie-front.jpeg",
+    images: ["/products/kids-hoodie-front.jpeg"],
+    sizes: ["130", "140", "150", "160"],
+    colours: ["Grey"],
+    category: "Outerwear",
+    shortDescription: "Kids combat sports hoodie",
+    shippingWeightLb: 1,
+    description:
+      "A juniors version of the Apertos Essential Hoodie — a clean, heavyweight hoodie built for the gym bag, mat warm-up and everyday wear.",
+    material: "80% Cotton, 20% Polyester — heavyweight fleece, brushed interior",
+    careInstructions: "Machine wash cold 30°C · Tumble dry low · Do not iron print",
+    sizeGuides: [
+      {
+        title: "Kids Hoodie Size Guide",
+        note: "Sizes are height based (cm). Relaxed fit.",
+        rows: [
+          { size: "130", height: "130 cm · approx. age 7-8" },
+          { size: "140", height: "140 cm · approx. age 9-10" },
+          { size: "150", height: "150 cm · approx. age 11-12" },
+          { size: "160", height: "160 cm · approx. age 13-14" }
         ]
       }
     ]
