@@ -4,6 +4,11 @@ import { getProductById } from "@/lib/products";
 const WIX_ORDERS_URL = "https://www.wixapis.com/ecom/v1/orders";
 const WIX_STORES_APP_ID = "1380bb76-6100-5030-9176-3012e30ae49f";
 
+const WIX_DEFAULT_PRODUCT_MAP: Record<string, string> = {
+  "apertos-essential-hoodie": "32ec2ddb-d93b-4793-846f-2b5a51a0c13d",
+  "apertos-kids-hoodie": "1a86af4a-b00f-4b77-b133-2e8ccbec06bb"
+};
+
 export function hasWixStoreEnv() {
   return Boolean(
     process.env.WIX_API_KEY &&
@@ -13,22 +18,27 @@ export function hasWixStoreEnv() {
 
 export function getWixStoreProductMap(): Record<string, string> {
   const raw = process.env.WIX_STORE_PRODUCT_MAP ?? "";
-  if (!raw) return {};
 
-  try {
-    const parsed = JSON.parse(raw) as Record<string, unknown>;
-    const map: Record<string, string> = {};
+  if (raw) {
+    try {
+      const parsed = JSON.parse(raw) as Record<string, unknown>;
+      const map: Record<string, string> = {};
 
-    for (const [key, value] of Object.entries(parsed)) {
-      if (typeof value === "string" && value.trim()) {
-        map[key] = value.trim();
+      for (const [key, value] of Object.entries(parsed)) {
+        if (typeof value === "string" && value.trim()) {
+          map[key] = value.trim();
+        }
       }
-    }
 
-    return map;
-  } catch {
-    return {};
+      if (Object.keys(map).length > 0) {
+        return map;
+      }
+    } catch {
+      // fall through to defaults
+    }
   }
+
+  return { ...WIX_DEFAULT_PRODUCT_MAP };
 }
 
 function splitName(fullName: string | null) {
@@ -43,6 +53,84 @@ function splitName(fullName: string | null) {
   }
 
   return { firstName: parts[0], lastName: parts.slice(1).join(" ") };
+}
+
+type WixProductOption = {
+  name: string;
+  choices: string[];
+};
+
+async function fetchWixProductOptions(
+  apiKey: string,
+  siteId: string,
+  catalogItemId: string
+): Promise<WixProductOption[]> {
+  const response = await fetch(
+    `https://www.wixapis.com/stores/v3/products/${catalogItemId}`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: apiKey,
+        "wix-site-id": siteId
+      }
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error(`Unable to load Wix product ${catalogItemId} (${response.status}).`);
+  }
+
+  const data = (await response.json()) as {
+    product?: {
+      options?: Array<{
+        name?: string;
+        choicesSettings?: { choices?: Array<{ name?: string }> };
+      }>;
+    };
+  };
+
+  const options = data.product?.options ?? [];
+
+  return options
+    .map((option) => ({
+      name: option.name ?? "",
+      choices: (option.choicesSettings?.choices ?? [])
+        .map((choice) => choice.name ?? "")
+        .filter(Boolean)
+    }))
+    .filter((option) => option.name && option.choices.length > 0);
+}
+
+function buildCatalogOptions(
+  productOptions: WixProductOption[],
+  size: string,
+  colour: string | null
+): Array<{ option: string; choices: string[] }> {
+  const options: Array<{ option: string; choices: string[] }> = [];
+
+  for (const productOption of productOptions) {
+    const lower = productOption.name.toLowerCase();
+    const desiredValue =
+      lower === "size" ? size :
+      lower === "color" || lower === "colour" ? (colour ?? "") :
+      "";
+
+    let choice = "";
+    if (desiredValue) {
+      choice =
+        productOption.choices.find((c) => c === desiredValue) ??
+        productOption.choices.find((c) => c.toLowerCase() === desiredValue.toLowerCase()) ??
+        "";
+    }
+
+    if (!choice) {
+      choice = productOption.choices[0];
+    }
+
+    options.push({ option: productOption.name, choices: [choice] });
+  }
+
+  return options;
 }
 
 type WixStoreOrderResult = {
@@ -104,19 +192,45 @@ export async function createWixStoreOrder(
     subdivision: address.state ?? ""
   };
 
-  const lineItems = podItems.map((item) => {
-    const options = [{ option: "Size", choices: [item.size] }];
-    if (item.colour) {
-      options.push({ option: "Colour", choices: [item.colour] });
+  const lineItems: Array<{
+    quantity: number;
+    productName: { original: string };
+    catalogReference: {
+      catalogItemId: string;
+      appId: string;
+      catalogItemOptions: { options: Array<{ option: string; choices: string[] }> };
+    };
+    itemType: { preset: "PHYSICAL" };
+    price: { amount: string; currency: "GBP" };
+    taxInfo: {
+      taxAmount: { amount: string; currency: "GBP" };
+      taxableAmount: { amount: string; currency: "GBP" };
+      taxRate: string;
+      taxIncludedInPrice: boolean;
+    };
+  }> = [];
+
+  for (const item of podItems) {
+    const catalogItemId = productMap[item.productId];
+
+    let productOptions: WixProductOption[];
+    try {
+      productOptions = await fetchWixProductOptions(apiKey, siteId, catalogItemId);
+    } catch (error) {
+      return {
+        ok: false,
+        message:
+          error instanceof Error ? error.message : `Unable to load Wix product for "${item.name}".`
+      };
     }
 
-    return {
+    lineItems.push({
       quantity: item.quantity,
       productName: { original: item.name },
       catalogReference: {
-        catalogItemId: productMap[item.productId],
+        catalogItemId,
         appId: process.env.WIX_STORES_APP_ID ?? WIX_STORES_APP_ID,
-        catalogItemOptions: { options }
+        catalogItemOptions: { options: buildCatalogOptions(productOptions, item.size, item.colour ?? null) }
       },
       itemType: { preset: "PHYSICAL" },
       price: { amount: String(item.price), currency: "GBP" },
@@ -126,8 +240,8 @@ export async function createWixStoreOrder(
         taxRate: "0",
         taxIncludedInPrice: false
       }
-    };
-  });
+    });
+  }
 
   const totalAmount = String(
     podItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
