@@ -26,6 +26,31 @@ function StarDisplay({ rating }: { rating: number }) {
   );
 }
 
+function MediaGrid({ urls }: { urls: string[] }) {
+  if (!urls || urls.length === 0) return null;
+
+  return (
+    <div className="grid grid-cols-3 gap-3">
+      {urls.map((url) => {
+        const isVideo = /\.(mp4|webm|mov)$/i.test(url);
+        return (
+          <div
+            key={url}
+            className="aspect-square overflow-hidden rounded-[0.75rem] border border-white/10 bg-black/30"
+          >
+            {isVideo ? (
+              <video src={url} controls className="h-full w-full object-cover" />
+            ) : (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={url} alt="Customer attachment" className="h-full w-full object-cover" />
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 export function ReviewModeration({ initialReviews }: { initialReviews: PendingReview[] }) {
   const [reviews, setReviews] = useState<PendingReview[]>(initialReviews);
   const [processing, setProcessing] = useState<Record<string, boolean>>({});
@@ -80,6 +105,7 @@ export function ReviewModeration({ initialReviews }: { initialReviews: PendingRe
             </div>
             <p className="text-xs uppercase tracking-[0.2em] text-neutral-400">{review.productName}</p>
             <p className="text-sm leading-7 tracking-[0.1em] text-neutral-300">{review.comment}</p>
+            <MediaGrid urls={review.mediaUrls} />
           </div>
 
           <div className="flex gap-3 lg:flex-col lg:justify-center">

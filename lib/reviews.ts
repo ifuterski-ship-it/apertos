@@ -18,6 +18,24 @@ export type ReviewToken = {
   createdAt: string;
 };
 
+export function parseMediaUrls(value: unknown): string[] {
+  if (!value) return [];
+  if (Array.isArray(value)) {
+    return value.filter((item): item is string => typeof item === "string");
+  }
+  if (typeof value === "string") {
+    try {
+      const parsed: unknown = JSON.parse(value);
+      if (Array.isArray(parsed)) {
+        return parsed.filter((item): item is string => typeof item === "string");
+      }
+    } catch {
+      // fall through
+    }
+  }
+  return [];
+}
+
 export type PendingReview = {
   id: string;
   productId: string;
@@ -26,6 +44,7 @@ export type PendingReview = {
   rating: number;
   comment: string;
   verifiedPurchase: boolean;
+  mediaUrls: string[];
   createdAt: string;
 };
 
@@ -97,7 +116,13 @@ export async function getReviewToken(token: string): Promise<ReviewToken | null>
 export async function submitVerifiedReviews(
   tokenId: string,
   reviewerName: string,
-  reviews: Array<{ productId: string; productName: string; rating: number; comment: string }>
+  reviews: Array<{
+    productId: string;
+    productName: string;
+    rating: number;
+    comment: string;
+    mediaUrls?: string[];
+  }>
 ): Promise<{ ok: boolean; message?: string }> {
   if (!hasSupabaseAdminEnv) return { ok: false, message: "Reviews unavailable." };
 
@@ -111,7 +136,8 @@ export async function submitVerifiedReviews(
     rating: r.rating,
     comment: r.comment.trim().slice(0, 1000),
     verified_purchase: true,
-    approved: false
+    approved: false,
+    media_urls: r.mediaUrls ?? []
   }));
 
   const { error } = await supabase.from("reviews").insert(rows);
@@ -134,20 +160,24 @@ export async function getApprovedReviews(productId: string) {
   const supabase = createAdminClient();
   const { data } = await supabase
     .from("reviews")
-    .select("id, product_id, reviewer_name, rating, comment, verified_purchase, created_at")
+    .select("id, product_id, reviewer_name, rating, comment, verified_purchase, media_urls, created_at")
     .eq("product_id", productId)
     .eq("approved", true)
     .order("created_at", { ascending: false });
 
-  return (data ?? []) as Array<{
-    id: string;
-    product_id: string;
-    reviewer_name: string;
-    rating: number;
-    comment: string;
-    verified_purchase: boolean;
-    created_at: string;
-  }>;
+  return (data ?? []).map((row) => {
+    const r = row as Record<string, unknown>;
+    return {
+      id: r.id as string,
+      product_id: r.product_id as string,
+      reviewer_name: r.reviewer_name as string,
+      rating: r.rating as number,
+      comment: r.comment as string,
+      verified_purchase: Boolean(r.verified_purchase),
+      media_urls: parseMediaUrls(r.media_urls),
+      created_at: r.created_at as string
+    };
+  });
 }
 
 export async function getPendingReviews(): Promise<PendingReview[]> {
@@ -156,7 +186,9 @@ export async function getPendingReviews(): Promise<PendingReview[]> {
   const supabase = createAdminClient();
   const { data } = await supabase
     .from("reviews")
-    .select("id, product_id, product_name, reviewer_name, rating, comment, verified_purchase, created_at")
+    .select(
+      "id, product_id, product_name, reviewer_name, rating, comment, verified_purchase, media_urls, created_at"
+    )
     .eq("approved", false)
     .order("created_at", { ascending: false });
 
@@ -167,7 +199,8 @@ export async function getPendingReviews(): Promise<PendingReview[]> {
     reviewerName: r.reviewer_name as string,
     rating: r.rating as number,
     comment: r.comment as string,
-    verifiedPurchase: r.verified_purchase as boolean,
+    verifiedPurchase: Boolean(r.verified_purchase),
+    mediaUrls: parseMediaUrls(r.media_urls),
     createdAt: r.created_at as string
   }));
 }

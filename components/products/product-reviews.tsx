@@ -8,8 +8,34 @@ type Review = {
   rating: number;
   comment: string;
   verified_purchase?: boolean;
+  media_urls?: string[];
   created_at: string;
 };
+
+function MediaAttachments({ urls }: { urls: string[] }) {
+  if (!urls || urls.length === 0) return null;
+
+  return (
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+      {urls.map((url) => {
+        const isVideo = /\.(mp4|webm|mov)$/i.test(url);
+        return (
+          <div
+            key={url}
+            className="aspect-square overflow-hidden rounded-[0.75rem] border border-white/10 bg-black/30"
+          >
+            {isVideo ? (
+              <video src={url} controls className="h-full w-full object-cover" />
+            ) : (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={url} alt="Customer photo" className="h-full w-full object-cover" />
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
 
 function Stars({ rating }: { rating: number }) {
   return (
@@ -103,7 +129,7 @@ export function ProductReviews({
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="space-y-1">
                   <div className="flex items-center gap-3">
-                    <p className="text-sm uppercase tracking-[0.25em] text-white">{review.reviewer_name}</p>
+                    <p className="text-xs uppercase tracking-[0.25em] text-white">{review.reviewer_name}</p>
                     {review.verified_purchase ? (
                       <span className="border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[10px] uppercase tracking-[0.2em] text-emerald-400">
                         Verified
@@ -121,6 +147,7 @@ export function ProductReviews({
                 <Stars rating={review.rating} />
               </div>
               <p className="text-sm leading-7 tracking-[0.15em] text-neutral-300">{review.comment}</p>
+              <MediaAttachments urls={review.media_urls ?? []} />
             </div>
           ))}
         </div>

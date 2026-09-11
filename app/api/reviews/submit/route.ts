@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getReviewToken, submitVerifiedReviews } from "@/lib/reviews";
+import { supabaseUrl } from "@/lib/supabase/config";
 
 export const runtime = "nodejs";
 
@@ -11,8 +12,15 @@ type SubmitBody = {
     productName: string;
     rating: number;
     comment: string;
+    mediaUrls?: string[];
   }>;
 };
+
+const REVIEW_MEDIA_PREFIX = `${supabaseUrl}/storage/v1/object/public/review-media/`;
+
+function isValidMediaUrl(value: string) {
+  return typeof value === "string" && value.startsWith(REVIEW_MEDIA_PREFIX);
+}
 
 export async function POST(request: Request) {
   let body: SubmitBody;
@@ -42,6 +50,16 @@ export async function POST(request: Request) {
     }
     if (typeof review.comment !== "string" || review.comment.trim().length < 10) {
       return NextResponse.json({ ok: false, message: "Review must be at least 10 characters." }, { status: 400 });
+    }
+    if (review.mediaUrls !== undefined) {
+      if (!Array.isArray(review.mediaUrls) || review.mediaUrls.length > 5) {
+        return NextResponse.json({ ok: false, message: "Invalid media attachments." }, { status: 400 });
+      }
+      for (const url of review.mediaUrls) {
+        if (!isValidMediaUrl(url)) {
+          return NextResponse.json({ ok: false, message: "Invalid media attachment." }, { status: 400 });
+        }
+      }
     }
   }
 

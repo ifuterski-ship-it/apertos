@@ -4,6 +4,9 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { ReviewProduct } from "@/lib/reviews";
 
+const MAX_FILES = 3;
+const MAX_BYTES = 15 * 1024 * 1024;
+
 function Stars({
   rating,
   onRate
@@ -65,6 +68,8 @@ export function ReviewForm({
   const [ratings, setRatings] = useState<Record<string, ProductRating>>(
     Object.fromEntries(products.map((p) => [p.id, { rating: 0, comment: "" }]))
   );
+  const [media, setMedia] = useState<Record<string, File[]>>({});
+  const [previews, setPreviews] = useState<Record<string, string[]>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -75,6 +80,56 @@ export function ReviewForm({
   const setComment = (productId: string, comment: string) => {
     setRatings((prev) => ({ ...prev, [productId]: { ...prev[productId], comment } }));
   };
+
+  const addFiles = (productId: string, files: FileList | null) => {
+    if (!files || files.length === 0) return;
+
+    const incoming = Array.from(files);
+    const existing = media[productId] ?? [];
+
+    for (const file of incoming) {
+      const type = file.type.toLowerCase();
+      const isImage = type.startsWith("image/");
+      const isVideo = type.startsWith("video/");
+      if (!isImage && !isVideo) {
+        setError("Only photos and videos can be attached.");
+        return;
+      }
+      if (file.size > MAX_BYTES) {
+        setError("Each photo or video must be under 15MB.");
+        return;
+      }
+    }
+
+    const next = [...existing, ...incoming].slice(0, MAX_FILES);
+    if (existing.length + incoming.length > MAX_FILES) {
+      setError(`Maximum of ${MAX_FILES} photos or videos per review.`);
+    } else {
+      setError(null);
+    }
+
+    setMedia((prev) => ({ ...prev, [productId]: next }));
+    setPreviews((prev) => ({
+      ...prev,
+      [productId]: next.map((f) => URL.createObjectURL(f))
+    }));
+  };
+
+  const removeFile = (productId: string, index: number) => {
+    setMedia((prev) => {
+      const next = { ...prev };
+      next[productId] = (prev[productId] ?? []).filter((_, i) => i !== index);
+      return next;
+    });
+    setPreviews((prev) => {
+      const next = { ...prev };
+      next[productId] = (prev[productId] ?? []).filter((_, i) => i !== index);
+      return next;
+    });
+    setError(null);
+  };
+
+  const isVideo = (file: File) => file.type.toLowerCase().startsWith("video/");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -99,6 +154,33 @@ export function ReviewForm({
     setIsSubmitting(true);
 
     try {
+      const mediaUrls: Record<string, string[]> = {};
+
+      for (const product of products) {
+        const files = media[product.id] ?? [];
+        if (files.length === 0) continue;
+
+        const formData = new FormData();
+        formData.append("token", token);
+        for (const file of files) {
+          formData.append("files", file);
+        }
+
+        const uploadRes = await fetch("/api/reviews/upload", {
+          method: "POST",
+          body: formData
+        });
+
+        const uploadData = (await uploadRes.json()) as { ok: boolean; message?: string; urls?: string[] };
+
+        if (!uploadData.ok || !uploadData.urls) {
+          setError(uploadData.message ?? "Unable to upload photos or videos.");
+          return;
+        }
+
+        mediaUrls[product.id] = uploadData.urls;
+      }
+
       const res = await fetch("/api/reviews/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -109,7 +191,8 @@ export function ReviewForm({
             productId: p.id,
             productName: p.name,
             rating: ratings[p.id].rating,
-            comment: ratings[p.id].comment
+            comment: ratings[p.id].comment,
+            mediaUrls: mediaUrls[p.id] ?? []
           }))
         })
       });
@@ -148,36 +231,95 @@ export function ReviewForm({
         />
       </div>
 
-      {products.map((product) => (
-        <div key={product.id} className="space-y-5 rounded-[1.75rem] border border-white/10 bg-white/[0.03] p-6">
-          <p className="font-display text-lg uppercase tracking-[0.08em]">{product.name}</p>
+      {products.map((product) => {
+        const productMedia = media[product.id] ?? [];
+        const productPreviews = previews[product.id] ?? [];
 
-          <div className="space-y-2">
-            <label className="text-xs uppercase tracking-[0.3em] text-neutral-400">Rating</label>
-            <Stars rating={ratings[product.id].rating} onRate={(r) => setRating(product.id, r)} />
-          </div>
+        return (
+          <div key={product.id} className="space-y-5 rounded-[1.75rem] border border-white/10 bg-white/[0.03] p-6">
+            <p className="font-display text-lg uppercase tracking-[0.08em]">{product.name}</p>
 
-          <div className="space-y-2">
-            <label
-              htmlFor={`comment-${product.id}`}
-              className="text-xs uppercase tracking-[0.3em] text-neutral-400"
-            >
-              Your Review
-            </label>
-            <textarea
-              id={`comment-${product.id}`}
-              required
-              minLength={10}
-              maxLength={1000}
-              rows={4}
-              value={ratings[product.id].comment}
-              onChange={(e) => setComment(product.id, e.target.value)}
-              placeholder="How does it fit? How does it perform on the mat?"
-              className="w-full resize-none border border-white/10 bg-black/30 px-4 py-4 text-sm text-white outline-none transition placeholder:text-neutral-600 focus:border-white"
-            />
+            <div className="space-y-2">
+              <label className="text-xs uppercase tracking-[0.3em] text-neutral-400">Rating</label>
+              <Stars rating={ratings[product.id].rating} onRate={(r) => setRating(product.id, r)} />
+            </div>
+
+            <div className="space-y-2">
+              <label
+                htmlFor={`comment-${product.id}`}
+                className="text-xs uppercase tracking-[0.3em] text-neutral-400"
+              >
+                Your Review
+              </label>
+              <textarea
+                id={`comment-${product.id}`}
+                required
+                minLength={10}
+                maxLength={1000}
+                rows={4}
+                value={ratings[product.id].comment}
+                onChange={(e) => setComment(product.id, e.target.value)}
+                placeholder="How does it fit? How does it perform on the mat?"
+                className="w-full resize-none border border-white/10 bg-black/30 px-4 py-4 text-sm text-white outline-none transition placeholder:text-neutral-600 focus:border-white"
+              />
+            </div>
+
+            <div className="space-y-3">
+              <label
+                htmlFor={`media-${product.id}`}
+                className="text-xs uppercase tracking-[0.3em] text-neutral-400"
+              >
+                Photo Or Video
+              </label>
+              <label
+                htmlFor={`media-${product.id}`}
+                className="flex w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-[1rem] border border-dashed border-white/20 bg-black/20 px-6 py-8 text-center transition hover:border-white/40 hover:bg-black/30"
+              >
+                <span className="text-[11px] uppercase tracking-[0.25em] text-neutral-300">
+                  Add up to {MAX_FILES} photos or videos of you wearing it
+                </span>
+                <span className="text-[10px] uppercase tracking-[0.2em] text-neutral-500">
+                  JPG · PNG · WEBP · GIF · MP4 · MOV — max 15MB each
+                </span>
+              </label>
+              <input
+                id={`media-${product.id}`}
+                type="file"
+                accept="image/*,video/*"
+                multiple
+                className="hidden"
+                onChange={(e) => addFiles(product.id, e.target.files)}
+              />
+
+              {productPreviews.length > 0 ? (
+                <div className="grid grid-cols-3 gap-3">
+                  {productPreviews.map((preview, index) => (
+                    <div
+                      key={preview}
+                      className="relative aspect-square overflow-hidden rounded-[0.75rem] border border-white/10 bg-black/30"
+                    >
+                      {isVideo(productMedia[index]) ? (
+                        <video src={preview} className="h-full w-full object-cover" controls />
+                      ) : (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={preview} alt="Review attachment" className="h-full w-full object-cover" />
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => removeFile(product.id, index)}
+                        aria-label="Remove attachment"
+                        className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-black/80 text-xs text-white transition hover:bg-red-500"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              ) : null}
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
 
       {error ? (
         <p className="text-xs uppercase tracking-[0.25em] text-red-300">{error}</p>
