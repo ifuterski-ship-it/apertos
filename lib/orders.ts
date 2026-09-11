@@ -33,12 +33,19 @@ export type OrderShippingLabel = {
   purchasedAt: string;
 };
 
+export type OrderPodHandoff = {
+  externalOrderId: string;
+  submittedAt: string;
+  externalOrderUrl: string | null;
+};
+
 export type OrderItemsPayload = {
   version: number;
   items: OrderItem[];
   shippingAddress: OrderShippingAddress | null;
   shippingLabel: OrderShippingLabel | null;
   inventoryAdjustedAt: string | null;
+  podHandoff: OrderPodHandoff | null;
 };
 
 type RecordedOrder = {
@@ -87,7 +94,8 @@ function createEmptyPayload(): OrderItemsPayload {
     items: [],
     shippingAddress: null,
     shippingLabel: null,
-    inventoryAdjustedAt: null
+    inventoryAdjustedAt: null,
+    podHandoff: null
   };
 }
 
@@ -161,6 +169,24 @@ function sanitizeShippingLabel(label: unknown): OrderShippingLabel | null {
   };
 }
 
+function sanitizePodHandoff(value: unknown): OrderPodHandoff | null {
+  if (!value || typeof value !== "object") {
+    return null;
+  }
+
+  const handoff = value as Partial<OrderPodHandoff>;
+
+  if (typeof handoff.externalOrderId !== "string" || !handoff.externalOrderId) {
+    return null;
+  }
+
+  return {
+    externalOrderId: handoff.externalOrderId,
+    submittedAt: typeof handoff.submittedAt === "string" ? handoff.submittedAt : new Date().toISOString(),
+    externalOrderUrl: typeof handoff.externalOrderUrl === "string" ? handoff.externalOrderUrl : null
+  };
+}
+
 export function parseOrderItemsPayload(rawItems: string | null | undefined): OrderItemsPayload {
   if (!rawItems) {
     return createEmptyPayload();
@@ -175,7 +201,8 @@ export function parseOrderItemsPayload(rawItems: string | null | undefined): Ord
         items: parsed.map(sanitizeOrderItem).filter((item): item is OrderItem => item !== null),
         shippingAddress: null,
         shippingLabel: null,
-        inventoryAdjustedAt: null
+        inventoryAdjustedAt: null,
+        podHandoff: null
       };
     }
 
@@ -189,6 +216,7 @@ export function parseOrderItemsPayload(rawItems: string | null | undefined): Ord
       shippingAddress?: unknown;
       shippingLabel?: unknown;
       inventoryAdjustedAt?: unknown;
+      podHandoff?: unknown;
     };
 
     return {
@@ -198,7 +226,8 @@ export function parseOrderItemsPayload(rawItems: string | null | undefined): Ord
         : [],
       shippingAddress: sanitizeShippingAddress(payload.shippingAddress),
       shippingLabel: sanitizeShippingLabel(payload.shippingLabel),
-      inventoryAdjustedAt: typeof payload.inventoryAdjustedAt === "string" ? payload.inventoryAdjustedAt : null
+      inventoryAdjustedAt: typeof payload.inventoryAdjustedAt === "string" ? payload.inventoryAdjustedAt : null,
+      podHandoff: sanitizePodHandoff(payload.podHandoff)
     };
   } catch {
     return createEmptyPayload();
@@ -215,7 +244,8 @@ export function buildOrderItemsPayload(items: OrderItem[], shippingAddress: Orde
     items,
     shippingAddress,
     shippingLabel: null,
-    inventoryAdjustedAt: null
+    inventoryAdjustedAt: null,
+    podHandoff: null
   });
 }
 
@@ -236,6 +266,16 @@ export function applyInventoryAdjustedToPayload(items: string, inventoryAdjusted
     ...payload,
     version: 2,
     inventoryAdjustedAt
+  });
+}
+
+export function applyPodHandoffToPayload(items: string, handoff: OrderPodHandoff) {
+  const payload = parseOrderItemsPayload(items);
+
+  return serializeOrderItemsPayload({
+    ...payload,
+    version: 2,
+    podHandoff: handoff
   });
 }
 
@@ -439,6 +479,42 @@ export async function markInventoryAdjustedForOrder(stripeCheckoutSessionId: str
       ...existingOrder.parsedItemsPayload,
       version: 2,
       inventoryAdjustedAt
+    }
+  };
+}
+
+export async function savePodHandoffForOrder(
+  stripeCheckoutSessionId: string,
+  handoff: OrderPodHandoff
+) {
+  const existingOrder = await getOrderForAdmin(stripeCheckoutSessionId);
+
+  if (!existingOrder) {
+    throw new Error("Order not found.");
+  }
+
+  const supabase = createAdminClient();
+  const { error } = await withOrdersSchemaRetry(supabase, async () =>
+    supabase
+      .schema("public")
+      .from("orders")
+      .update({
+        items: applyPodHandoffToPayload(existingOrder.items, handoff)
+      })
+      .eq("stripe_checkout_session_id", stripeCheckoutSessionId)
+  );
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return {
+    ...existingOrder,
+    items: applyPodHandoffToPayload(existingOrder.items, handoff),
+    parsedItemsPayload: {
+      ...existingOrder.parsedItemsPayload,
+      version: 2,
+      podHandoff: handoff
     }
   };
 }

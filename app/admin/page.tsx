@@ -2,6 +2,7 @@ import Link from "next/link";
 import { AdminOverview } from "@/app/admin/admin-overview";
 import { DeleteOrderButton } from "@/app/admin/delete-order-button";
 import { GenerateLabelButton } from "@/app/admin/generate-label-button";
+import { PodHandoffButton } from "@/app/admin/pod-handoff-button";
 import { ProductLaunchControls } from "@/app/admin/product-launch-controls";
 import { GenerateReviewLink } from "@/components/admin/generate-review-link";
 import { ReviewModeration } from "@/app/admin/review-moderation";
@@ -12,6 +13,7 @@ import { products } from "@/lib/products";
 import { getPendingReviews } from "@/lib/reviews";
 import { hasShipEngineEnv } from "@/lib/shipengine";
 import { hasSupabaseAdminEnv } from "@/lib/supabase/admin";
+import { hasWixStoreEnv } from "@/lib/wix-store";
 import { getSupabaseEnvDiagnostics } from "@/lib/supabase/env-diagnostics";
 
 function formatMoney(amount: number | null, currency: string | null) {
@@ -62,6 +64,7 @@ export default async function AdminPage() {
     getProductFlags()
   ]);
   const flagsRecord = Object.fromEntries(productFlags);
+  const wixStoreConfigured = hasWixStoreEnv();
 
   try {
     orders = await getOrdersForAdmin();
@@ -161,9 +164,15 @@ export default async function AdminPage() {
                         {order.createdAt ? new Date(order.createdAt).toLocaleString("en-GB") : "Order"}
                       </p>
                       {isPodOrder ? (
-                        <span className="border border-amber-500/40 bg-amber-500/10 px-2 py-1 text-[10px] uppercase tracking-[0.25em] text-amber-300">
-                          POD — Submit to Tapstitch
-                        </span>
+                        payload.podHandoff ? (
+                          <span className="border border-emerald-500/40 bg-emerald-500/10 px-2 py-1 text-[10px] uppercase tracking-[0.25em] text-emerald-300">
+                            Submitted to Wix
+                          </span>
+                        ) : (
+                          <span className="border border-amber-500/40 bg-amber-500/10 px-2 py-1 text-[10px] uppercase tracking-[0.25em] text-amber-300">
+                            POD — Submit to Wix
+                          </span>
+                        )
                       ) : hasPodItems ? (
                         <span className="border border-amber-500/40 bg-amber-500/10 px-2 py-1 text-[10px] uppercase tracking-[0.25em] text-amber-300">
                           Contains POD item
@@ -250,17 +259,35 @@ export default async function AdminPage() {
                   </div>
 
                   {isPodOrder ? (
-                    <div className="rounded-[1rem] border border-amber-500/20 bg-amber-500/[0.06] px-5 py-4">
-                      <p className="text-[11px] uppercase leading-6 tracking-[0.25em] text-amber-200">
-                        Submit this order to Tapstitch — no shipping label needed. The print partner handles production &amp; delivery.
-                      </p>
+                    <div className="space-y-4">
+                      <div className="rounded-[1rem] border border-amber-500/20 bg-amber-500/[0.06] px-5 py-4">
+                        <p className="text-[11px] uppercase leading-6 tracking-[0.25em] text-amber-200">
+                          No shipping label needed — the print partner handles production &amp; delivery.
+                        </p>
+                      </div>
+                      <PodHandoffButton
+                        sessionId={order.stripeCheckoutSessionId}
+                        hasShippingAddress={Boolean(shippingAddress?.address1)}
+                        configured={wixStoreConfigured}
+                        handoff={payload.podHandoff}
+                      />
                     </div>
                   ) : (
-                    <GenerateLabelButton
-                      sessionId={order.stripeCheckoutSessionId}
-                      hasShippingAddress={Boolean(shippingAddress?.address1)}
-                      existingLabelUrl={shippingLabel?.labelUrl ?? null}
-                    />
+                    <>
+                      <GenerateLabelButton
+                        sessionId={order.stripeCheckoutSessionId}
+                        hasShippingAddress={Boolean(shippingAddress?.address1)}
+                        existingLabelUrl={shippingLabel?.labelUrl ?? null}
+                      />
+                      {hasPodItems ? (
+                        <PodHandoffButton
+                          sessionId={order.stripeCheckoutSessionId}
+                          hasShippingAddress={Boolean(shippingAddress?.address1)}
+                          configured={wixStoreConfigured}
+                          handoff={payload.podHandoff}
+                        />
+                      ) : null}
+                    </>
                   )}
                 </div>
               </div>

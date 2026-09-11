@@ -134,7 +134,7 @@ async function handleCheckoutSession(
     await sendEmail({
       to: podFulfillmentEmail,
       from: ordersFromEmail,
-      subject: `[ACTION REQUIRED] Tapstitch Order — ${podItems.map((i) => i.name).join(", ")}`,
+      subject: `[ACTION REQUIRED] POD Order — Submit to Wix: ${podItems.map((i) => i.name).join(", ")}`,
       html: renderPodFulfillmentEmail({
         sessionId: session.id,
         podItems,

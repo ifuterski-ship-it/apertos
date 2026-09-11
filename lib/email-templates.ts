@@ -282,9 +282,9 @@ export function renderPodFulfillmentEmail({
 
   return renderEmailShell({
     eyebrow: "POD Fulfillment Required",
-    title: "Submit To Tapstitch",
+    title: "Submit To Wix",
     body: `
-      <p style="margin:0 0 24px;color:#0a84ff;font-size:13px">A customer has ordered a print-on-demand item. Submit this order to Tapstitch now.</p>
+      <p style="margin:0 0 24px;color:#0a84ff;font-size:13px">A customer has ordered a print-on-demand item. Submit this order to your Wix store so Tapstitch can fulfill it.</p>
 
       <table style="width:100%;border-collapse:collapse;margin:0 0 24px">
         <thead>
