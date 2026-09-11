@@ -119,12 +119,18 @@ export async function createWixStoreOrder(
         catalogItemOptions: { options }
       },
       itemType: { preset: "PHYSICAL" },
-      price: { amount: String(Math.round(item.price * 100)), currency: "GBP" }
+      price: { amount: String(item.price), currency: "GBP" },
+      taxInfo: {
+        taxAmount: { amount: "0", currency: "GBP" },
+        taxableAmount: { amount: String(item.price), currency: "GBP" },
+        taxRate: "0",
+        taxIncludedInPrice: false
+      }
     };
   });
 
   const totalAmount = String(
-    podItems.reduce((sum, item) => sum + Math.round(item.price * 100) * item.quantity, 0)
+    podItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
   );
 
   let response: Response;
@@ -198,14 +204,14 @@ export async function createWixStoreOrder(
     return { ok: false, message: wixMessage };
   }
 
-  let result: { order?: { _id?: string } };
+  let result: { order?: { id?: string; _id?: string } };
   try {
-    result = (await response.json()) as { order?: { _id?: string } };
+    result = (await response.json()) as { order?: { id?: string; _id?: string } };
   } catch {
     return { ok: false, message: "Wix returned an invalid response." };
   }
 
-  const orderId = result.order?._id;
+  const orderId = result.order?.id ?? result.order?._id;
   if (!orderId) {
     return { ok: false, message: "Wix did not return an order ID." };
   }
