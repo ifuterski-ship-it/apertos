@@ -8,16 +8,16 @@
 -- Stock (user-supplied, Sakura Dragon only):
 --   XS: sold out (0)
 --   S:  rashguard 0, shorts 1
---   M:  rashguard 2, shorts 2
---   L:  rashguard 1, shorts 1
+--   M:  rashguard 0 (sold out), shorts 2
+--   L:  rashguard 0 (sold out), shorts 0 (sold out — L set unavailable)
 --   XL: rashguard 1, shorts 1
 
 -- Sakura rashguard stock
 INSERT INTO public.inventory (product_id, size, stock) VALUES
   ('sakura-rashguard', 'XS', 0),
   ('sakura-rashguard', 'S',  0),
-  ('sakura-rashguard', 'M',  2),
-  ('sakura-rashguard', 'L',  1),
+  ('sakura-rashguard', 'M',  0),
+  ('sakura-rashguard', 'L',  0),
   ('sakura-rashguard', 'XL', 1)
 ON CONFLICT (product_id, size) DO UPDATE SET stock = EXCLUDED.stock, updated_at = now();
 
@@ -26,6 +26,6 @@ INSERT INTO public.inventory (product_id, size, stock) VALUES
   ('sakura-shorts', 'XS', 0),
   ('sakura-shorts', 'S',  1),
   ('sakura-shorts', 'M',  2),
-  ('sakura-shorts', 'L',  1),
+  ('sakura-shorts', 'L',  0),
   ('sakura-shorts', 'XL', 1)
 ON CONFLICT (product_id, size) DO UPDATE SET stock = EXCLUDED.stock, updated_at = now();
