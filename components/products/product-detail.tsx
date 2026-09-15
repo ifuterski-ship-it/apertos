@@ -456,7 +456,7 @@ export function ProductDetail({
                         Made to order — produced &amp; shipped by our print partner. Allow 7–14 business days for production before dispatch.
                       </p>
                       <p className="text-[11px] uppercase leading-6 tracking-[0.3em] text-neutral-500">
-                        Shipping is £5 for the first item plus £3 for each additional item, charged at checkout. If ordered with other products it ships separately.
+                        Shipping is included for this item. If ordered with other products it ships separately.
                       </p>
                     </>
                   ) : (

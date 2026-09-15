@@ -85,7 +85,7 @@ export function CheckoutForm({ allowedCountries }: { allowedCountries: string[] 
 
   const selectedRate = rates?.find((r) => r.rateId === selectedRateId) ?? null;
   const totalWithShipping = subtotal + (selectedRate ? selectedRate.amountPence / 100 : 0);
-  const canCheckout = isPodOnly ? addressComplete : Boolean(addressComplete && selectedRate);
+  const canCheckout = isPodOnly ? addressComplete : Boolean(selectedRate);
 
   const setField =
     (field: keyof Address) =>
@@ -161,19 +161,9 @@ export function CheckoutForm({ allowedCountries }: { allowedCountries: string[] 
     };
 
     const shippingOption = isPodOnly
-      ? {
-          rateId: selectedRate?.rateId ?? "pod-included",
-          displayName: selectedRate?.displayName ?? "Standard Delivery",
-          amountPence: selectedRate?.amountPence ?? 0,
-          address: shippingAddress
-        }
+      ? { rateId: "pod-included", displayName: "Shipping Included", amountPence: 0, address: shippingAddress }
       : selectedRate
-        ? {
-            rateId: selectedRate.rateId,
-            displayName: selectedRate.displayName,
-            amountPence: selectedRate.amountPence,
-            address: shippingAddress
-          }
+        ? { rateId: selectedRate.rateId, displayName: selectedRate.displayName, amountPence: selectedRate.amountPence, address: shippingAddress }
         : null;
 
     if (!shippingOption) return;
@@ -279,34 +269,38 @@ export function CheckoutForm({ allowedCountries }: { allowedCountries: string[] 
           {isPodOnly ? (
             <div className="space-y-2 rounded-[1rem] border border-amber-500/20 bg-amber-500/[0.06] px-5 py-4">
               <p className="text-sm uppercase tracking-[0.2em] text-amber-200">
-                Made to order — production takes 7–14 business days before dispatch
+                Shipping included — delivered by our print partner
+              </p>
+              <p className="text-[11px] uppercase leading-6 tracking-[0.28em] text-neutral-400">
+                This item is made to order. Production takes 7–14 business days before dispatch.
               </p>
             </div>
           ) : (
-            hasPodItems ? (
-              <div className="space-y-2 rounded-[1rem] border border-amber-500/20 bg-amber-500/[0.06] px-5 py-4">
-                <p className="text-sm uppercase tracking-[0.2em] text-amber-200">
-                  This order ships in two parts
-                </p>
-                <p className="text-[11px] uppercase leading-6 tracking-[0.28em] text-neutral-400">
-                  Your hoodie is made to order (7–14 business days production) and ships separately from your in-stock gear.
-                </p>
-              </div>
-            ) : null
+            <>
+              {hasPodItems ? (
+                <div className="space-y-2 rounded-[1rem] border border-amber-500/20 bg-amber-500/[0.06] px-5 py-4">
+                  <p className="text-sm uppercase tracking-[0.2em] text-amber-200">
+                    This order ships in two parts
+                  </p>
+                  <p className="text-[11px] uppercase leading-6 tracking-[0.28em] text-neutral-400">
+                    Your hoodie is made to order (7–14 business days production) and ships separately from your in-stock gear.
+                  </p>
+                </div>
+              ) : null}
+              <button
+                type="button"
+                onClick={handleGetRates}
+                disabled={!addressComplete || isFetchingRates}
+                className="w-full border border-white px-6 py-4 text-sm font-semibold uppercase tracking-[0.35em] transition hover:bg-white hover:text-black disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {isFetchingRates ? "Fetching Rates..." : "Get Shipping Rates"}
+              </button>
+
+              {ratesError ? (
+                <p className="text-sm uppercase tracking-[0.18em] text-red-300">{ratesError}</p>
+              ) : null}
+            </>
           )}
-
-          <button
-            type="button"
-            onClick={handleGetRates}
-            disabled={!addressComplete || isFetchingRates}
-            className="w-full border border-white px-6 py-4 text-sm font-semibold uppercase tracking-[0.35em] transition hover:bg-white hover:text-black disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {isFetchingRates ? "Fetching Rates..." : "Get Shipping Rates"}
-          </button>
-
-          {ratesError ? (
-            <p className="text-sm uppercase tracking-[0.18em] text-red-300">{ratesError}</p>
-          ) : null}
         </section>
 
         {/* Step 2: Rate selection */}
@@ -370,11 +364,13 @@ export function CheckoutForm({ allowedCountries }: { allowedCountries: string[] 
           <div className="flex items-center justify-between text-neutral-300">
             <span>Shipping</span>
             <span>
-              {selectedRate
-                ? selectedRate.amountPence === 0
-                  ? "Free"
-                  : `£${(selectedRate.amountPence / 100).toFixed(2)}`
-                : "—"}
+              {isPodOnly
+                ? "Included"
+                : selectedRate
+                  ? selectedRate.amountPence === 0
+                    ? "Free"
+                    : `£${(selectedRate.amountPence / 100).toFixed(2)}`
+                  : "—"}
             </span>
           </div>
         </div>

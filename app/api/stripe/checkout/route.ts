@@ -4,7 +4,6 @@ import { products } from "@/lib/products";
 import { assertInventoryAvailable } from "@/lib/inventory";
 import { getStripe } from "@/lib/stripe";
 import { getAllowedShippingCountries } from "@/lib/shipengine";
-import { getPodShippingFeePence } from "@/lib/wix-shipping";
 
 type CheckoutItem = {
   productId: string;
@@ -60,21 +59,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, message: "No valid products found for checkout." }, { status: 400 });
   }
 
-  const podItems = normalizedItems.filter(({ product }) => product.category === "Outerwear");
-  const podFee =
-    podItems.length > 0
-      ? getPodShippingFeePence(podItems.map(({ product, quantity }) => ({ productId: product.id, quantity })))
-      : 0;
-
-  const effectiveShipping =
-    shipping && podFee > 0
-      ? {
-          ...shipping,
-          amountPence: Math.max(shipping.amountPence, podFee),
-          displayName: shipping.displayName || ("Hoodie Delivery" as const)
-        }
-      : shipping;
-
   try {
     await assertInventoryAvailable(
       normalizedItems.map(({ product, quantity, size }) => ({
@@ -110,22 +94,22 @@ export async function POST(request: Request) {
   }));
 
   const shippingLineItem =
-    effectiveShipping && effectiveShipping.amountPence > 0
+    shipping && shipping.amountPence > 0
       ? [
           {
             quantity: 1,
             price_data: {
               currency: "gbp",
-              unit_amount: effectiveShipping.amountPence,
+              unit_amount: shipping.amountPence,
               product_data: {
-                name: `Shipping — ${effectiveShipping.displayName}`
+                name: `Shipping — ${shipping.displayName}`
               }
             }
           }
         ]
       : [];
 
-  const customerEmail = effectiveShipping?.address?.email || email || undefined;
+  const customerEmail = shipping?.address?.email || email || undefined;
 
   const sessionParams: Stripe.Checkout.SessionCreateParams = {
     mode: "payment",
@@ -147,17 +131,17 @@ export async function POST(request: Request) {
           price: product.price
         }))
       ),
-      ...(effectiveShipping
+      ...(shipping
         ? {
-            shipping_address: JSON.stringify(effectiveShipping.address),
-            shipping_display_name: effectiveShipping.displayName,
-            shipping_amount_pence: String(effectiveShipping.amountPence)
+            shipping_address: JSON.stringify(shipping.address),
+            shipping_display_name: shipping.displayName,
+            shipping_amount_pence: String(shipping.amountPence)
           }
         : {})
     }
   };
 
-  if (!effectiveShipping) {
+  if (!shipping) {
     sessionParams.shipping_address_collection = { allowed_countries: allowedCountries };
   }
 
