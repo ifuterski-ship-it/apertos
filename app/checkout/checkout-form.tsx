@@ -160,14 +160,21 @@ export function CheckoutForm({ allowedCountries }: { allowedCountries: string[] 
       country: address.country
     };
 
-    const shippingOption = selectedRate
+    const shippingOption = isPodOnly
       ? {
-          rateId: selectedRate.rateId,
-          displayName: selectedRate.displayName,
-          amountPence: selectedRate.amountPence,
+          rateId: selectedRate?.rateId ?? "pod-included",
+          displayName: selectedRate?.displayName ?? "Standard Delivery",
+          amountPence: selectedRate?.amountPence ?? 0,
           address: shippingAddress
         }
-      : null;
+      : selectedRate
+        ? {
+            rateId: selectedRate.rateId,
+            displayName: selectedRate.displayName,
+            amountPence: selectedRate.amountPence,
+            address: shippingAddress
+          }
+        : null;
 
     if (!shippingOption) return;
 
