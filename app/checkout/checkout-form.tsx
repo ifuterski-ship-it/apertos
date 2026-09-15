@@ -85,7 +85,7 @@ export function CheckoutForm({ allowedCountries }: { allowedCountries: string[] 
 
   const selectedRate = rates?.find((r) => r.rateId === selectedRateId) ?? null;
   const totalWithShipping = subtotal + (selectedRate ? selectedRate.amountPence / 100 : 0);
-  const canCheckout = Boolean(addressComplete && selectedRate);
+  const canCheckout = isPodOnly ? addressComplete : Boolean(addressComplete && selectedRate);
 
   const setField =
     (field: keyof Address) =>
