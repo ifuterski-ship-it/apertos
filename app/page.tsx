@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { Layers, Ruler, Zap } from "lucide-react";
-import { ProductGrid } from "@/components/products/product-grid";
+import { ProductShowcase } from "@/components/products/product-showcase";
 import { getApparelProducts, getSakuraDragonProducts, products } from "@/lib/products";
 import { absoluteUrl, siteKeywords } from "@/lib/site";
 
@@ -13,10 +12,8 @@ const homepageKeywords = siteKeywords;
 
 const homeImages = {
   newCollection: "/products/new-collection-hero.jpeg",
-  fightwear: "/products/nogi-lifestyle.jpeg",
   lifestyle: "/products/lifestyle-hoodie.jpeg",
-  teamKits: "/fighters/team-kits-placeholder.jpg",
-  athletes: "/fighters/abel-biju.jpg",
+  kids: "/products/kids-hoodie-front.jpeg",
   sponsoredAthlete: "/fighters/abel-biju.jpg"
 };
 
@@ -43,52 +40,6 @@ export const metadata: Metadata = {
   }
 };
 
-const faqItems = [
-  {
-    question: "What Is Apertos Fightwear?",
-    answer:
-      "Apertos Fightwear is a premium combat sports brand offering BJJ rash guards, MMA fight shorts, and matching no-gi sets. All products are engineered for high-output grappling and striking training."
-  },
-  {
-    question: "What Sports Is Apertos Gear Designed For?",
-    answer:
-      "Apertos gear is designed for Brazilian Jiu-Jitsu (BJJ), MMA, no-gi grappling, Muay Thai cross-training, and general combat sports conditioning."
-  },
-  {
-    question: "What Sizes Do You Stock?",
-    answer:
-      "Apertos Fightwear is available in sizes S through 2XL across all product categories. Size charts are available on each product page."
-  },
-  {
-    question: "How Do I Care For Apertos Rash Guards And Shorts?",
-    answer:
-      "Machine wash cold with similar colours. Turn inside out before washing. Tumble dry low or hang to dry. Do not use bleach or fabric softener."
-  },
-  {
-    question: "Do You Ship Internationally?",
-    answer:
-      "Yes. Apertos Fightwear ships worldwide. Delivery times and shipping rates are calculated at checkout based on your location."
-  }
-];
-
-const featureCards = [
-  {
-    icon: Layers,
-    title: "Fabric",
-    description: "85% polyester, 15% spandex — 4-way stretch, moisture-wicking performance material built for hard rounds and mat durability."
-  },
-  {
-    icon: Ruler,
-    title: "Fit",
-    description: "Compression-cut for maximum movement, locked-in feel and zero bunching under the gi or during scrambles."
-  },
-  {
-    icon: Zap,
-    title: "Design",
-    description: "Clean monochrome silhouette engineered for competition focus. Sharp lines, zero excess."
-  }
-];
-
 const fightwearProducts = [
   "apertos-the-original-rashguard",
   "apertos-the-original-shorts",
@@ -97,16 +48,10 @@ const fightwearProducts = [
   .map((id) => products.find((p) => p.id === id))
   .filter((p): p is (typeof products)[number] => Boolean(p));
 
-const sectionCategories = [
-  { href: "/shop/rash-guards", label: "Rash Guards", eyebrow: "Performance Top" },
-  { href: "/shop/mma-shorts", label: "MMA Shorts", eyebrow: "Training Bottoms" },
-  { href: "/shop/no-gi-sets", label: "No-Gi Sets", eyebrow: "Bundle" },
-  { href: "/shop/apparel", label: "Apparel & Accessories", eyebrow: "Lifestyle" }
-];
-
 export default function HomePage() {
   const sakuraDragon = getSakuraDragonProducts();
   const apparel = getApparelProducts();
+  const kidsHoodie = products.find((p) => p.id === "apertos-kids-hoodie");
 
   const organizationSchema = {
     "@context": "https://schema.org",
@@ -127,247 +72,84 @@ export default function HomePage() {
     description: homepageDescription
   };
 
-  const faqSchema = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: faqItems.map((item) => ({
-      "@type": "Question",
-      name: item.question,
-      acceptedAnswer: { "@type": "Answer", text: item.answer }
-    }))
-  };
-
   return (
     <div className="space-y-20 pb-24">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
 
-      {/* ── New Collection ── */}
-      <section id="new-collection" className="relative -mx-4 overflow-hidden sm:-mx-6 lg:-mx-8">
-        <div className="relative min-h-[88vh] flex items-center">
-          <Image
-            src={homeImages.newCollection}
-            alt="Apertos Fightwear new collection"
-            fill
-            sizes="100vw"
-            className="object-cover object-center"
-            priority
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/55 to-black" />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/40 to-transparent" />
+      {/* ── Hero: New Collection (full screen) ── */}
+      <section className="relative -mx-4 -mt-10 flex min-h-[100svh] items-center overflow-hidden sm:-mx-6 lg:-mx-8">
+        <Image
+          src={homeImages.newCollection}
+          alt="Apertos Fightwear new collection"
+          fill
+          sizes="100vw"
+          className="object-cover object-center"
+          priority
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/30 to-black" />
 
-          <div className="relative z-10 mx-auto w-full max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
-            <p className="mb-5 text-[11px] uppercase tracking-[0.55em] text-crimson">
-              Apertos Fightwear — New Collection
-            </p>
-            <h1 className="font-display text-6xl uppercase leading-none tracking-[0.04em] text-crimson sm:text-7xl md:text-8xl lg:text-9xl">
-              New Collection.
-            </h1>
-            <p className="mt-8 max-w-md text-sm uppercase leading-7 tracking-[0.2em] text-neutral-300">
-              BJJ rash guards, MMA shorts and no-gi sets engineered for grapplers who train seriously.
-            </p>
-            <div className="mt-10 flex flex-wrap gap-4">
-              <a
-                href="#fightwear"
-                className="inline-flex items-center bg-crimson px-7 py-4 text-xs font-semibold uppercase tracking-[0.3em] text-white transition hover:bg-crimson/85"
-              >
-                Shop Fightwear
-              </a>
-              <Link
-                href="/shop"
-                className="inline-flex items-center border border-crimson px-7 py-4 text-xs font-semibold uppercase tracking-[0.3em] text-white transition hover:bg-crimson/10"
-              >
-                Shop The Collection
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Sakura Dragon drop ── */}
-      {sakuraDragon.length > 0 ? (
-        <section className="space-y-8">
-          <div>
-            <p className="text-xs uppercase tracking-[0.55em] text-crimson">New Collection</p>
-            <h2 className="mt-3 font-display text-4xl uppercase tracking-[0.08em] md:text-5xl">
-              Sakura Dragon
-            </h2>
-            <p className="mt-4 max-w-xl text-sm uppercase leading-7 tracking-[0.22em] text-neutral-400">
-              Limited no-gi drop. Engineered for the mat.
-            </p>
-          </div>
-          <ProductGrid products={sakuraDragon} />
-        </section>
-      ) : null}
-
-      {/* ── Fightwear ── */}
-      <section id="fightwear" className="scroll-mt-24 space-y-8">
-        <div>
-          <p className="text-xs uppercase tracking-[0.55em] text-crimson">Fightwear</p>
-          <h2 className="mt-3 font-display text-4xl uppercase tracking-[0.08em] md:text-5xl">
-            Built For The Mat
-          </h2>
-          <p className="mt-4 max-w-xl text-sm uppercase leading-7 tracking-[0.22em] text-neutral-400">
-            Performance compression gear for hard rounds, scrambles and comp day.
+        <div className="relative z-10 mx-auto w-full max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
+          <p className="mb-5 text-[11px] uppercase tracking-[0.55em] text-crimson">
+            Apertos Fightwear — New Collection
           </p>
-        </div>
-        <ProductGrid products={fightwearProducts} />
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {sectionCategories.map(({ href, label, eyebrow }) => (
+          <h1 className="font-display text-5xl uppercase leading-none tracking-[0.04em] text-white sm:text-6xl md:text-7xl lg:text-8xl">
+            New Collection
+          </h1>
+          <p className="mt-6 max-w-md text-sm uppercase leading-7 tracking-[0.2em] text-neutral-200">
+            BJJ rash guards, MMA shorts and no-gi sets engineered for grapplers who train seriously.
+          </p>
+          <div className="mt-10 flex flex-wrap gap-4">
             <Link
-              key={href}
-              href={href}
-              className="group flex items-center justify-between rounded-[1.75rem] border border-white/10 bg-panel p-7 transition hover:border-crimson/40 hover:bg-panel/80"
+              href="/shop"
+              className="inline-flex items-center bg-crimson px-7 py-4 text-xs font-semibold uppercase tracking-[0.3em] text-white transition hover:bg-crimson/85"
             >
-              <div>
-                <p className="text-[10px] uppercase tracking-[0.45em] text-crimson">{eyebrow}</p>
-                <h3 className="mt-2 font-display text-2xl uppercase tracking-[0.08em]">{label}</h3>
-              </div>
-              <span className="text-xl text-neutral-600 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-crimson">
-                →
-              </span>
+              Shop The Collection
             </Link>
-          ))}
-        </div>
-        <div className="grid gap-5 md:grid-cols-3">
-          {featureCards.map(({ icon: Icon, title, description }) => (
-            <div key={title} className="rounded-[1.75rem] border border-white/10 bg-panel p-8 space-y-5">
-              <Icon className="h-8 w-8 text-white/70" strokeWidth={1.5} />
-              <h3 className="font-display text-2xl uppercase tracking-[0.15em]">{title}</h3>
-              <p className="text-sm uppercase leading-7 tracking-[0.18em] text-neutral-400">{description}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ── Lifestyle ── */}
-      <section id="lifestyle" className="scroll-mt-24 space-y-8">
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <p className="text-xs uppercase tracking-[0.55em] text-crimson">Lifestyle</p>
-            <h2 className="mt-3 font-display text-4xl uppercase tracking-[0.08em] md:text-5xl">
-              Hoodies &amp; Streetwear
-            </h2>
-            <p className="mt-4 max-w-xl text-sm uppercase leading-7 tracking-[0.22em] text-neutral-400">
-              Off-the-mat essentials cut from the same premium cloth.
-            </p>
-          </div>
-        </div>
-        <ProductGrid products={apparel} />
-        <div className="grid gap-6 lg:grid-cols-2">
-          <div className="relative min-h-[520px] overflow-hidden rounded-[1.75rem] border border-white/10 bg-black">
-            <Image
-              src={homeImages.lifestyle}
-              alt="Apertos lifestyle hoodie"
-              fill
-              sizes="(min-width: 1024px) 50vw, 100vw"
-              className="object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-          </div>
-          <div className="relative overflow-hidden rounded-[1.75rem] border border-white/10 bg-panel p-8 md:p-12">
-            <div className="flex h-full flex-col justify-center space-y-6">
-              <p className="text-[10px] uppercase tracking-[0.55em] text-crimson">Off The Mat</p>
-              <h3 className="font-display text-4xl uppercase tracking-[0.08em] md:text-5xl">
-                Represent In The Day, Not Just On It
-              </h3>
-              <p className="max-w-md text-sm uppercase leading-7 tracking-[0.22em] text-neutral-400">
-                Heavyweight feel, clean silhouette. Built to carry the Apertos mark everywhere you go.
-              </p>
-              <Link
-                href="/shop/apparel"
-                className="inline-flex w-fit items-center bg-crimson px-6 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-white transition hover:bg-crimson/85"
-              >
-                Shop Hoodies
-              </Link>
-            </div>
+            <Link
+              href="/shop/apparel"
+              className="inline-flex items-center border border-white/25 px-7 py-4 text-xs font-semibold uppercase tracking-[0.3em] text-white transition hover:bg-white/5"
+            >
+              Shop Lifestyle
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* ── Team Kits ── */}
-      <section id="team-kits" className="scroll-mt-24 grid gap-6 lg:grid-cols-2">
-        <a
-          href="/team-kits"
-          className="group relative block min-h-[400px] overflow-hidden rounded-[1.75rem] border border-crimson/30 bg-crimson/5 transition hover:border-crimson/60"
-        >
+      {/* ── Lifestyle: hoodies ── */}
+      <section id="lifestyle" className="scroll-mt-24 grid gap-6 lg:grid-cols-2">
+        <div className="relative min-h-[520px] overflow-hidden rounded-[1.75rem] border border-white/10 bg-black">
           <Image
-            src={homeImages.teamKits}
-            alt="Apertos custom team kits"
+            src={homeImages.lifestyle}
+            alt="Apertos lifestyle hoodie"
             fill
             sizes="(min-width: 1024px) 50vw, 100vw"
-            className="object-cover transition-transform duration-300 group-hover:scale-105"
+            className="object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-          <div className="absolute bottom-6 left-6 right-6 space-y-2">
-            <p className="text-xs uppercase tracking-[0.55em] text-crimson">Custom</p>
-            <h2 className="font-display text-3xl uppercase tracking-[0.08em] md:text-4xl">
-              Team &amp; Club Kits
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+        </div>
+        <div className="relative overflow-hidden rounded-[1.75rem] border border-white/10 bg-panel p-8 md:p-12">
+          <div className="flex h-full flex-col justify-center space-y-6">
+            <p className="text-[10px] uppercase tracking-[0.55em] text-crimson">Lifestyle</p>
+            <h2 className="font-display text-4xl uppercase tracking-[0.08em] md:text-5xl">
+              Hoodies. Built For Everywhere.
             </h2>
-          </div>
-        </a>
-        <div className="flex flex-col justify-center rounded-[1.75rem] border border-crimson/30 bg-crimson/5 p-8 transition hover:border-crimson/60 hover:bg-crimson/10 sm:p-10">
-          <div className="space-y-4">
-            <p className="text-xs uppercase tracking-[0.55em] text-crimson">Custom</p>
-            <h2 className="font-display text-3xl uppercase tracking-[0.08em] md:text-4xl">
-              Team &amp; Club Kits
-            </h2>
-            <p className="max-w-lg text-sm uppercase leading-7 tracking-[0.2em] text-neutral-400">
-              Rash guards, hoodies and MMA shorts designed with your club. Min. 10 per item · ~6 weeks production.
+            <p className="max-w-md text-sm uppercase leading-7 tracking-[0.22em] text-neutral-400">
+              Heavyweight feel, clean silhouette. Off-the-mat essentials in the Apertos monochrome style.
             </p>
-            <a
-              href="/team-kits"
-              className="inline-flex items-center text-xs font-semibold uppercase tracking-[0.3em] text-crimson transition hover:text-white"
+            <Link
+              href="/shop/apparel"
+              className="inline-flex w-fit items-center bg-crimson px-6 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-white transition hover:bg-crimson/85"
             >
-              Enquire Now <span className="ml-2 transition-transform duration-200 group-hover:translate-x-1">→</span>
-            </a>
+              Shop Lifestyle
+            </Link>
           </div>
-        </div>
-      </section>
-
-      {/* ── Our Athletes ── */}
-      <section id="our-athletes" className="scroll-mt-24 space-y-8">
-        <div>
-          <p className="text-xs uppercase tracking-[0.55em] text-crimson">Our Athletes</p>
-          <h2 className="mt-3 font-display text-4xl uppercase tracking-[0.08em] md:text-5xl">
-            Representing Apertos
-          </h2>
-          <p className="mt-4 max-w-xl text-sm uppercase leading-7 tracking-[0.22em] text-neutral-400">
-            The fighters competing in Apertos Fightwear.
-          </p>
-        </div>
-        <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-          <Link
-            href="/fighters/abel-biju"
-            className="group flex gap-6 rounded-[1.75rem] border border-white/10 bg-panel p-5 transition hover:border-crimson/40 hover:bg-panel/80"
-          >
-            <div className="relative h-44 w-44 shrink-0 overflow-hidden rounded-[1.25rem] border border-white/10 bg-black">
-              <Image
-                src={homeImages.athletes}
-                alt='Abel "The Ninja" Biju'
-                fill
-                sizes="176px"
-                className="object-cover object-top transition-transform duration-300 group-hover:scale-105"
-              />
-            </div>
-            <div className="flex flex-col justify-center space-y-3">
-              <p className="text-[10px] uppercase tracking-[0.45em] text-crimson">Sponsored Athlete</p>
-              <h3 className="font-display text-2xl uppercase tracking-[0.08em]">
-                Abel <span className="text-crimson">“The Ninja”</span> Biju
-              </h3>
-              <p className="text-xs uppercase tracking-[0.25em] text-neutral-400">Lions Gym Coventry · MMA</p>
-              <p className="inline-flex w-fit items-center text-xs font-semibold uppercase tracking-[0.3em] text-white transition group-hover:text-crimson">
-                View Profile <span className="ml-2 transition-transform duration-200 group-hover:translate-x-1">→</span>
-              </p>
-            </div>
-          </Link>
         </div>
       </section>
 
       {/* ── Sponsored Athlete ── */}
       <section id="sponsored-athlete" className="scroll-mt-24 grid gap-6 lg:grid-cols-2">
-        <div className="relative min-h-[520px] overflow-hidden rounded-[1.75rem] border border-white/10 bg-black">
+        <div className="relative min-h-[420px] overflow-hidden rounded-[1.75rem] border border-white/10 bg-black">
           <Image
             src={homeImages.sponsoredAthlete}
             alt='Abel "The Ninja" Biju sponsored athlete'
@@ -381,65 +163,126 @@ export default function HomePage() {
           <div className="flex h-full flex-col justify-center space-y-6">
             <p className="text-[10px] uppercase tracking-[0.55em] text-crimson">Sponsored Athlete</p>
             <h2 className="font-display text-4xl uppercase tracking-[0.08em] md:text-5xl">
-              Follow The Fight
+              Abel “The Ninja” Biju
             </h2>
             <p className="max-w-md text-sm uppercase leading-7 tracking-[0.22em] text-neutral-400">
-              Meet the athletes Apertos supports — on the mats, in the cage, and everywhere the brand is worn.
+              Amateur MMA fighter representing Lions Gym Coventry, competing in Apertos Fightwear.
             </p>
             <Link
               href="/fighters/abel-biju"
               className="inline-flex w-fit items-center bg-crimson px-6 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-white transition hover:bg-crimson/85"
             >
-              Meet The Athlete
+              View Profile
             </Link>
           </div>
         </div>
       </section>
 
-      {/* ── FAQ ── */}
-      <section className="space-y-8">
+      {/* ── Showcase: fightwear ── */}
+      <section id="fightwear" className="scroll-mt-24 space-y-8">
         <div>
-          <p className="text-xs uppercase tracking-[0.55em] text-crimson">FAQ</p>
+          <p className="text-xs uppercase tracking-[0.55em] text-crimson">Fightwear</p>
           <h2 className="mt-3 font-display text-4xl uppercase tracking-[0.08em] md:text-5xl">
-            Frequently Asked Questions
+            Built For The Mat
           </h2>
         </div>
-        <div className="space-y-3">
-          {faqItems.map((item) => (
-            <div key={item.question} className="rounded-[1.5rem] border border-white/10 bg-panel p-7">
-              <h3 className="font-display text-xl uppercase tracking-[0.08em]">{item.question}</h3>
-              <p className="mt-4 text-sm uppercase leading-7 tracking-[0.18em] text-neutral-400">{item.answer}</p>
-            </div>
-          ))}
-        </div>
+        <ProductShowcase label="Fightwear" products={fightwearProducts} />
       </section>
 
-      {/* ── Social ── */}
-      <section className="rounded-[1.75rem] border border-white/10 bg-panel px-6 py-16 text-center md:px-12">
-        <p className="text-[10px] uppercase tracking-[0.55em] text-crimson">Follow Us</p>
-        <h2 className="mt-3 font-display text-4xl uppercase tracking-[0.08em] md:text-5xl">
-          Follow Us On The Mat
-        </h2>
-        <p className="mx-auto mt-4 max-w-xl text-sm uppercase leading-7 tracking-[0.2em] text-neutral-400">
-          See how athletes are training in Apertos gear. Follow us on TikTok for behind-the-scenes, training clips, and new drops.
-        </p>
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-          <a
-            href="https://www.tiktok.com/@apertos.fightwear"
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center bg-crimson px-6 py-3 text-xs font-semibold uppercase tracking-[0.35em] text-white transition hover:bg-crimson/85"
-          >
-            TikTok @apertos.fightwear
-          </a>
-          <a
-            href="https://instagram.com/apertos.fightwear"
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center border border-white/20 px-6 py-3 text-xs uppercase tracking-[0.35em] transition hover:border-white hover:text-white"
-          >
-            Instagram @apertos.fightwear
-          </a>
+      {/* ── Showcase: new collection ── */}
+      {sakuraDragon.length > 0 ? (
+        <section className="space-y-8">
+          <div>
+            <p className="text-xs uppercase tracking-[0.55em] text-crimson">New Collection</p>
+            <h2 className="mt-3 font-display text-4xl uppercase tracking-[0.08em] md:text-5xl">
+              Sakura Dragon
+            </h2>
+          </div>
+          <ProductShowcase label="New Collection" products={sakuraDragon} />
+        </section>
+      ) : null}
+
+      {/* ── Showcase: lifestyle ── */}
+      <section id="lifestyle-showcase" className="scroll-mt-24 space-y-8">
+        <div>
+          <p className="text-xs uppercase tracking-[0.55em] text-crimson">Lifestyle</p>
+          <h2 className="mt-3 font-display text-4xl uppercase tracking-[0.08em] md:text-5xl">
+            Hoodies &amp; Streetwear
+          </h2>
+        </div>
+        <ProductShowcase label="Lifestyle" products={apparel} />
+      </section>
+
+      {/* ── Kids section ── */}
+      {kidsHoodie ? (
+        <section id="kids" className="scroll-mt-24 grid gap-6 lg:grid-cols-2">
+          <div className="flex flex-col justify-center rounded-[1.75rem] border border-white/10 bg-panel p-8 md:p-12">
+            <div className="space-y-6">
+              <p className="text-[10px] uppercase tracking-[0.55em] text-crimson">Kids</p>
+              <h2 className="font-display text-4xl uppercase tracking-[0.08em] md:text-5xl">
+                For The Next Generation
+              </h2>
+              <p className="max-w-md text-sm uppercase leading-7 tracking-[0.22em] text-neutral-400">
+                The Apertos kids hoodie — same heavyweight build, made for your mini athlete.
+              </p>
+              <Link
+                href={`/product/${kidsHoodie.id}`}
+                className="inline-flex w-fit items-center bg-crimson px-6 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-white transition hover:bg-crimson/85"
+              >
+                Shop Kids
+              </Link>
+            </div>
+          </div>
+          <div className="relative min-h-[420px] overflow-hidden rounded-[1.75rem] border border-white/10 bg-black">
+            <Image
+              src={homeImages.kids}
+              alt="Apertos kids hoodie"
+              fill
+              sizes="(min-width: 1024px) 50vw, 100vw"
+              className="object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+          </div>
+        </section>
+      ) : null}
+
+      {/* ── Team Kits ── */}
+      <section id="team-kits" className="scroll-mt-24 grid gap-6 lg:grid-cols-2">
+        <Link
+          href="/team-kits"
+          className="group relative block min-h-[400px] overflow-hidden rounded-[1.75rem] border border-crimson/30 bg-crimson/5 transition hover:border-crimson/60"
+        >
+          <Image
+            src="/fighters/team-kits-placeholder.jpg"
+            alt="Apertos custom team kits"
+            fill
+            sizes="(min-width: 1024px) 50vw, 100vw"
+            className="object-cover transition-transform duration-300 group-hover:scale-105"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+          <div className="absolute bottom-6 left-6 right-6 space-y-2">
+            <p className="text-xs uppercase tracking-[0.55em] text-crimson">Custom</p>
+            <h2 className="font-display text-3xl uppercase tracking-[0.08em] md:text-4xl">
+              Team &amp; Club Kits
+            </h2>
+          </div>
+        </Link>
+        <div className="flex flex-col justify-center rounded-[1.75rem] border border-crimson/30 bg-crimson/5 p-8 transition hover:border-crimson/60 hover:bg-crimson/10 sm:p-10">
+          <div className="space-y-4">
+            <p className="text-xs uppercase tracking-[0.55em] text-crimson">Custom</p>
+            <h2 className="font-display text-3xl uppercase tracking-[0.08em] md:text-4xl">
+              Team &amp; Club Kits
+            </h2>
+            <p className="max-w-lg text-sm uppercase leading-7 tracking-[0.2em] text-neutral-400">
+              Rash guards, hoodies and MMA shorts designed with your club. Min. 10 per item · ~6 weeks production.
+            </p>
+            <Link
+              href="/team-kits"
+              className="inline-flex items-center text-xs font-semibold uppercase tracking-[0.3em] text-crimson transition hover:text-white"
+            >
+              Enquire Now <span className="ml-2 transition-transform duration-200 group-hover:translate-x-1">→</span>
+            </Link>
+          </div>
         </div>
       </section>
     </div>
