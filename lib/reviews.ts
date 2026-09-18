@@ -180,6 +180,45 @@ export async function getApprovedReviews(productId: string) {
   });
 }
 
+export type ApprovedReview = {
+  id: string;
+  productId: string;
+  productName: string;
+  productImage: string | null;
+  reviewerName: string;
+  rating: number;
+  comment: string;
+  verifiedPurchase: boolean;
+  mediaUrls: string[];
+  createdAt: string;
+};
+
+export async function getAllApprovedReviews(): Promise<ApprovedReview[]> {
+  if (!hasSupabaseAdminEnv) return [];
+
+  const supabase = createAdminClient();
+  const { data } = await supabase
+    .from("reviews")
+    .select(
+      "id, product_id, product_name, reviewer_name, rating, comment, verified_purchase, media_urls, created_at"
+    )
+    .eq("approved", true)
+    .order("created_at", { ascending: false });
+
+  return ((data ?? []) as Array<Record<string, unknown>>).map((r) => ({
+    id: r.id as string,
+    productId: r.product_id as string,
+    productName: (r.product_name as string) || (r.product_id as string),
+    productImage: null,
+    reviewerName: r.reviewer_name as string,
+    rating: r.rating as number,
+    comment: r.comment as string,
+    verifiedPurchase: Boolean(r.verified_purchase),
+    mediaUrls: parseMediaUrls(r.media_urls),
+    createdAt: r.created_at as string
+  }));
+}
+
 export async function getPendingReviews(): Promise<PendingReview[]> {
   if (!hasSupabaseAdminEnv) return [];
 

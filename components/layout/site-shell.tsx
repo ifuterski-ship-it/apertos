@@ -17,6 +17,7 @@ const navLinks = [
   { href: "/shop", label: "Shop" },
   { href: "/about", label: "About" },
   { href: "/team-kits", label: "Team Kits" },
+  { href: "/reviews", label: "Reviews" },
   { href: "/#sponsored-athlete", label: "Sponsored Athlete" },
   { href: "/wishlist", label: "Wishlist" },
   { href: "/cart", label: "Cart" },

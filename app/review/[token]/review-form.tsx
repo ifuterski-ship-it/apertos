@@ -237,7 +237,15 @@ export function ReviewForm({
 
         return (
           <div key={product.id} className="space-y-5 rounded-[1.75rem] border border-white/10 bg-white/[0.03] p-6">
-            <p className="font-display text-lg uppercase tracking-[0.08em]">{product.name}</p>
+            <div className="flex items-center gap-4">
+              {product.image ? (
+                <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-[0.75rem] border border-white/10 bg-black/30">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={product.image} alt={product.name} className="h-full w-full object-cover" />
+                </div>
+              ) : null}
+              <p className="font-display text-lg uppercase tracking-[0.08em]">{product.name}</p>
+            </div>
 
             <div className="space-y-2">
               <label className="text-xs uppercase tracking-[0.3em] text-neutral-400">Rating</label>
