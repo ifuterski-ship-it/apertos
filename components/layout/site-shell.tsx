@@ -17,6 +17,7 @@ const navLinks = [
   { href: "/shop", label: "Shop" },
   { href: "/about", label: "About" },
   { href: "/team-kits", label: "Team Kits" },
+  { href: "/#sponsored-athlete", label: "Sponsored Athlete" },
   { href: "/wishlist", label: "Wishlist" },
   { href: "/cart", label: "Cart" },
   { href: "/contact", label: "Contact" }
@@ -77,7 +78,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
             </span>
           </Link>
 
-          <nav className="hidden items-center gap-6 md:flex">
+          <nav className="hidden items-center gap-5 lg:flex">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
@@ -115,7 +116,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
           <button
             type="button"
             onClick={() => setIsMobileMenuOpen((open) => !open)}
-            className="inline-flex items-center justify-center border border-white/10 p-3 text-white transition hover:border-white/40 md:hidden"
+            className="inline-flex items-center justify-center border border-white/10 p-3 text-white transition hover:border-white/40 lg:hidden"
             aria-expanded={isMobileMenuOpen}
             aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
           >
@@ -124,7 +125,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
         </div>
 
         {isMobileMenuOpen ? (
-          <div className="border-t border-white/10 bg-black/95 md:hidden">
+          <div className="border-t border-white/10 bg-black/95 lg:hidden">
             <nav className="mx-auto flex w-full max-w-7xl flex-col gap-3 px-4 py-4 sm:px-6">
               {navLinks.map((link) => (
                 <Link
