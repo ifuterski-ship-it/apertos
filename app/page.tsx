@@ -13,7 +13,7 @@ const homepageKeywords = siteKeywords;
 const homeImages = {
   newCollection: "/products/new-collection-hero.jpeg",
   lifestyle: "/products/lifestyle-hoodie.jpeg",
-  kids: "/products/kids-hoodie-front.jpeg",
+  kids: "/products/kids-hoodie-lifestyle.jpeg",
   sponsoredAthlete: "/fighters/abel-biju.jpg"
 };
 
