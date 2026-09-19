@@ -147,6 +147,7 @@ export const products: Product[] = [
     images: [
       "/products/hoodie-grey-front.jpeg",
       "/products/hoodie-grey-hover.jpeg",
+      "/products/hoodie-grey-hover-2.jpeg",
       "/products/hoodie-black-front.jpeg",
       "/products/hoodie-grey-back.png.jpeg",
       "/products/hoodie-black-back.jpeg"

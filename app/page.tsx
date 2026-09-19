@@ -75,7 +75,7 @@ export default function HomePage() {
           alt="Apertos Fightwear new collection"
           fill
           sizes="100vw"
-          className="object-cover object-center"
+          className="object-contain"
           priority
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/30 to-black" />
@@ -92,7 +92,7 @@ export default function HomePage() {
           </p>
           <div className="mt-10 flex flex-wrap gap-4">
             <Link
-              href="/shop"
+              href="/shop/new-releases"
               className="inline-flex items-center bg-crimson px-7 py-4 text-xs font-semibold uppercase tracking-[0.3em] text-white transition hover:bg-crimson/85"
             >
               Shop New Releases
