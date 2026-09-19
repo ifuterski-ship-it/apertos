@@ -180,7 +180,7 @@ export const products: Product[] = [
     price: 40,
     priceLabel: "£40.00",
     image: "/products/kids-hoodie-lifestyle.jpeg",
-    images: ["/products/kids-hoodie-lifestyle.jpeg"],
+    images: ["/products/kids-hoodie-lifestyle.jpeg", "/products/kids-hoodie-hover.jpeg"],
     sizes: ["130", "140", "150", "160"],
     colours: ["Grey"],
     category: "Outerwear",
