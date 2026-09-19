@@ -174,7 +174,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
       <div className="border-b border-crimson/30 bg-crimson/5 py-2.5">
         <div className="mx-auto flex w-full max-w-7xl items-center justify-center px-4 sm:px-6 lg:px-8">
           <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1 text-[10px] uppercase tracking-[0.35em] text-crimson/80">
-            <span>Free UK Shipping Over £40</span>
+            <span>Free UK Shipping Over £50</span>
             <span className="hidden text-white/20 sm:inline">·</span>
             <span className="hidden sm:inline">Secure Checkout</span>
             <span className="hidden text-white/20 sm:inline">·</span>

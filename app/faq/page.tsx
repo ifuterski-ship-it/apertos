@@ -76,7 +76,7 @@ const faqSections = [
       {
         question: "Do you offer free shipping?",
         answer:
-          "Yes. Free UK shipping on orders over £40. Standard UK delivery takes 2–5 working days."
+          "Yes. Free UK shipping on orders over £50. Standard UK delivery takes 2–5 working days."
       },
       {
         question: "Do you ship internationally?",

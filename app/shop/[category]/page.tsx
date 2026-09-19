@@ -29,7 +29,7 @@ const categoryConfig: Record<string, CategoryConfig> = {
     ],
     metaTitle: "BJJ Rash Guards UK | No-Gi Compression Tops | Apertos Fightwear",
     metaDescription:
-      "Premium BJJ rash guards built for no-gi grappling and high-output training. Compression fit, moisture-wicking performance fabric. Free UK shipping over £40.",
+      "Premium BJJ rash guards built for no-gi grappling and high-output training. Compression fit, moisture-wicking performance fabric. Free UK shipping over £50.",
     metaKeywords: [
       "bjj rash guard",
       "no gi rash guard uk",
@@ -55,7 +55,7 @@ const categoryConfig: Record<string, CategoryConfig> = {
     ],
     metaTitle: "MMA Shorts UK | Grappling Shorts | Apertos Fightwear",
     metaDescription:
-      "Lightweight MMA shorts designed for grappling, sparring and combat sports training. Quick-dry, 4-way stretch. Free UK shipping over £40.",
+      "Lightweight MMA shorts designed for grappling, sparring and combat sports training. Quick-dry, 4-way stretch. Free UK shipping over £50.",
     metaKeywords: [
       "mma shorts uk",
       "bjj shorts",
@@ -81,7 +81,7 @@ const categoryConfig: Record<string, CategoryConfig> = {
     ],
     metaTitle: "No-Gi Sets UK | Rash Guard & Shorts Bundle | Apertos Fightwear",
     metaDescription:
-      "No-gi sets bundling a BJJ rash guard and MMA shorts in matching monochrome APERTOS design. Better value, complete look. Free UK shipping over £40.",
+      "No-gi sets bundling a BJJ rash guard and MMA shorts in matching monochrome APERTOS design. Better value, complete look. Free UK shipping over £50.",
     metaKeywords: [
       "no gi set uk",
       "bjj no gi set",

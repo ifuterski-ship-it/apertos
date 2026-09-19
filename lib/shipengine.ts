@@ -2,7 +2,7 @@ import type { OrderRecord } from "@/lib/orders";
 import { getProductById } from "@/lib/products";
 
 const SHIPENGINE_BASE_URL = "https://api.shipengine.com";
-const FREE_SHIPPING_THRESHOLD_PENCE = 4000;
+const FREE_SHIPPING_THRESHOLD_PENCE = 5000;
 
 const defaultAllowedCountries = [
   "GB",

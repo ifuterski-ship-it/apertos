@@ -461,7 +461,7 @@ export function ProductDetail({
                     </>
                   ) : (
                     <>
-                      <p className="text-[11px] uppercase leading-6 tracking-[0.3em] text-neutral-500">Free UK shipping on orders over £40 · Standard 2–5 working days</p>
+                      <p className="text-[11px] uppercase leading-6 tracking-[0.3em] text-neutral-500">Free UK shipping on orders over £50 · Standard 2–5 working days</p>
                       <p className="text-[11px] uppercase leading-6 tracking-[0.3em] text-neutral-500">International shipping available to EU, US, CA and more</p>
                     </>
                   )}

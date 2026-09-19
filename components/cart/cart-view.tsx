@@ -103,7 +103,7 @@ export function CartView() {
           </div>
 
           {(() => {
-            const FREE_SHIPPING_THRESHOLD = 40;
+            const FREE_SHIPPING_THRESHOLD = 50;
             const remaining = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotalAmount);
             const progress = Math.min(100, (subtotalAmount / FREE_SHIPPING_THRESHOLD) * 100);
             return (
