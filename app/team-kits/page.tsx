@@ -34,6 +34,7 @@ const steps = [
 ];
 
 const galleryPhotos = [
+  { src: "/fighters/team-kits.jpg", alt: "Apertos custom team kit" },
   { src: "/fighters/team-kits-2.jpg", alt: "Apertos custom team kit" },
   { src: "/fighters/team-kits-3.jpg", alt: "Apertos custom team kit" },
   { src: "/fighters/team-kits-4.png", alt: "Apertos custom team kit" },
