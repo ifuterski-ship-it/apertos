@@ -209,10 +209,10 @@ export const products: Product[] = [
     name: "Sakura Dragon",
     price: 50,
     priceLabel: "£50.00",
-    image: "/products/sakura-dragon-front.jpeg",
+    image: "/products/sakura-dragon-back.jpeg",
     images: [
-      "/products/sakura-dragon-front.jpeg",
       "/products/sakura-dragon-back.jpeg",
+      "/products/sakura-dragon-front.jpeg",
       "/products/sakura-dragon-detail-1.jpeg",
       "/products/sakura-dragon-detail-2.jpeg"
     ],
