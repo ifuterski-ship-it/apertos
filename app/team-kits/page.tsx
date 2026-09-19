@@ -45,17 +45,29 @@ export default function TeamKitsPage() {
         </p>
       </div>
 
-      {/* Team hero image */}
-      <div className="relative min-h-[380px] overflow-hidden rounded-[2rem] border border-white/10 bg-black sm:min-h-[460px]">
-        <Image
-          src="/fighters/team-kits-placeholder.jpg"
-          alt="Apertos custom team kits"
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+      {/* Team gallery */}
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="relative min-h-[340px] overflow-hidden rounded-[2rem] border border-white/10 bg-black sm:min-h-[420px]">
+          <Image
+            src="/fighters/team-kits-2.jpg"
+            alt="Apertos custom team kit"
+            fill
+            priority
+            sizes="(min-width: 640px) 50vw, 100vw"
+            className="object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+        </div>
+        <div className="relative min-h-[340px] overflow-hidden rounded-[2rem] border border-white/10 bg-black sm:min-h-[420px]">
+          <Image
+            src="/fighters/team-kits-3.jpg"
+            alt="Apertos custom team kit"
+            fill
+            sizes="(min-width: 640px) 50vw, 100vw"
+            className="object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+        </div>
       </div>
 
       <section className="space-y-8">
@@ -111,7 +123,7 @@ export default function TeamKitsPage() {
         <div className="grid gap-6 lg:grid-cols-2 lg:items-start">
           <div className="relative min-h-[320px] overflow-hidden rounded-[2rem] border border-white/10 bg-black sm:min-h-[420px]">
             <Image
-              src="/fighters/team-kits-placeholder.jpg"
+              src="/fighters/team-kits.jpg"
               alt="Order your Apertos custom team kit"
               fill
               sizes="(min-width: 1024px) 50vw, 100vw"
