@@ -33,6 +33,14 @@ const steps = [
   }
 ];
 
+const galleryPhotos = [
+  { src: "/fighters/team-kits-2.jpg", alt: "Apertos custom team kit" },
+  { src: "/fighters/team-kits-3.jpg", alt: "Apertos custom team kit" },
+  { src: "/fighters/team-kits-4.png", alt: "Apertos custom team kit" },
+  { src: "/fighters/team-kits-5.png", alt: "Apertos custom team kit" },
+  { src: "/fighters/team-kits-6.png", alt: "Apertos custom team kit" }
+];
+
 export default function TeamKitsPage() {
   return (
     <div className="space-y-20 pb-24">
@@ -47,27 +55,24 @@ export default function TeamKitsPage() {
 
       {/* Team gallery */}
       <div className="grid gap-4 sm:grid-cols-2">
-        <div className="relative min-h-[340px] overflow-hidden rounded-[2rem] border border-white/10 bg-black sm:min-h-[420px]">
-          <Image
-            src="/fighters/team-kits-2.jpg"
-            alt="Apertos custom team kit"
-            fill
-            priority
-            sizes="(min-width: 640px) 50vw, 100vw"
-            className="object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-        </div>
-        <div className="relative min-h-[340px] overflow-hidden rounded-[2rem] border border-white/10 bg-black sm:min-h-[420px]">
-          <Image
-            src="/fighters/team-kits-3.jpg"
-            alt="Apertos custom team kit"
-            fill
-            sizes="(min-width: 640px) 50vw, 100vw"
-            className="object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-        </div>
+        {galleryPhotos.map((photo, index) => (
+          <div
+            key={photo.src}
+            className={`relative overflow-hidden rounded-[2rem] border border-white/10 bg-black ${
+              index === 0 ? "min-h-[340px] sm:min-h-[420px]" : "min-h-[300px] sm:min-h-[360px]"
+            }`}
+          >
+            <Image
+              src={photo.src}
+              alt={photo.alt}
+              fill
+              priority={index === 0}
+              sizes="(min-width: 640px) 50vw, 100vw"
+              className="object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+          </div>
+        ))}
       </div>
 
       <section className="space-y-8">
