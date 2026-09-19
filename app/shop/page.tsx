@@ -69,9 +69,12 @@ export const metadata: Metadata = {
 export default async function ShopPage() {
   const allProducts = await getProductsWithFlags();
   const sakuraDragon = allProducts.filter((p) => p.id.startsWith("apertos-sakura-dragon"));
-  const ogProducts = allProducts.filter(
-    (p) => !p.id.startsWith("apertos-sakura-dragon") && p.category !== "Outerwear"
-  );
+  const ogProducts = allProducts
+    .filter((p) => !p.id.startsWith("apertos-sakura-dragon") && p.category !== "Outerwear")
+    .sort((a, b) => {
+      const order = ["apertos-the-original-no-gi-set", "apertos-the-original-rashguard", "apertos-the-original-shorts"];
+      return order.indexOf(a.id) - order.indexOf(b.id);
+    });
   const lifestyleProducts = allProducts.filter((p) => p.category === "Outerwear");
   const storeSchema = {
     "@context": "https://schema.org",

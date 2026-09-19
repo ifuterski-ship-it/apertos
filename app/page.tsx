@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { ProductShowcase } from "@/components/products/product-showcase";
-import { getSakuraDragonProducts, products } from "@/lib/products";
+import { getApparelProducts, getSakuraDragonProducts } from "@/lib/products";
 import { absoluteUrl, siteKeywords } from "@/lib/site";
 
 const homepageTitle = "Apertos Fightwear | BJJ Rash Guards, MMA Shorts & No-Gi Sets";
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
 
 export default function HomePage() {
   const sakuraDragon = getSakuraDragonProducts();
-  const kidsProducts = products.filter((p) => p.id === "apertos-kids-hoodie");
+  const lifestyleWear = getApparelProducts();
 
   const organizationSchema = {
     "@context": "https://schema.org",
@@ -69,13 +69,16 @@ export default function HomePage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }} />
 
       {/* ── Hero: New Collection (full screen) ── */}
-      <section className="relative -mx-4 -mt-10 flex min-h-[100svh] items-center overflow-hidden sm:-mx-6 lg:-mx-8">
+      <section
+        className="relative -mx-4 -mt-10 flex items-center overflow-hidden sm:-mx-6 lg:-mx-8"
+        style={{ aspectRatio: "1147 / 1600" }}
+      >
         <Image
           src={homeImages.newCollection}
           alt="Apertos Fightwear new collection"
           fill
           sizes="100vw"
-          className="object-contain"
+          className="object-cover object-center"
           priority
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/30 to-black" />
@@ -182,15 +185,15 @@ export default function HomePage() {
         </section>
       ) : null}
 
-      {/* ── Showcase: lifestyle ── */}
+      {/* ── Showcase: lifestyle wear ── */}
       <section id="lifestyle-showcase" className="scroll-mt-24 space-y-8">
         <div>
-          <p className="text-xs uppercase tracking-[0.55em] text-crimson">Kids</p>
+          <p className="text-xs uppercase tracking-[0.55em] text-crimson">Lifestyle Wear</p>
           <h2 className="mt-3 font-display text-4xl uppercase tracking-[0.08em] md:text-5xl">
-            The Kids Hoodie
+            Hoodies &amp; Streetwear
           </h2>
         </div>
-        <ProductShowcase label="Kids" products={kidsProducts} />
+        <ProductShowcase label="Lifestyle Wear" products={lifestyleWear} />
       </section>
 
       {/* ── Team Kits ── */}
@@ -200,11 +203,11 @@ export default function HomePage() {
           className="group relative block min-h-[400px] overflow-hidden rounded-[1.75rem] border border-crimson/30 bg-crimson/5 transition hover:border-crimson/60"
         >
           <Image
-            src="/fighters/team-kits-placeholder.jpg"
+            src="/fighters/team-kits.jpg"
             alt="Apertos custom team kits"
             fill
             sizes="(min-width: 1024px) 50vw, 100vw"
-            className="object-cover transition-transform duration-300 group-hover:scale-105"
+            className="object-cover object-top transition-transform duration-300 group-hover:scale-105"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
           <div className="absolute bottom-6 left-6 right-6 space-y-2">
@@ -212,22 +215,29 @@ export default function HomePage() {
             <h2 className="font-display text-3xl uppercase tracking-[0.08em] md:text-4xl">
               Team &amp; Club Kits
             </h2>
+            <p className="text-xs uppercase leading-6 tracking-[0.2em] text-neutral-300">
+              Your club, your kit, your colours.
+            </p>
           </div>
         </Link>
-        <div className="flex flex-col justify-center rounded-[1.75rem] border border-crimson/30 bg-crimson/5 p-8 transition hover:border-crimson/60 hover:bg-crimson/10 sm:p-10">
-          <div className="space-y-4">
+        <div className="flex flex-col justify-center rounded-[1.75rem] border border-crimson/30 bg-crimson/5 p-8 text-center transition hover:border-crimson/60 hover:bg-crimson/10 sm:p-10">
+          <div className="mx-auto max-w-xl space-y-4">
             <p className="text-xs uppercase tracking-[0.55em] text-crimson">Custom</p>
             <h2 className="font-display text-3xl uppercase tracking-[0.08em] md:text-4xl">
               Team &amp; Club Kits
             </h2>
-            <p className="max-w-lg text-sm uppercase leading-7 tracking-[0.2em] text-neutral-400">
-              Rash guards, hoodies and MMA shorts designed with your club. Min. 10 per item · ~6 weeks production.
+            <p className="text-sm uppercase leading-7 tracking-[0.2em] text-neutral-400">
+              Outfit your whole club in Apertos. Rash guards, hoodies and MMA shorts in your colours — we&apos;ll
+              work with you to design it, whatever your budget.
+            </p>
+            <p className="text-xs uppercase leading-6 tracking-[0.18em] text-neutral-500">
+              Easy ordering · Min. 10 per item · ~6 weeks to your door
             </p>
             <Link
               href="/team-kits"
-              className="inline-flex items-center text-xs font-semibold uppercase tracking-[0.3em] text-crimson transition hover:text-white"
+              className="mt-2 inline-flex items-center bg-crimson px-6 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-white transition hover:bg-crimson/85"
             >
-              Enquire Now <span className="ml-2 transition-transform duration-200 group-hover:translate-x-1">→</span>
+              Get In Touch
             </Link>
           </div>
         </div>

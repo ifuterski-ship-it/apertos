@@ -43,13 +43,16 @@ export default async function NewReleasesPage() {
   return (
     <div className="space-y-10 pb-24">
       {/* Hero */}
-      <section className="relative -mx-4 -mt-10 flex min-h-[70vh] items-center overflow-hidden sm:-mx-6 lg:-mx-8">
+      <section
+        className="relative -mx-4 -mt-10 flex items-center overflow-hidden sm:-mx-6 lg:-mx-8"
+        style={{ aspectRatio: "1147 / 1600" }}
+      >
         <Image
           src="/products/new-collection-hero.jpeg"
           alt="Apertos new releases"
           fill
           sizes="100vw"
-          className="object-contain"
+          className="object-cover object-center"
           priority
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black" />
