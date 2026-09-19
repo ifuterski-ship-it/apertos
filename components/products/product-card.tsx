@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Heart } from "lucide-react";
+import { useRef, useState } from "react";
 import { useWishlist } from "@/components/wishlist/wishlist-provider";
 import { LaunchCountdown } from "@/components/products/launch-countdown";
 import { isProductComingSoon } from "@/lib/product-availability";
@@ -12,6 +13,22 @@ export function ProductCard({ product }: { product: Product }) {
   const { has, toggle } = useWishlist();
   const inWishlist = has(product.id);
   const comingSoon = isProductComingSoon(product);
+
+  const imageTrackRef = useRef<HTMLDivElement>(null);
+  const images = product.images?.length ? product.images : [product.image];
+
+  const handleMouseEnter = () => {
+    const track = imageTrackRef.current;
+    if (!track) return;
+    const cardWidth = track.firstElementChild?.getBoundingClientRect().width ?? track.offsetWidth;
+    track.scrollTo({ left: cardWidth, behavior: "smooth" });
+  };
+
+  const handleMouseLeave = () => {
+    const track = imageTrackRef.current;
+    if (!track) return;
+    track.scrollTo({ left: 0, behavior: "smooth" });
+  };
 
   return (
     <div className="group overflow-hidden rounded-[1.75rem] border border-white/10 bg-panel transition duration-500 hover:-translate-y-1 hover:border-white/20">
@@ -43,17 +60,29 @@ export function ProductCard({ product }: { product: Product }) {
 
         <Link href={`/product/${product.id}`} className="block">
           <div className="relative aspect-[4/5] overflow-hidden bg-[#0d0d0d]">
-            <div className="absolute inset-0 p-6 md:p-8">
-              <Image
-                src={product.image}
-                alt={product.name}
-                fill
-                sizes="(min-width: 1280px) 30vw, (min-width: 640px) 45vw, 100vw"
-                className="object-contain transition duration-500 group-hover:scale-[1.04]"
-              />
+            <div
+              ref={imageTrackRef}
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={handleMouseLeave}
+              className="no-scrollbar flex h-full w-full snap-x snap-mandatory touch-pan-x overflow-x-auto"
+              style={{ scrollSnapType: "x mandatory" }}
+            >
+              {images.map((image) => (
+                <div key={image} className="relative h-full w-full shrink-0 snap-start">
+                  <div className="absolute inset-0 p-6 md:p-8">
+                    <Image
+                      src={image}
+                      alt={product.name}
+                      fill
+                      sizes="(min-width: 1280px) 30vw, (min-width: 640px) 45vw, 100vw"
+                      className="object-contain transition duration-500"
+                    />
+                  </div>
+                </div>
+              ))}
             </div>
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-            <div className="absolute inset-x-0 bottom-0 p-5">
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 p-5">
               <p className="text-[10px] uppercase tracking-[0.4em] text-white/50">{product.category}</p>
               <h3 className="font-display text-2xl uppercase tracking-[0.08em] text-white">{product.name}</h3>
             </div>
