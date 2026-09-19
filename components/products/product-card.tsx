@@ -108,15 +108,13 @@ export function ProductCard({ product }: { product: Product }) {
             >
               {images.map((image) => (
                 <div key={image} className="relative h-full w-full shrink-0">
-                  <div className="absolute inset-0 p-6 md:p-8">
-                    <Image
-                      src={image}
-                      alt={product.name}
-                      fill
-                      sizes="(min-width: 1280px) 30vw, (min-width: 640px) 45vw, 100vw"
-                      className="object-contain transition duration-500"
-                    />
-                  </div>
+                  <Image
+                    src={image}
+                    alt={product.name}
+                    fill
+                    sizes="(min-width: 1280px) 30vw, (min-width: 640px) 45vw, 100vw"
+                    className="object-cover transition duration-500"
+                  />
                 </div>
               ))}
             </div>

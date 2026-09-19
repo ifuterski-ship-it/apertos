@@ -202,8 +202,8 @@ export function ProductDetail({
             onClick={() => setIsZoomOpen(true)}
             className="relative block min-h-[480px] w-full overflow-hidden rounded-[2rem] border border-white/10 bg-white text-left sm:min-h-[520px]"
           >
-            <div className="absolute inset-0 p-8 md:p-14">
-              <Image src={activeImage} alt={product.name} fill sizes="(min-width: 1024px) 55vw, 100vw" className="object-contain" priority />
+            <div className="absolute inset-0">
+              <Image src={activeImage} alt={product.name} fill sizes="(min-width: 1024px) 55vw, 100vw" className="object-cover" priority />
             </div>
             <div className="absolute bottom-5 right-5 border border-black/10 bg-white/90 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.3em] text-black">
               Click To Zoom
@@ -227,8 +227,8 @@ export function ProductDetail({
                     className={`relative min-h-32 overflow-hidden rounded-[1.25rem] border bg-white transition ${isActive ? "border-white" : "border-white/10 hover:border-white/40"}`}
                     aria-label={`View ${product.name} image ${index + 1}`}
                   >
-                    <div className="absolute inset-0 p-3">
-                      <Image src={image} alt={`${product.name} view ${index + 1}`} fill sizes="(min-width: 1024px) 20vw, 25vw" className="object-contain" />
+                    <div className="absolute inset-0">
+                      <Image src={image} alt={`${product.name} view ${index + 1}`} fill sizes="(min-width: 1024px) 20vw, 25vw" className="object-cover" />
                     </div>
                   </button>
                 );
