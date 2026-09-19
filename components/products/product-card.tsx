@@ -21,13 +21,13 @@ export function ProductCard({ product }: { product: Product }) {
     const track = imageTrackRef.current;
     if (!track) return;
     const cardWidth = track.firstElementChild?.getBoundingClientRect().width ?? track.offsetWidth;
-    track.scrollTo({ left: cardWidth, behavior: "smooth" });
+    track.scrollTo({ left: cardWidth, behavior: "auto" });
   };
 
   const handleMouseLeave = () => {
     const track = imageTrackRef.current;
     if (!track) return;
-    track.scrollTo({ left: 0, behavior: "smooth" });
+    track.scrollTo({ left: 0, behavior: "auto" });
   };
 
   return (
