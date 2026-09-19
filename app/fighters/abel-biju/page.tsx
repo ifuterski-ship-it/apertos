@@ -4,7 +4,7 @@ import Image from "next/image";
 export const metadata: Metadata = {
   title: "Abel \"The Ninja\" Biju | Apertos Fightwear Sponsored Athlete",
   description:
-    "Abel \"The Ninja\" Biju is an Apertos Fightwear sponsored amateur MMA fighter representing Lions Gym Coventry. An exciting UK amateur MMA prospect with an 8-1-0 record.",
+    "Abel \"The Ninja\" Biju is an Apertos Fightwear sponsored amateur MMA fighter representing Lions Gym Coventry. An exciting UK amateur MMA prospect with a 9-1-0 record.",
   robots: { index: true, follow: true }
 };
 
@@ -22,7 +22,7 @@ const socials = [
 ];
 
 const stats = [
-  { label: "Record", value: "8–1–0" },
+  { label: "Record", value: "9–1–0" },
   { label: "Nickname", value: "The Ninja" },
   { label: "Gym", value: "Lions Gym Coventry" },
   { label: "Fighting Out Of", value: "Coventry, UK" }
