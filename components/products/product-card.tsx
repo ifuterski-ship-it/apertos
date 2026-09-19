@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Heart } from "lucide-react";
+import { ChevronLeft, ChevronRight, Heart } from "lucide-react";
 import { useRef, useState } from "react";
 import { useWishlist } from "@/components/wishlist/wishlist-provider";
 import { LaunchCountdown } from "@/components/products/launch-countdown";
@@ -14,20 +14,53 @@ export function ProductCard({ product }: { product: Product }) {
   const inWishlist = has(product.id);
   const comingSoon = isProductComingSoon(product);
 
-  const imageTrackRef = useRef<HTMLDivElement>(null);
   const images = product.images?.length ? product.images : [product.image];
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  const touchStartX = useRef<number | null>(null);
+  const swipedRef = useRef(false);
+
+  const imageTrackRef = useRef<HTMLDivElement>(null);
+
+  const prevImage = () => setActiveIndex((i) => (i - 1 + images.length) % images.length);
+  const nextImage = () => setActiveIndex((i) => (i + 1) % images.length);
 
   const handleMouseEnter = () => {
-    const track = imageTrackRef.current;
-    if (!track) return;
-    const cardWidth = track.firstElementChild?.getBoundingClientRect().width ?? track.offsetWidth;
-    track.scrollTo({ left: cardWidth, behavior: "auto" });
+    if (images.length > 1) setActiveIndex((i) => (i + 1) % images.length);
   };
 
   const handleMouseLeave = () => {
-    const track = imageTrackRef.current;
-    if (!track) return;
-    track.scrollTo({ left: 0, behavior: "auto" });
+    setActiveIndex(0);
+  };
+
+  const handleTouchStart = (event: React.TouchEvent) => {
+    touchStartX.current = event.touches[0].clientX;
+    swipedRef.current = false;
+  };
+
+  const handleTouchEnd = (event: React.TouchEvent) => {
+    if (touchStartX.current === null) return;
+    const deltaX = event.changedTouches[0].clientX - touchStartX.current;
+    touchStartX.current = null;
+
+    if (Math.abs(deltaX) > 40) {
+      swipedRef.current = true;
+      if (deltaX < 0) {
+        nextImage();
+      } else {
+        prevImage();
+      }
+      return;
+    }
+    swipedRef.current = false;
+  };
+
+  const handleImageTap = (event: React.MouseEvent) => {
+    if (swipedRef.current) {
+      event.preventDefault();
+      event.stopPropagation();
+      swipedRef.current = false;
+    }
   };
 
   return (
@@ -58,17 +91,23 @@ export function ProductCard({ product }: { product: Product }) {
           </button>
         ) : null}
 
-        <Link href={`/product/${product.id}`} className="block">
-          <div className="relative aspect-[4/5] overflow-hidden bg-[#0d0d0d]">
+        <div className="relative aspect-[4/5] overflow-hidden bg-[#0d0d0d]">
+          <Link
+            href={`/product/${product.id}`}
+            onClick={handleImageTap}
+            className="block h-full w-full"
+          >
             <div
               ref={imageTrackRef}
               onMouseEnter={handleMouseEnter}
               onMouseLeave={handleMouseLeave}
-              className="no-scrollbar flex h-full w-full snap-x snap-mandatory touch-pan-x overflow-x-auto"
-              style={{ scrollSnapType: "x mandatory" }}
+              onTouchStart={handleTouchStart}
+              onTouchEnd={handleTouchEnd}
+              className="flex h-full w-full"
+              style={{ transform: `translateX(-${activeIndex * 100}%)` }}
             >
               {images.map((image) => (
-                <div key={image} className="relative h-full w-full shrink-0 snap-start">
+                <div key={image} className="relative h-full w-full shrink-0">
                   <div className="absolute inset-0 p-6 md:p-8">
                     <Image
                       src={image}
@@ -81,13 +120,53 @@ export function ProductCard({ product }: { product: Product }) {
                 </div>
               ))}
             </div>
-            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 p-5">
-              <p className="text-[10px] uppercase tracking-[0.4em] text-white/50">{product.category}</p>
-              <h3 className="font-display text-2xl uppercase tracking-[0.08em] text-white">{product.name}</h3>
-            </div>
+          </Link>
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 p-5">
+            <p className="text-[10px] uppercase tracking-[0.4em] text-white/50">{product.category}</p>
+            <h3 className="font-display text-2xl uppercase tracking-[0.08em] text-white">{product.name}</h3>
           </div>
-        </Link>
+
+          {images.length > 1 ? (
+            <>
+              <button
+                type="button"
+                aria-label="Previous image"
+                onClick={(event) => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  prevImage();
+                }}
+                className="absolute left-3 top-1/2 z-10 inline-flex -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-black/60 p-2 text-white transition hover:bg-black/90 hover:border-white/50"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+              <button
+                type="button"
+                aria-label="Next image"
+                onClick={(event) => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  nextImage();
+                }}
+                className="absolute right-3 top-1/2 z-10 inline-flex -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-black/60 p-2 text-white transition hover:bg-black/90 hover:border-white/50"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </button>
+
+              <div className="pointer-events-none absolute bottom-2 left-1/2 flex -translate-x-1/2 items-center gap-1.5">
+                {images.map((image, i) => (
+                  <span
+                    key={image}
+                    className={`h-1.5 rounded-full transition-all ${
+                      i === activeIndex ? "w-4 bg-white" : "w-1.5 bg-white/40"
+                    }`}
+                  />
+                ))}
+              </div>
+            </>
+          ) : null}
+        </div>
       </div>
 
       <div className="p-5 space-y-4">

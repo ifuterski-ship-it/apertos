@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { ProductShowcase } from "@/components/products/product-showcase";
-import { getApparelProducts, getSakuraDragonProducts, products } from "@/lib/products";
+import { getSakuraDragonProducts, products } from "@/lib/products";
 import { absoluteUrl, siteKeywords } from "@/lib/site";
 
 const homepageTitle = "Apertos Fightwear | BJJ Rash Guards, MMA Shorts & No-Gi Sets";
@@ -40,18 +40,9 @@ export const metadata: Metadata = {
   }
 };
 
-const fightwearProducts = [
-  "apertos-the-original-rashguard",
-  "apertos-the-original-shorts",
-  "apertos-the-original-no-gi-set"
-]
-  .map((id) => products.find((p) => p.id === id))
-  .filter((p): p is (typeof products)[number] => Boolean(p));
-
 export default function HomePage() {
   const sakuraDragon = getSakuraDragonProducts();
-  const apparel = getApparelProducts();
-  const kidsHoodie = products.find((p) => p.id === "apertos-kids-hoodie");
+  const kidsProducts = products.filter((p) => p.id === "apertos-kids-hoodie");
 
   const organizationSchema = {
     "@context": "https://schema.org",
@@ -104,7 +95,7 @@ export default function HomePage() {
               href="/shop"
               className="inline-flex items-center bg-crimson px-7 py-4 text-xs font-semibold uppercase tracking-[0.3em] text-white transition hover:bg-crimson/85"
             >
-              Shop The Collection
+              Shop New Releases
             </Link>
             <Link
               href="/shop/apparel"
@@ -178,17 +169,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Showcase: fightwear ── */}
-      <section id="fightwear" className="scroll-mt-24 space-y-8">
-        <div>
-          <p className="text-xs uppercase tracking-[0.55em] text-crimson">Fightwear</p>
-          <h2 className="mt-3 font-display text-4xl uppercase tracking-[0.08em] md:text-5xl">
-            Built For The Mat
-          </h2>
-        </div>
-        <ProductShowcase label="Fightwear" products={fightwearProducts} />
-      </section>
-
       {/* ── Showcase: new collection ── */}
       {sakuraDragon.length > 0 ? (
         <section className="space-y-8">
@@ -205,46 +185,13 @@ export default function HomePage() {
       {/* ── Showcase: lifestyle ── */}
       <section id="lifestyle-showcase" className="scroll-mt-24 space-y-8">
         <div>
-          <p className="text-xs uppercase tracking-[0.55em] text-crimson">Lifestyle</p>
+          <p className="text-xs uppercase tracking-[0.55em] text-crimson">Kids</p>
           <h2 className="mt-3 font-display text-4xl uppercase tracking-[0.08em] md:text-5xl">
-            Hoodies &amp; Streetwear
+            The Kids Hoodie
           </h2>
         </div>
-        <ProductShowcase label="Lifestyle" products={apparel} />
+        <ProductShowcase label="Kids" products={kidsProducts} />
       </section>
-
-      {/* ── Kids section ── */}
-      {kidsHoodie ? (
-        <section id="kids" className="scroll-mt-24 grid gap-6 lg:grid-cols-2">
-          <div className="flex flex-col justify-center rounded-[1.75rem] border border-white/10 bg-panel p-8 md:p-12">
-            <div className="space-y-6">
-              <p className="text-[10px] uppercase tracking-[0.55em] text-crimson">Kids</p>
-              <h2 className="font-display text-4xl uppercase tracking-[0.08em] md:text-5xl">
-                For The Next Generation
-              </h2>
-              <p className="max-w-md text-sm uppercase leading-7 tracking-[0.22em] text-neutral-400">
-                The Apertos kids hoodie — same heavyweight build, made for your mini athlete.
-              </p>
-              <Link
-                href={`/product/${kidsHoodie.id}`}
-                className="inline-flex w-fit items-center bg-crimson px-6 py-3 text-xs font-semibold uppercase tracking-[0.3em] text-white transition hover:bg-crimson/85"
-              >
-                Shop Kids
-              </Link>
-            </div>
-          </div>
-          <div className="relative min-h-[420px] overflow-hidden rounded-[1.75rem] border border-white/10 bg-black">
-            <Image
-              src={homeImages.kids}
-              alt="Apertos kids hoodie"
-              fill
-              sizes="(min-width: 1024px) 50vw, 100vw"
-              className="object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-          </div>
-        </section>
-      ) : null}
 
       {/* ── Team Kits ── */}
       <section id="team-kits" className="scroll-mt-24 grid gap-6 lg:grid-cols-2">

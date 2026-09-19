@@ -140,7 +140,7 @@ export const products: Product[] = [
   },
   {
     id: "apertos-essential-hoodie",
-    name: "Apertos Essential Hoodie",
+    name: "Apertos Essential Adult Hoodie",
     price: 45,
     priceLabel: "£45.00",
     image: "/products/hoodie-grey-front.jpeg",
@@ -176,7 +176,7 @@ export const products: Product[] = [
   },
   {
     id: "apertos-kids-hoodie",
-    name: "Apertos Kids Hoodie",
+    name: "Apertos Essential Kids Hoodie",
     price: 40,
     priceLabel: "£40.00",
     image: "/products/kids-hoodie-lifestyle.jpeg",
@@ -187,7 +187,7 @@ export const products: Product[] = [
     shortDescription: "Kids combat sports hoodie",
     shippingWeightLb: 1,
     description:
-      "A juniors version of the Apertos Essential Hoodie — a clean, heavyweight hoodie built for the gym bag, mat warm-up and everyday wear.",
+      "A juniors version of the Apertos Essential Adult Hoodie — a clean, heavyweight hoodie built for the gym bag, mat warm-up and everyday wear.",
     material: "80% Cotton, 20% Polyester — heavyweight fleece, brushed interior",
     careInstructions: "Machine wash cold 30°C · Tumble dry low · Do not iron print",
     sizeGuides: [
