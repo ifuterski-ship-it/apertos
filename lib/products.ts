@@ -150,12 +150,10 @@ export const products: Product[] = [
       "/products/hoodie-grey-front.jpeg",
       "/products/hoodie-grey-hover.jpeg",
       "/products/hoodie-grey-hover-2.jpeg",
-      "/products/hoodie-black-front.jpeg",
-      "/products/hoodie-grey-back.png.jpeg",
-      "/products/hoodie-black-back.jpeg"
+      "/products/hoodie-grey-back.png.jpeg"
     ],
     sizes: ["S", "M", "L", "XL", "2XL"],
-    colours: ["Grey", "Black"],
+    colours: ["Grey"],
     category: "Outerwear",
     shortDescription: "Premium combat sports hoodie",
     shippingWeightLb: 1.5,
