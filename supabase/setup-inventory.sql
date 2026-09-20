@@ -22,10 +22,17 @@ on conflict (product_id, size) do nothing;
 
 -- Hoodies are now fulfilled from physical stock (POD on hold)
 insert into public.inventory (product_id, size, stock) values
-  ('hoodie-adult', 'S', 4),
+  ('hoodie-adult', 'S', 3),
+  ('hoodie-adult', 'M', 0),
+  ('hoodie-adult', 'L', 0),
+  ('hoodie-adult', 'XL', 0),
+  ('hoodie-adult', '2XL', 0),
   ('hoodie-kids', '150', 1),
-  ('hoodie-womens', 'S', 5)
-on conflict (product_id, size) do nothing;
+  ('hoodie-womens', 'S', 5),
+  ('hoodie-womens', 'M', 0),
+  ('hoodie-womens', 'L', 0)
+on conflict (product_id, size)
+do update set stock = excluded.stock, updated_at = now();
 
 -- Create a function to reduce inventory
 create or replace function public.reduce_inventory(

@@ -40,7 +40,7 @@ const fallbackProductStock: Record<BaseInventoryProductId, number> = {
   shorts: 9,
   "sakura-rashguard": 0,
   "sakura-shorts": 0,
-  "hoodie-adult": 4,
+  "hoodie-adult": 3,
   "hoodie-kids": 1,
   "hoodie-womens": 5
 };
