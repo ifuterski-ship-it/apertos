@@ -78,7 +78,7 @@ function getBaseInventoryProductsForProduct(productId: string): BaseInventoryPro
     return ["hoodie-kids"];
   }
 
-  if (productId === "apertos-sakura-dragon-womens-hoodie") {
+  if (productId === "apertos-womens-hoodie") {
     return ["hoodie-womens"];
   }
 

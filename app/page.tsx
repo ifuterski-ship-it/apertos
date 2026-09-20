@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { ProductShowcase } from "@/components/products/product-showcase";
-import { getApparelProducts, getSakuraDragonProducts } from "@/lib/products";
+import { getApparelProducts, getSakuraDragonProducts, getWomensProducts } from "@/lib/products";
 import { absoluteUrl, siteKeywords } from "@/lib/site";
 
 const homepageTitle = "Apertos Fightwear | BJJ Rash Guards, MMA Shorts & No-Gi Sets";
@@ -42,6 +42,7 @@ export const metadata: Metadata = {
 
 export default function HomePage() {
   const sakuraDragon = getSakuraDragonProducts();
+  const womens = getWomensProducts();
   const lifestyleWear = getApparelProducts();
 
   const organizationSchema = {
@@ -182,6 +183,19 @@ export default function HomePage() {
             </h2>
           </div>
           <ProductShowcase label="New Collection" products={sakuraDragon} />
+        </section>
+      ) : null}
+
+      {/* ── Showcase: womens ── */}
+      {womens.length > 0 ? (
+        <section id="womens" className="scroll-mt-24 space-y-8">
+          <div>
+            <p className="text-xs uppercase tracking-[0.55em] text-crimson">Womens</p>
+            <h2 className="mt-3 font-display text-4xl uppercase tracking-[0.08em] md:text-5xl">
+              Womens Collection
+            </h2>
+          </div>
+          <ProductShowcase label="Womens" products={womens} />
         </section>
       ) : null}
 

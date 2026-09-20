@@ -7,6 +7,7 @@ import { absoluteUrl } from "@/lib/site";
 type CategoryConfig = {
   displayName: string;
   categoryFilter: string[];
+  collectionFilter?: string[];
   description: string;
   features: string[];
   metaTitle: string;
@@ -117,6 +118,30 @@ const categoryConfig: Record<string, CategoryConfig> = {
       "apertos hoodie",
       "grappling apparel uk"
     ]
+  },
+  "womens": {
+    displayName: "Womens",
+    categoryFilter: [],
+    collectionFilter: ["womens"],
+    description:
+      "Womens fightwear and lifestyle apparel from Apertos — premium hoodies and gear cut for women who train hard and dress with intention.",
+    features: [
+      "Women's cut and fit",
+      "Premium heavyweight fabrics",
+      "Monochrome APERTOS design",
+      "Built for the mat and the street"
+    ],
+    metaTitle: "Womens Fightwear & Hoodies UK | Apertos Fightwear",
+    metaDescription:
+      "Womens BJJ and MMA apparel from Apertos Fightwear. Premium womens hoodies and fightwear for athletes who train hard. UK-based.",
+    metaKeywords: [
+      "womens bjj hoodie",
+      "womens mma clothing",
+      "womens fightwear uk",
+      "girls bjj hoodie",
+      "womens combat sports apparel",
+      "apertos womens hoodie"
+    ]
   }
 };
 
@@ -177,8 +202,10 @@ export default async function CategoryPage({
     notFound();
   }
 
-  const categoryProducts = products.filter(
-    (product) => config.categoryFilter.includes(product.category)
+  const categoryProducts = products.filter((product) =>
+    config.collectionFilter
+      ? config.collectionFilter.some((collection) => product.collections?.includes(collection))
+      : config.categoryFilter.includes(product.category)
   );
 
   return (

@@ -32,6 +32,7 @@ export type Product = {
   isComingSoon?: boolean;
   launchAt?: string;
   fulfillment?: "pod" | "physical";
+  collections?: string[];
 };
 
 export const products: Product[] = [
@@ -206,7 +207,7 @@ export const products: Product[] = [
     ]
   },
   {
-    id: "apertos-sakura-dragon-womens-hoodie",
+    id: "apertos-womens-hoodie",
     name: "Sakura Dragon Womens Hoodie",
     price: 45,
     priceLabel: "£45.00",
@@ -215,6 +216,7 @@ export const products: Product[] = [
     sizes: ["S"],
     colours: ["Grey", "Black"],
     category: "Outerwear",
+    collections: ["womens", "lifestyle"],
     shortDescription: "Womens Sakura Dragon combat sports hoodie",
     shippingWeightLb: 1.5,
     description:
@@ -370,6 +372,10 @@ export function getOriginalProducts() {
 
 export function getApparelProducts() {
   return products.filter((p) => p.category === "Outerwear");
+}
+
+export function getWomensProducts() {
+  return products.filter((p) => p.collections?.includes("womens"));
 }
 
 export function getProductById(id: string) {

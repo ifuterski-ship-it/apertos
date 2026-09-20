@@ -69,6 +69,7 @@ export const metadata: Metadata = {
 export default async function ShopPage() {
   const allProducts = await getProductsWithFlags();
   const sakuraDragon = allProducts.filter((p) => p.id.startsWith("apertos-sakura-dragon"));
+  const womensProducts = allProducts.filter((p) => p.collections?.includes("womens"));
   const ogProducts = allProducts
     .filter((p) => !p.id.startsWith("apertos-sakura-dragon") && p.category !== "Outerwear")
     .sort((a, b) => {
@@ -161,6 +162,14 @@ export default async function ShopPage() {
         <div className="space-y-3">
           <p className="text-[10px] uppercase tracking-[0.55em] text-crimson">Sakura Dragon</p>
           <ProductGrid products={sakuraDragon} />
+        </div>
+      )}
+
+      {/* Womens collection */}
+      {womensProducts.length > 0 && (
+        <div className="space-y-3">
+          <p className="text-[10px] uppercase tracking-[0.55em] text-crimson">Womens</p>
+          <ProductGrid products={womensProducts} />
         </div>
       )}
 
