@@ -341,18 +341,29 @@ export function ProductDetail({
             <div className="flex flex-wrap gap-3">
               {product.sizes.map((size) => {
                 const active = size === selectedSize;
-                const disabled = !comingSoon && Boolean(inventoryBySize[size]?.isOutOfStock);
+                const outOfStock = !comingSoon && Boolean(inventoryBySize[size]?.isOutOfStock);
                 return (
                   <button
                     key={size}
                     type="button"
-                    disabled={disabled}
+                    disabled={outOfStock}
                     onClick={() => setSelectedSize(size)}
                     className={`min-h-[44px] min-w-16 border px-4 py-3 text-xs uppercase tracking-[0.35em] transition ${
                       active ? "border-white bg-white text-black" : "border-white/15 hover:border-white/50"
-                    } disabled:cursor-not-allowed disabled:border-white/10 disabled:text-neutral-600 disabled:line-through`}
+                    } ${
+                      outOfStock
+                        ? "disabled:cursor-not-allowed disabled:border-white/10 disabled:bg-black/40 disabled:text-neutral-600 disabled:line-through"
+                        : ""
+                    }`}
                   >
-                    {size}
+                    <span className="flex flex-col items-center leading-tight">
+                      {size}
+                      {outOfStock ? (
+                        <span className="mt-0.5 text-[9px] uppercase tracking-[0.2em] text-red-400/70">
+                          Sold Out
+                        </span>
+                      ) : null}
+                    </span>
                   </button>
                 );
               })}
