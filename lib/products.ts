@@ -211,7 +211,7 @@ export const products: Product[] = [
     priceLabel: "£45.00",
     image: "/products/womens-hoodie-front.jpeg",
     images: ["/products/womens-hoodie-front.jpeg", "/products/womens-hoodie-back.jpeg"],
-    sizes: ["XS", "S", "M", "L", "XL"],
+    sizes: ["S"],
     colours: ["Grey", "Black"],
     category: "Outerwear",
     shortDescription: "Womens Sakura Dragon combat sports hoodie",
