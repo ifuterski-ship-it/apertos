@@ -208,7 +208,7 @@ export const products: Product[] = [
   },
   {
     id: "apertos-womens-hoodie",
-    name: "Sakura Dragon Womens Hoodie",
+    name: "Womens Sakura Hoodie",
     price: 45,
     priceLabel: "£45.00",
     image: "/products/womens-hoodie-front.jpeg",
@@ -217,10 +217,10 @@ export const products: Product[] = [
     colours: ["Grey", "Black"],
     category: "Outerwear",
     collections: ["womens", "lifestyle"],
-    shortDescription: "Womens Sakura Dragon combat sports hoodie",
+    shortDescription: "Womens Sakura combat sports hoodie",
     shippingWeightLb: 1.5,
     description:
-      "A women's cut Sakura Dragon hoodie from APERTOS — a clean, heavyweight hoodie built for the gym bag, mat warm-up and everyday wear.",
+      "A women's cut Sakura hoodie from APERTOS — a clean, heavyweight hoodie built for the gym bag, mat warm-up and everyday wear.",
     material: "80% Cotton, 20% Polyester — heavyweight fleece, brushed interior",
     careInstructions: "Machine wash cold 30°C · Tumble dry low · Do not iron print",
     sizeGuides: [
