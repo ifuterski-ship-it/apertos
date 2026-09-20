@@ -13,6 +13,17 @@ export function ProductShowcase({ products, label }: { products: Product[]; labe
     if (!track) return;
     const card = track.querySelector<HTMLElement>("[data-showcase-card]");
     const step = card ? card.offsetWidth + 24 : 340;
+    const atStart = track.scrollLeft <= 1;
+    const atEnd = track.scrollLeft + track.clientWidth >= track.scrollWidth - 1;
+
+    if (direction === 1 && atEnd) {
+      track.scrollTo({ left: 0, behavior: "smooth" });
+      return;
+    }
+    if (direction === -1 && atStart) {
+      track.scrollTo({ left: track.scrollWidth, behavior: "smooth" });
+      return;
+    }
     track.scrollBy({ left: direction * step, behavior: "smooth" });
   }, []);
 
