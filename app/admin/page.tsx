@@ -9,7 +9,7 @@ import { ReviewModeration } from "@/app/admin/review-moderation";
 import { hasAdminEmailsConfigured, requireAdminUser } from "@/lib/admin-auth";
 import { getOrdersForAdmin } from "@/lib/orders";
 import { getProductFlags } from "@/lib/product-flags";
-import { products } from "@/lib/products";
+import { isPodProduct, products } from "@/lib/products";
 import { getPendingReviews } from "@/lib/reviews";
 import { hasShipEngineEnv } from "@/lib/shipengine";
 import { hasSupabaseAdminEnv } from "@/lib/supabase/admin";
@@ -143,11 +143,11 @@ export default async function AdminPage() {
             const shippingLabel = payload.shippingLabel;
             const isPodOrder = payload.items.every((item) => {
               const product = products.find((p) => p.id === item.productId);
-              return product?.category === "Outerwear";
+              return isPodProduct(product);
             });
             const hasPodItems = payload.items.some((item) => {
               const product = products.find((p) => p.id === item.productId);
-              return product?.category === "Outerwear";
+              return isPodProduct(product);
             });
 
             return (

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { hasSupabaseEnv } from "@/lib/supabase/config";
 import { useCart } from "@/components/cart/cart-provider";
-import { products } from "@/lib/products";
+import { isPodProduct, products } from "@/lib/products";
 import type { ShipEngineRate } from "@/lib/shipengine";
 
 type Address = {
@@ -38,11 +38,11 @@ export function CheckoutForm({ allowedCountries }: { allowedCountries: string[] 
   const supabase = useMemo(() => (hasSupabaseEnv ? createClient() : null), []);
   const hasPodItems = items.some((item) => {
     const product = products.find((p) => p.id === item.productId);
-    return product?.category === "Outerwear";
+    return isPodProduct(product);
   });
   const isPodOnly = items.length > 0 && items.every((item) => {
     const product = products.find((p) => p.id === item.productId);
-    return product?.category === "Outerwear";
+    return isPodProduct(product);
   });
 
   const [address, setAddress] = useState<Address>({

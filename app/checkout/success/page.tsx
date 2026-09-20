@@ -6,9 +6,9 @@ import { sendEmail } from "@/lib/email";
 import { renderOrderConfirmationEmail } from "@/lib/email-templates";
 import { ordersFromEmail } from "@/lib/email-config";
 import { decrementInventoryForOrder } from "@/lib/inventory";
+import { getProductById, isPodProduct } from "@/lib/products";
 import { buildOrderItemsPayload, getOrderForAdmin, recordOrder } from "@/lib/orders";
 import { hasSupabaseAdminEnv } from "@/lib/supabase/admin";
-import { getProductById } from "@/lib/products";
 import type Stripe from "stripe";
 
 type MetadataItem = {
@@ -48,7 +48,7 @@ export default async function CheckoutSuccessPage({
       purchaseCurrency = (session.currency ?? "gbp").toUpperCase();
       hasPodItems = metadataItems.some((item) => {
         const product = getProductById(item.productId);
-        return product?.category === "Outerwear";
+        return isPodProduct(product);
       });
       purchaseItems = lineItems.data.map((item, index) => {
         const metadataItem = metadataItems[index];

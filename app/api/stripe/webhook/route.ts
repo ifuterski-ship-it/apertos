@@ -5,7 +5,7 @@ import { renderOrderConfirmationEmail, renderPodFulfillmentEmail } from "@/lib/e
 import { ordersFromEmail, podFulfillmentEmail, trustpilotBccEmail } from "@/lib/email-config";
 import { decrementInventoryForOrder } from "@/lib/inventory";
 import { buildOrderItemsPayload, getOrderForAdmin, recordOrder } from "@/lib/orders";
-import { products } from "@/lib/products";
+import { products, isPodProduct } from "@/lib/products";
 import { createReviewToken } from "@/lib/reviews";
 import { getStripe } from "@/lib/stripe";
 import { absoluteUrl } from "@/lib/site";
@@ -127,7 +127,7 @@ async function handleCheckoutSession(
 
   const podItems = items.filter((item) => {
     const product = products.find((p) => p.id === item.productId);
-    return product?.category === "Outerwear";
+    return isPodProduct(product);
   });
 
   if (podItems.length > 0) {

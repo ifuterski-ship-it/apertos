@@ -4,7 +4,7 @@ import Image from "next/image";
 import { Star } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Product, SizeGuideBlock } from "@/lib/products";
+import { Product, SizeGuideBlock, isPodProduct } from "@/lib/products";
 import { ProductInventoryBySize } from "@/lib/inventory";
 import { trackEvent } from "@/lib/analytics";
 import { useCart } from "@/components/cart/cart-provider";
@@ -291,7 +291,7 @@ export function ProductDetail({
               ) : null}
 
               {/* POD info */}
-              {product.category === "Outerwear" && (
+              {isPodProduct(product) && (
                 <div className="rounded-[1.25rem] border border-amber-500/20 bg-amber-500/[0.06] px-5 py-4">
                   <p className="text-[11px] uppercase leading-6 tracking-[0.25em] text-amber-200">
                     Made to order — printed and shipped by our production partner. Please allow 7–14 business days for production.
@@ -450,7 +450,7 @@ export function ProductDetail({
                   <span className="text-neutral-500 transition-transform duration-200 group-open:rotate-45">+</span>
                 </summary>
                 <div className="space-y-2 px-5 pb-4">
-                  {product.category === "Outerwear" ? (
+                  {isPodProduct(product) ? (
                     <>
                       <p className="text-[11px] uppercase leading-6 tracking-[0.3em] text-neutral-500">
                         Made to order — produced &amp; shipped by our print partner. Allow 7–14 business days for production before dispatch.

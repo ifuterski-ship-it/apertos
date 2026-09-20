@@ -1,6 +1,6 @@
 import type { OrderItem, OrderShippingAddress, OrderShippingLabel } from "@/lib/orders";
 import { siteName, siteUrl } from "@/lib/site";
-import { getProductById } from "@/lib/products";
+import { getProductById, isPodProduct } from "@/lib/products";
 
 function renderSiteButton(label = "Visit The Store") {
   return `
@@ -101,7 +101,7 @@ export function renderOrderConfirmationEmail({
 
   const hasPodItems = items.some((item) => {
     const product = getProductById(item.productId);
-    return product?.category === "Outerwear";
+    return isPodProduct(product);
   });
   const podNote = hasPodItems
     ? `

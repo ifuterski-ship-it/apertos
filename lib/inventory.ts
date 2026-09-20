@@ -9,7 +9,14 @@ type InventoryRow = {
   stock: number | null;
 };
 
-type BaseInventoryProductId = "rashguard" | "shorts" | "sakura-rashguard" | "sakura-shorts";
+type BaseInventoryProductId =
+  | "rashguard"
+  | "shorts"
+  | "sakura-rashguard"
+  | "sakura-shorts"
+  | "hoodie-adult"
+  | "hoodie-kids"
+  | "hoodie-womens";
 
 type InventoryProductState = {
   totalStock: number;
@@ -32,7 +39,10 @@ const fallbackProductStock: Record<BaseInventoryProductId, number> = {
   rashguard: 9,
   shorts: 9,
   "sakura-rashguard": 0,
-  "sakura-shorts": 0
+  "sakura-shorts": 0,
+  "hoodie-adult": 4,
+  "hoodie-kids": 1,
+  "hoodie-womens": 5
 };
 
 function getBaseInventoryProductsForProduct(productId: string): BaseInventoryProductId[] {
@@ -58,6 +68,18 @@ function getBaseInventoryProductsForProduct(productId: string): BaseInventoryPro
 
   if (productId === "apertos-sakura-dragon-no-gi-set") {
     return ["sakura-rashguard", "sakura-shorts"];
+  }
+
+  if (productId === "apertos-essential-hoodie") {
+    return ["hoodie-adult"];
+  }
+
+  if (productId === "apertos-kids-hoodie") {
+    return ["hoodie-kids"];
+  }
+
+  if (productId === "apertos-sakura-dragon-womens-hoodie") {
+    return ["hoodie-womens"];
   }
 
   return [];
@@ -128,7 +150,10 @@ function createInventoryState(rows: InventoryRow[]): InventoryState {
     rashguard: { totalStock: fallbackProductStock.rashguard, hasBaseRow: false, stockBySize: {}, hasSizeRows: false },
     shorts: { totalStock: fallbackProductStock.shorts, hasBaseRow: false, stockBySize: {}, hasSizeRows: false },
     "sakura-rashguard": { totalStock: fallbackProductStock["sakura-rashguard"], hasBaseRow: false, stockBySize: {}, hasSizeRows: false },
-    "sakura-shorts": { totalStock: fallbackProductStock["sakura-shorts"], hasBaseRow: false, stockBySize: {}, hasSizeRows: false }
+    "sakura-shorts": { totalStock: fallbackProductStock["sakura-shorts"], hasBaseRow: false, stockBySize: {}, hasSizeRows: false },
+    "hoodie-adult": { totalStock: fallbackProductStock["hoodie-adult"], hasBaseRow: false, stockBySize: {}, hasSizeRows: false },
+    "hoodie-kids": { totalStock: fallbackProductStock["hoodie-kids"], hasBaseRow: false, stockBySize: {}, hasSizeRows: false },
+    "hoodie-womens": { totalStock: fallbackProductStock["hoodie-womens"], hasBaseRow: false, stockBySize: {}, hasSizeRows: false }
   };
 
   const groupedRows = new Map<BaseInventoryProductId, InventoryRow[]>();

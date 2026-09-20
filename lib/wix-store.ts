@@ -1,5 +1,5 @@
 import type { OrderRecord } from "@/lib/orders";
-import { getProductById } from "@/lib/products";
+import { getProductById, isPodProduct } from "@/lib/products";
 
 const WIX_ORDERS_URL = "https://www.wixapis.com/ecom/v1/orders";
 const WIX_STORES_APP_ID = "1380bb76-6100-5030-9176-3012e30ae49f";
@@ -164,7 +164,7 @@ export async function createWixStoreOrder(
 
   const podItems = payload.items.filter((item) => {
     const product = getProductById(item.productId);
-    return product?.category === "Outerwear";
+    return isPodProduct(product);
   });
 
   if (podItems.length === 0) {

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { isAdminEmail } from "@/lib/admin-auth";
 import { parseOrderItemsPayload } from "@/lib/orders";
-import { products } from "@/lib/products";
+import { products, isPodProduct } from "@/lib/products";
 import { getStripe } from "@/lib/stripe";
 import { createAdminClient, hasSupabaseAdminEnv } from "@/lib/supabase/admin";
 import { hasSupabaseEnv } from "@/lib/supabase/config";
@@ -138,7 +138,7 @@ async function supabaseStatus() {
         payload.items.length > 0 &&
         payload.items.every((item) => {
           const product = products.find((p) => p.id === item.productId);
-          return product?.category === "Outerwear";
+          return isPodProduct(product);
         });
       return !isPodOnly;
     }).length;

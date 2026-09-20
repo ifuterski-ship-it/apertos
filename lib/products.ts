@@ -31,6 +31,7 @@ export type Product = {
   isBestSeller?: boolean;
   isComingSoon?: boolean;
   launchAt?: string;
+  fulfillment?: "pod" | "physical";
 };
 
 export const products: Product[] = [
@@ -373,4 +374,8 @@ export function getApparelProducts() {
 
 export function getProductById(id: string) {
   return products.find((product) => product.id === id);
+}
+
+export function isPodProduct(product: Product | null | undefined) {
+  return product?.fulfillment === "pod";
 }
