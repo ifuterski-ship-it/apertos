@@ -44,7 +44,7 @@ function SizeGuideTable({
       </div>
       <div className="overflow-hidden rounded-[1.25rem] border border-white/10">
         <div
-          className={`grid grid-cols-4 bg-white/[0.04] px-4 py-3 text-[11px] uppercase tracking-[0.3em] text-neutral-400 ${
+          className={`grid grid-cols-4 bg-white/[0.04] px-4 py-2 text-[10px] uppercase tracking-[0.25em] text-neutral-500 ${
             guide.rows.some((row) => row.shoulder || row.sleeve) ? "grid-cols-5" : ""
           }`}
         >
@@ -77,7 +77,7 @@ function SizeGuideTable({
               type="button"
               onClick={() => !isOutOfStock && onSelectSize(row.size)}
               disabled={isOutOfStock}
-              className={`grid w-full ${gridClass} border-t border-white/10 px-4 py-3 text-left text-sm uppercase tracking-[0.18em] transition ${
+              className={`grid w-full ${gridClass} border-t border-white/10 px-4 py-2 text-left text-[10px] uppercase tracking-[0.15em] transition ${
                 isSelected
                   ? "bg-white text-black"
                   : isOutOfStock
@@ -106,7 +106,7 @@ function SizeGuideTable({
           ) : (
             <div
               key={row.size}
-              className={`grid w-full ${gridClass} border-t border-white/10 px-4 py-3 text-sm uppercase tracking-[0.18em] text-neutral-200`}
+              className={`grid w-full ${gridClass} border-t border-white/10 px-4 py-2 text-[10px] uppercase tracking-[0.15em] text-neutral-300`}
             >
               <span>{row.size}</span>
               {row.height ? (
