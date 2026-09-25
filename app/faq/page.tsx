@@ -41,7 +41,7 @@ const faqSections = [
       {
         question: "Is the Essential Hoodie suitable for mat warm-ups?",
         answer:
-          "Yes. The Apertos Essential Hoodie is an 80% Cotton, 20% Polyester heavyweight fleece built for warm-ups, post-session wear, and everyday use. It is not a mat training garment."
+          "Yes. The Apertos Essential Hoodie is a 42% Cotton, 53% Polyester, 5% other fabrics heavyweight fleece built for warm-ups, post-session wear, and everyday use. It is not a mat training garment."
       }
     ]
   },
