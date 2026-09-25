@@ -43,10 +43,21 @@ function SizeGuideTable({
         <p className="text-xs uppercase leading-6 tracking-[0.2em] text-neutral-400">{guide.note}</p>
       </div>
       <div className="overflow-hidden rounded-[1.25rem] border border-white/10">
-        <div className="grid grid-cols-4 bg-white/[0.04] px-4 py-3 text-[11px] uppercase tracking-[0.3em] text-neutral-400">
+        <div
+          className={`grid grid-cols-4 bg-white/[0.04] px-4 py-3 text-[11px] uppercase tracking-[0.3em] text-neutral-400 ${
+            guide.rows.some((row) => row.shoulder || row.sleeve) ? "grid-cols-5" : ""
+          }`}
+        >
           <span>Size</span>
           {guide.rows.some((row) => row.height) ? (
             <span className="col-span-3">Height</span>
+          ) : guide.rows.some((row) => row.shoulder || row.sleeve) ? (
+            <>
+              <span>Chest</span>
+              <span>Shoulder</span>
+              <span>Length</span>
+              <span>Sleeve</span>
+            </>
           ) : (
             <>
               <span>Chest</span>
@@ -58,13 +69,15 @@ function SizeGuideTable({
         {guide.rows.map((row) => {
           const isSelected = row.size === selectedSize;
           const isOutOfStock = Boolean(inventoryBySize?.[row.size]?.isOutOfStock);
+          const showShoulderSleeve = Boolean(row.shoulder || row.sleeve);
+          const gridClass = showShoulderSleeve ? "grid-cols-5" : "grid-cols-4";
           return onSelectSize ? (
             <button
               key={row.size}
               type="button"
               onClick={() => !isOutOfStock && onSelectSize(row.size)}
               disabled={isOutOfStock}
-              className={`grid w-full grid-cols-4 border-t border-white/10 px-4 py-3 text-left text-sm uppercase tracking-[0.18em] transition ${
+              className={`grid w-full ${gridClass} border-t border-white/10 px-4 py-3 text-left text-sm uppercase tracking-[0.18em] transition ${
                 isSelected
                   ? "bg-white text-black"
                   : isOutOfStock
@@ -75,6 +88,13 @@ function SizeGuideTable({
               <span>{row.size}</span>
               {row.height ? (
                 <span className="col-span-3">{row.height}</span>
+              ) : showShoulderSleeve ? (
+                <>
+                  <span>{row.chest ?? "—"}</span>
+                  <span>{row.shoulder ?? "—"}</span>
+                  <span>{row.length ?? "—"}</span>
+                  <span>{row.sleeve ?? "—"}</span>
+                </>
               ) : (
                 <>
                   <span>{row.chest ?? "—"}</span>
@@ -86,11 +106,18 @@ function SizeGuideTable({
           ) : (
             <div
               key={row.size}
-              className="grid grid-cols-4 border-t border-white/10 px-4 py-3 text-sm uppercase tracking-[0.18em] text-neutral-200"
+              className={`grid w-full ${gridClass} border-t border-white/10 px-4 py-3 text-sm uppercase tracking-[0.18em] text-neutral-200`}
             >
               <span>{row.size}</span>
               {row.height ? (
                 <span className="col-span-3">{row.height}</span>
+              ) : showShoulderSleeve ? (
+                <>
+                  <span>{row.chest ?? "—"}</span>
+                  <span>{row.shoulder ?? "—"}</span>
+                  <span>{row.length ?? "—"}</span>
+                  <span>{row.sleeve ?? "—"}</span>
+                </>
               ) : (
                 <>
                   <span>{row.chest ?? "—"}</span>

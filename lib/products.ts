@@ -4,6 +4,8 @@ export type SizeGuideRow = {
   waist?: string;
   length?: string;
   height?: string;
+  shoulder?: string;
+  sleeve?: string;
 };
 
 export type SizeGuideBlock = {
@@ -224,13 +226,11 @@ export const products: Product[] = [
     sizeGuides: [
       {
         title: "Womens Hoodie Size Guide",
-        note: "Women's fit. Size down for a more fitted look.",
+        note: "Women's fit — S measurements are actual garment measurements.",
         rows: [
-          { size: "XS", chest: "30-32 in", length: "24 in" },
-          { size: "S", chest: "32-34 in", length: "25 in" },
-          { size: "M", chest: "34-36 in", length: "26 in" },
-          { size: "L", chest: "36-38 in", length: "27 in" },
-          { size: "XL", chest: "38-40 in", length: "28 in" }
+          { size: "S", chest: "66 cm", shoulder: "65 cm", length: "70 cm", sleeve: "53.5 cm" },
+          { size: "M", chest: "—", shoulder: "—", length: "—", sleeve: "—" },
+          { size: "L", chest: "—", shoulder: "—", length: "—", sleeve: "—" }
         ]
       }
     ]
