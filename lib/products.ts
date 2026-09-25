@@ -166,13 +166,13 @@ export const products: Product[] = [
     sizeGuides: [
       {
         title: "Hoodie Size Guide",
-        note: "Relaxed fit. Size down for a more fitted look.",
+        note: "Garment measurements, same for men's and women's fits.",
         rows: [
-          { size: "S", chest: "38-40 in", length: "26 in" },
-          { size: "M", chest: "40-42 in", length: "27 in" },
-          { size: "L", chest: "42-44 in", length: "28 in" },
-          { size: "XL", chest: "44-46 in", length: "29 in" },
-          { size: "2XL", chest: "46-48 in", length: "30 in" }
+          { size: "S", chest: "66 cm", shoulder: "65 cm", length: "70 cm", sleeve: "53.5 cm" },
+          { size: "M", chest: "68 cm", shoulder: "67 cm", length: "72 cm", sleeve: "54.5 cm" },
+          { size: "L", chest: "70 cm", shoulder: "69 cm", length: "74 cm", sleeve: "55.5 cm" },
+          { size: "XL", chest: "72 cm", shoulder: "71 cm", length: "76 cm", sleeve: "56.5 cm" },
+          { size: "2XL", chest: "74 cm", shoulder: "73 cm", length: "78 cm", sleeve: "57.5 cm" }
         ]
       }
     ]
@@ -226,11 +226,11 @@ export const products: Product[] = [
     sizeGuides: [
       {
         title: "Womens Hoodie Size Guide",
-        note: "Women's fit — S measurements are actual garment measurements.",
+        note: "Garment measurements, same as the men's hoodie.",
         rows: [
           { size: "S", chest: "66 cm", shoulder: "65 cm", length: "70 cm", sleeve: "53.5 cm" },
-          { size: "M", chest: "—", shoulder: "—", length: "—", sleeve: "—" },
-          { size: "L", chest: "—", shoulder: "—", length: "—", sleeve: "—" }
+          { size: "M", chest: "68 cm", shoulder: "67 cm", length: "72 cm", sleeve: "54.5 cm" },
+          { size: "L", chest: "70 cm", shoulder: "69 cm", length: "74 cm", sleeve: "55.5 cm" }
         ]
       }
     ]
