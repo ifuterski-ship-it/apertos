@@ -185,7 +185,7 @@ export function ProductCard({ product }: { product: Product }) {
             {comingSoon ? "Coming Soon" : "Add To Cart"}
           </Link>
           <Link
-            href={`/product/${product.id}`}
+            href={`/product/${product.id}#size-guide`}
             className="flex items-center justify-center bg-crimson py-3 text-[11px] font-semibold uppercase tracking-[0.25em] text-white transition hover:bg-crimson/85"
           >
             Size Guide

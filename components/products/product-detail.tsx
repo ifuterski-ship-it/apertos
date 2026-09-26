@@ -36,33 +36,35 @@ function SizeGuideTable({
   inventoryBySize?: ProductInventoryBySize;
   onSelectSize?: (size: string) => void;
 }) {
+  const hasHeight = guide.rows.some((row) => row.height);
+  const hasShoulderSleeve = guide.rows.some((row) => row.shoulder || row.sleeve);
+  const colsClass = hasShoulderSleeve ? "grid-cols-5" : "grid-cols-4";
+
   return (
     <div className="space-y-3">
       <div className="space-y-1">
         <p className="text-xs uppercase tracking-[0.45em] text-muted">{guide.title}</p>
         <p className="text-xs uppercase leading-6 tracking-[0.2em] text-neutral-400">{guide.note}</p>
       </div>
-      <div className="overflow-hidden rounded-[1.25rem] border border-white/10">
+      <div className="overflow-x-auto rounded-[1.25rem] border border-white/10">
         <div
-          className={`grid grid-cols-4 bg-white/[0.04] px-4 py-2 text-[10px] uppercase tracking-[0.25em] text-neutral-500 ${
-            guide.rows.some((row) => row.shoulder || row.sleeve) ? "grid-cols-5" : ""
-          }`}
+          className={`grid min-w-[440px] ${colsClass} bg-white/[0.04] px-4 py-2 text-[10px] uppercase tracking-[0.2em] text-neutral-500`}
         >
-          <span>Size</span>
-          {guide.rows.some((row) => row.height) ? (
-            <span className="col-span-3">Height</span>
-          ) : guide.rows.some((row) => row.shoulder || row.sleeve) ? (
+          <span className="whitespace-nowrap">Size</span>
+          {hasHeight ? (
+            <span className="col-span-3 whitespace-nowrap">Height</span>
+          ) : hasShoulderSleeve ? (
             <>
-              <span>Chest</span>
-              <span>Shoulder</span>
-              <span>Length</span>
-              <span>Sleeve</span>
+              <span className="whitespace-nowrap">Chest</span>
+              <span className="whitespace-nowrap">Shoulder</span>
+              <span className="whitespace-nowrap">Length</span>
+              <span className="whitespace-nowrap">Sleeve</span>
             </>
           ) : (
             <>
-              <span>Chest</span>
-              <span>Waist</span>
-              <span>Length</span>
+              <span className="whitespace-nowrap">Chest</span>
+              <span className="whitespace-nowrap">Waist</span>
+              <span className="whitespace-nowrap">Length</span>
             </>
           )}
         </div>
@@ -70,14 +72,14 @@ function SizeGuideTable({
           const isSelected = row.size === selectedSize;
           const isOutOfStock = Boolean(inventoryBySize?.[row.size]?.isOutOfStock);
           const showShoulderSleeve = Boolean(row.shoulder || row.sleeve);
-          const gridClass = showShoulderSleeve ? "grid-cols-5" : "grid-cols-4";
+          const rowClass = showShoulderSleeve || hasShoulderSleeve ? "grid-cols-5" : "grid-cols-4";
           return onSelectSize ? (
             <button
               key={row.size}
               type="button"
               onClick={() => !isOutOfStock && onSelectSize(row.size)}
               disabled={isOutOfStock}
-              className={`grid w-full ${gridClass} border-t border-white/10 px-4 py-2 text-left text-[10px] uppercase tracking-[0.15em] transition ${
+              className={`grid min-w-[440px] w-full ${rowClass} border-t border-white/10 px-4 py-2 text-left text-[10px] uppercase tracking-[0.15em] transition ${
                 isSelected
                   ? "bg-white text-black"
                   : isOutOfStock
@@ -85,44 +87,44 @@ function SizeGuideTable({
                     : "text-neutral-200 hover:bg-white/[0.05]"
               }`}
             >
-              <span>{row.size}</span>
+              <span className="whitespace-nowrap">{row.size}</span>
               {row.height ? (
-                <span className="col-span-3">{row.height}</span>
-              ) : showShoulderSleeve ? (
+                <span className="col-span-3 whitespace-nowrap">{row.height}</span>
+              ) : showShoulderSleeve || hasShoulderSleeve ? (
                 <>
-                  <span>{row.chest ?? "—"}</span>
-                  <span>{row.shoulder ?? "—"}</span>
-                  <span>{row.length ?? "—"}</span>
-                  <span>{row.sleeve ?? "—"}</span>
+                  <span className="whitespace-nowrap">{row.chest ?? "—"}</span>
+                  <span className="whitespace-nowrap">{row.shoulder ?? "—"}</span>
+                  <span className="whitespace-nowrap">{row.length ?? "—"}</span>
+                  <span className="whitespace-nowrap">{row.sleeve ?? "—"}</span>
                 </>
               ) : (
                 <>
-                  <span>{row.chest ?? "—"}</span>
-                  <span>{row.waist ?? "—"}</span>
-                  <span>{row.length ?? "—"}</span>
+                  <span className="whitespace-nowrap">{row.chest ?? "—"}</span>
+                  <span className="whitespace-nowrap">{row.waist ?? "—"}</span>
+                  <span className="whitespace-nowrap">{row.length ?? "—"}</span>
                 </>
               )}
             </button>
           ) : (
             <div
               key={row.size}
-              className={`grid w-full ${gridClass} border-t border-white/10 px-4 py-2 text-[10px] uppercase tracking-[0.15em] text-neutral-300`}
+              className={`grid min-w-[440px] w-full ${rowClass} border-t border-white/10 px-4 py-2 text-[10px] uppercase tracking-[0.15em] text-neutral-300`}
             >
-              <span>{row.size}</span>
+              <span className="whitespace-nowrap">{row.size}</span>
               {row.height ? (
-                <span className="col-span-3">{row.height}</span>
-              ) : showShoulderSleeve ? (
+                <span className="col-span-3 whitespace-nowrap">{row.height}</span>
+              ) : showShoulderSleeve || hasShoulderSleeve ? (
                 <>
-                  <span>{row.chest ?? "—"}</span>
-                  <span>{row.shoulder ?? "—"}</span>
-                  <span>{row.length ?? "—"}</span>
-                  <span>{row.sleeve ?? "—"}</span>
+                  <span className="whitespace-nowrap">{row.chest ?? "—"}</span>
+                  <span className="whitespace-nowrap">{row.shoulder ?? "—"}</span>
+                  <span className="whitespace-nowrap">{row.length ?? "—"}</span>
+                  <span className="whitespace-nowrap">{row.sleeve ?? "—"}</span>
                 </>
               ) : (
                 <>
-                  <span>{row.chest ?? "—"}</span>
-                  <span>{row.waist ?? "—"}</span>
-                  <span>{row.length ?? "—"}</span>
+                  <span className="whitespace-nowrap">{row.chest ?? "—"}</span>
+                  <span className="whitespace-nowrap">{row.waist ?? "—"}</span>
+                  <span className="whitespace-nowrap">{row.length ?? "—"}</span>
                 </>
               )}
             </div>
@@ -154,6 +156,7 @@ export function ProductDetail({
   const { addItem } = useCart();
   const router = useRouter();
   const hasTrackedProductView = useRef(false);
+  const sizeGuideRef = useRef<HTMLDetailsElement>(null);
   const comingSoon = isProductComingSoon(product);
   const selectedInventory = inventoryBySize[selectedSize] ?? {
     stock: null,
@@ -192,6 +195,17 @@ export function ProductDetail({
     });
     hasTrackedProductView.current = true;
   }, [product.category, product.id, product.name, product.price]);
+
+  useEffect(() => {
+    if (window.location.hash !== "#size-guide") return;
+    const details = sizeGuideRef.current;
+    if (!details) return;
+    details.open = true;
+    const timer = window.setTimeout(() => {
+      details.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 50);
+    return () => window.clearTimeout(timer);
+  }, []);
 
   const handleAddToCart = () => {
     if (isOutOfStock) return;
@@ -460,7 +474,11 @@ export function ProductDetail({
                 </div>
               </details>
             ) : null}
-            <details className="group rounded-[1.5rem] border border-white/10 bg-white/[0.02]">
+            <details
+              ref={sizeGuideRef}
+              id="size-guide"
+              className="group scroll-mt-24 rounded-[1.5rem] border border-white/10 bg-white/[0.02]"
+            >
               <summary className="flex cursor-pointer list-none items-center justify-between px-5 py-4">
                 <span className="text-[11px] uppercase tracking-[0.35em] text-neutral-400">Size Guide</span>
                 <span className="text-neutral-500 transition-transform duration-200 group-open:rotate-45">+</span>
