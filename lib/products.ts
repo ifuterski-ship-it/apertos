@@ -151,8 +151,7 @@ export const products: Product[] = [
     images: [
       "/products/hoodie-grey-front.jpeg",
       "/products/hoodie-grey-hover.jpeg",
-      "/products/hoodie-grey-hover-2.jpeg",
-      "/products/hoodie-grey-back.png.jpeg"
+      "/products/hoodie-grey-hover-2.jpeg"
     ],
     sizes: ["S", "M", "L", "XL", "2XL"],
     colours: ["Grey"],
