@@ -132,6 +132,88 @@ export async function markCartCompleted(
   }
 }
 
+export type AbandonedCartRow = {
+  id: string;
+  email: string;
+  items: OrderItem[];
+};
+
+/**
+ * Finds carts created by a customer (email captured) that are still 'open'
+ * past the delay and have not already been emailed, so the recovery sweep can
+ * nudge the customer back. Requires the recovery_email_sent_at column from
+ * supabase/setup-cart-recovery.sql.
+ */
+export async function findAbandonedCarts({
+  olderThanMinutes = 60,
+  limit = 40,
+}: {
+  olderThanMinutes?: number;
+  limit?: number;
+} = {}): Promise<AbandonedCartRow[]> {
+  const supabase = requireAdminClient();
+  const cutoff = new Date(Date.now() - olderThanMinutes * 60 * 1000).toISOString();
+
+  const { data, error } = await supabase
+    .from("checkout_carts")
+    .select("id, cart, email")
+    .eq("status", "open")
+    .not("email", "is", null)
+    .is("recovery_email_sent_at", null)
+    .lt("created_at", cutoff)
+    .order("created_at", { ascending: true })
+    .limit(limit);
+
+  if (error) {
+    throw new Error(`Could not query abandoned carts: ${error.message}`);
+  }
+
+  return (data ?? []).flatMap((row) => {
+    const stored = row.cart as StoredCart | null;
+    const email = (row.email as string | null)?.trim() ?? "";
+    if (!stored?.items?.length || !email) return [];
+    return [{ id: row.id as string, email, items: stored.items }];
+  });
+}
+
+/** Stamps a cart so the recovery sweep does not email it again. */
+export async function markRecoveryEmailSent(
+  cartRef: string,
+): Promise<void> {
+  try {
+    await requireAdminClient()
+      .from("checkout_carts")
+      .update({ recovery_email_sent_at: new Date().toISOString() })
+      .eq("id", cartRef);
+  } catch (error) {
+    console.error("Could not mark cart recovery email sent", error);
+  }
+}
+
+/**
+ * Returns the basket for cart restoration from the recovery email link.
+ * Exposes items only — never the stored shipping address. Completed carts
+ * (already paid) must not be restored.
+ */
+export async function getCartItemsForRestore(
+  cartRef: string,
+): Promise<OrderItem[] | null> {
+  try {
+    const { data, error } = await requireAdminClient()
+      .from("checkout_carts")
+      .select("cart, status")
+      .eq("id", cartRef)
+      .maybeSingle();
+
+    if (error || !data || data.status === "completed") return null;
+    const stored = data.cart as StoredCart | null;
+    return stored?.items?.length ? stored.items : null;
+  } catch (error) {
+    console.error("Could not load cart for restore", error);
+    return null;
+  }
+}
+
 export type ResolvedCart = {
   items: OrderItem[];
   shippingAddress: OrderShippingAddress | null;

@@ -1,7 +1,7 @@
 "use client";
 
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { Product } from "@/lib/products";
+import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { getProductById, Product } from "@/lib/products";
 
 export type CartItem = {
   id: string;
@@ -23,6 +23,15 @@ type CartContextValue = {
   subtotal: number;
   totalItems: number;
   isHydrated: boolean;
+};
+
+type RestoreOrderItem = {
+  productId: string;
+  name: string;
+  price: number;
+  quantity: number;
+  size: string;
+  colour?: string;
 };
 
 const STORAGE_KEY = "apertos-cart";
@@ -52,6 +61,41 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
     }
   }, [isHydrated, items]);
+
+  // Restore a basket from an abandoned-cart recovery email (?restore=<cartId>).
+  const restoredRef = useRef(false);
+
+  useEffect(() => {
+    if (restoredRef.current || !isHydrated) return;
+    const restoreId = new URLSearchParams(window.location.search).get("restore");
+    if (!restoreId) return;
+    restoredRef.current = true;
+
+    (async () => {
+      try {
+        const res = await fetch(`/api/cart-recovery/${encodeURIComponent(restoreId)}`);
+        if (!res.ok) return;
+        const data = (await res.json()) as { ok?: boolean; items?: RestoreOrderItem[] };
+        if (!data.ok || !data.items?.length) return;
+
+        const restoredItems: CartItem[] = data.items.map((item) => ({
+          id: `${item.productId}-${item.size}${item.colour ? `-${item.colour}` : ""}`,
+          productId: item.productId as CartItem["productId"],
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity,
+          image: getProductById(item.productId)?.image ?? "",
+          size: item.size,
+          ...(item.colour ? { colour: item.colour } : {})
+        }));
+
+        setItems(restoredItems);
+        window.history.replaceState(null, "", window.location.pathname);
+      } catch {
+        // Leave the visitor's cart as-is.
+      }
+    })();
+  }, [isHydrated]);
 
   const value = useMemo<CartContextValue>(() => {
     const addItem = (product: Product, size: string, colour?: string) => {

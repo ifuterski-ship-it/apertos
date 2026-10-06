@@ -138,6 +138,56 @@ export function renderOrderConfirmationEmail({
   });
 }
 
+export function renderAbandonedCartEmail({
+  cartId,
+  items,
+  totalPrice
+}: {
+  cartId: string;
+  items: OrderItem[];
+  totalPrice: number;
+}) {
+  const itemRows = items
+    .map(
+      (item) => `
+        <tr>
+          <td style="padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.08)">${item.name}</td>
+          <td style="padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.08);text-align:center">${item.size}${item.colour ? ` / ${item.colour}` : ""}</td>
+          <td style="padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.08);text-align:center">${item.quantity}</td>
+          <td style="padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.08);text-align:right">£${(item.price * item.quantity).toFixed(2)}</td>
+        </tr>
+      `
+    )
+    .join("");
+
+  const restoreUrl = `${siteUrl}/cart?restore=${encodeURIComponent(cartId)}`;
+
+  return renderEmailShell({
+    eyebrow: siteName,
+    title: "You Left Something Behind",
+    body: `
+      <p style="margin:0 0 18px">Your APERTOS basket is still waiting for you.</p>
+      <table style="width:100%;border-collapse:collapse;margin:24px 0 16px">
+        <thead>
+          <tr style="color:#8f8f8f;font-size:11px;letter-spacing:0.28em">
+            <th style="padding:0 0 10px;text-align:left">Product</th>
+            <th style="padding:0 0 10px;text-align:center">Size</th>
+            <th style="padding:0 0 10px;text-align:center">Qty</th>
+            <th style="padding:0 0 10px;text-align:right">Total</th>
+          </tr>
+        </thead>
+        <tbody>${itemRows}</tbody>
+      </table>
+      <p style="margin:0 0 24px">Basket total £${totalPrice.toFixed(2)}</p>
+      <a href="${restoreUrl}"
+        style="display:inline-block;background:#ffffff;color:#000000;padding:14px 28px;text-decoration:none;text-transform:uppercase;letter-spacing:0.3em;font-size:12px;font-weight:600;border-radius:2px">
+        Return To Your Basket
+      </a>
+      <p style="margin:18px 0 0;color:#a3a3a3;font-size:12px">Stock moves fast on drops — your sizes are held in this basket only while it stays open.</p>
+    `
+  });
+}
+
 function getTrackingUrl(trackingNumber: string, serviceLevel: string | null): string | null {
   const service = (serviceLevel ?? "").toLowerCase();
   if (service.startsWith("royal_mail")) {
