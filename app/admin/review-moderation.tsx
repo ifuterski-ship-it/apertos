@@ -54,37 +54,68 @@ function MediaGrid({ urls }: { urls: string[] }) {
 export function ReviewModeration({ initialReviews }: { initialReviews: PendingReview[] }) {
   const [reviews, setReviews] = useState<PendingReview[]>(initialReviews);
   const [processing, setProcessing] = useState<Record<string, boolean>>({});
+  const [error, setError] = useState<string | null>(null);
 
-  const handleApprove = async (id: string) => {
+  // The row is only removed once the server confirms the write. Previously this
+  // filtered unconditionally, so a failed update looked identical to a success
+  // and the review vanished from the queue without ever being approved.
+  const moderate = async (
+    id: string,
+    action: "approve" | "reject"
+  ) => {
     setProcessing((prev) => ({ ...prev, [id]: true }));
+    setError(null);
     try {
-      await fetch(`/api/admin/reviews/${id}`, { method: "PATCH" });
+      const res = await fetch(`/api/admin/reviews/${id}`, {
+        method: action === "approve" ? "PATCH" : "DELETE"
+      });
+      const body = (await res.json().catch(() => null)) as {
+        ok?: boolean;
+        message?: string;
+      } | null;
+
+      if (!res.ok || !body?.ok) {
+        setError(
+          body?.message
+            ? `Could not ${action} review: ${body.message}`
+            : `Could not ${action} review (HTTP ${res.status}). It is still pending.`
+        );
+        return;
+      }
+
       setReviews((prev) => prev.filter((r) => r.id !== id));
+    } catch {
+      setError(`Network error — could not ${action} review. It is still pending.`);
     } finally {
       setProcessing((prev) => ({ ...prev, [id]: false }));
     }
   };
 
-  const handleReject = async (id: string) => {
-    setProcessing((prev) => ({ ...prev, [id]: true }));
-    try {
-      await fetch(`/api/admin/reviews/${id}`, { method: "DELETE" });
-      setReviews((prev) => prev.filter((r) => r.id !== id));
-    } finally {
-      setProcessing((prev) => ({ ...prev, [id]: false }));
-    }
-  };
+  const handleApprove = (id: string) => moderate(id, "approve");
+  const handleReject = (id: string) => moderate(id, "reject");
 
   if (reviews.length === 0) {
     return (
-      <p className="text-xs uppercase tracking-[0.25em] text-neutral-500">
-        No reviews pending approval.
-      </p>
+      <div className="space-y-3">
+        {error ? (
+          <p className="border border-red-500/30 bg-red-500/10 px-4 py-3 text-xs uppercase tracking-[0.2em] text-red-400">
+            {error}
+          </p>
+        ) : null}
+        <p className="text-xs uppercase tracking-[0.25em] text-neutral-500">
+          No reviews pending approval.
+        </p>
+      </div>
     );
   }
 
   return (
     <div className="space-y-4">
+      {error ? (
+        <p className="border border-red-500/30 bg-red-500/10 px-4 py-3 text-xs uppercase tracking-[0.2em] text-red-400">
+          {error}
+        </p>
+      ) : null}
       {reviews.map((review) => (
         <div
           key={review.id}

@@ -290,7 +290,7 @@ export const products: Product[] = [
       "/products/sakura-dragon-rashguard-front.jpeg",
       "/products/sakura-dragon-rashguard-back.jpeg"
     ],
-    sizes: ["XS", "S", "M", "L", "XL"],
+    sizes: ["XXS", "XS", "S", "M", "L", "XL"],
     category: "Performance Top",
     shortDescription: "Sakura Dragon compression rashguard",
     shippingWeightLb: 0.45,
@@ -305,6 +305,7 @@ export const products: Product[] = [
         title: "Rashguard Size Guide",
         note: "Measured for a compression fit. Size up for a more relaxed feel.",
         rows: [
+          { size: "XXS", chest: "30-32 in", length: "23 in" },
           { size: "XS", chest: "32-34 in", length: "24 in" },
           { size: "S", chest: "34-36 in", length: "25 in" },
           { size: "M", chest: "36-38 in", length: "26 in" },

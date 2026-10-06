@@ -11,6 +11,10 @@ const config: Config = {
       colors: {
         canvas: "#000000",
         panel: "#111111",
+        // Warm charcoal. Slightly lifted off pure black with a warm cast so
+        // review surfaces read as a distinct layer rather than blending into
+        // the page. Used for review cards only.
+        charcoal: "#141210",
         ink: "#F5F5F5",
         muted: "#A3A3A3",
         line: "#2A2A2A",

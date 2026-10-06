@@ -46,6 +46,8 @@ const fallbackProductStock: Record<BaseInventoryProductId, number> = {
 };
 
 const fallbackStockBySize: Partial<Record<BaseInventoryProductId, Record<string, number>>> = {
+  "sakura-rashguard": { XXS: 4, XS: 6, S: 10, M: 0, L: 1, XL: 2 },
+  "sakura-shorts": { XS: 0 },
   "hoodie-adult": { S: 3, M: 0, L: 0, XL: 0, "2XL": 0 },
   "hoodie-kids": { "150": 1 },
   "hoodie-womens": { S: 5, M: 0, L: 0 }

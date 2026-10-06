@@ -86,10 +86,15 @@ export default async function ProductPage({
   let reviewSummary: { average: number; count: number } | null = null;
   if (hasSupabaseAdminEnv) {
     const supabase = createAdminClient();
+    // Must filter on approved. Without it the count includes reviews still
+    // sitting in the moderation queue, and schema.org aggregateRating then
+    // publishes that number to Google — surfacing unmoderated ratings in search
+    // results and contradicting the list rendered below.
     const { data: reviewRows } = await supabase
       .from("reviews")
       .select("rating")
-      .eq("product_id", id);
+      .eq("product_id", id)
+      .eq("approved", true);
     if (reviewRows && reviewRows.length > 0) {
       reviewSummary = {
         count: reviewRows.length,

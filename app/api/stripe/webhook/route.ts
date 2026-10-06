@@ -10,6 +10,7 @@ import { createReviewToken } from "@/lib/reviews";
 import { getStripe } from "@/lib/stripe";
 import { absoluteUrl } from "@/lib/site";
 import { hasSupabaseAdminEnv } from "@/lib/supabase/admin";
+import { markCartCompleted, resolveCartFromSession } from "@/lib/checkout-carts";
 
 export const runtime = "nodejs";
 
@@ -42,17 +43,14 @@ async function handleCheckoutSession(
     sessionWithShipping.shipping_details ??
     session.collected_information?.shipping_details;
   const email = session.customer_details?.email ?? session.customer_email ?? null;
-  const rawItems = session.metadata?.items ?? "[]";
-  let items: ParsedItem[] = [];
 
-  try {
-    const parsed = JSON.parse(rawItems) as unknown;
-    if (Array.isArray(parsed)) {
-      items = parsed as ParsedItem[];
-    }
-  } catch {
-    items = [];
-  }
+  // The basket lives in checkout_carts because Stripe rejects metadata values
+  // over 500 characters and a four-line basket exceeds that. resolveCartFromSession
+  // also recovers the legacy inline-metadata shape, so sessions created before
+  // cart storage shipped still fulfil.
+  const resolved = await resolveCartFromSession(session.metadata);
+  const cartRef = resolved.cartRef;
+  const items: ParsedItem[] = resolved.items as ParsedItem[];
 
   let metaAddress: Record<string, string | null> | null = null;
   try {
@@ -60,20 +58,23 @@ async function handleCheckoutSession(
     if (raw) metaAddress = JSON.parse(raw) as Record<string, string | null>;
   } catch { /* ignore */ }
 
+  const storedAddress = resolved.shippingAddress;
+
   const shippingAddress = {
-    name: shippingDetails?.name ?? metaAddress?.name ?? session.customer_details?.name ?? null,
+    name: shippingDetails?.name ?? storedAddress?.name ?? metaAddress?.name ?? session.customer_details?.name ?? null,
     email,
-    phone: metaAddress?.phone ?? session.customer_details?.phone ?? null,
-    address1: shippingDetails?.address?.line1 ?? metaAddress?.address1 ?? session.customer_details?.address?.line1 ?? null,
-    address2: shippingDetails?.address?.line2 ?? metaAddress?.address2 ?? session.customer_details?.address?.line2 ?? null,
-    city: shippingDetails?.address?.city ?? metaAddress?.city ?? session.customer_details?.address?.city ?? null,
-    state: shippingDetails?.address?.state ?? metaAddress?.state ?? session.customer_details?.address?.state ?? null,
+    phone: storedAddress?.phone ?? metaAddress?.phone ?? session.customer_details?.phone ?? null,
+    address1: shippingDetails?.address?.line1 ?? storedAddress?.address1 ?? metaAddress?.address1 ?? session.customer_details?.address?.line1 ?? null,
+    address2: shippingDetails?.address?.line2 ?? storedAddress?.address2 ?? metaAddress?.address2 ?? session.customer_details?.address?.line2 ?? null,
+    city: shippingDetails?.address?.city ?? storedAddress?.city ?? metaAddress?.city ?? session.customer_details?.address?.city ?? null,
+    state: shippingDetails?.address?.state ?? storedAddress?.state ?? metaAddress?.state ?? session.customer_details?.address?.state ?? null,
     postalCode:
       shippingDetails?.address?.postal_code ??
+      storedAddress?.postalCode ??
       metaAddress?.postalCode ??
       session.customer_details?.address?.postal_code ??
       null,
-    country: shippingDetails?.address?.country ?? metaAddress?.country ?? session.customer_details?.address?.country ?? null
+    country: shippingDetails?.address?.country ?? storedAddress?.country ?? metaAddress?.country ?? session.customer_details?.address?.country ?? null
   };
 
   const recordResult = await recordOrder({
@@ -89,6 +90,10 @@ async function handleCheckoutSession(
   if (!recordResult.ok) {
     return { ok: false, message: recordResult.message ?? "Unable to persist order from webhook." };
   }
+
+  // The order is safely persisted at this point, so the cart can be closed.
+  // Best-effort: a cart left 'open' is inert and expires on its own.
+  await markCartCompleted(cartRef);
 
   if (hasSupabaseAdminEnv) {
     const recordedOrder = await getOrderForAdmin(session.id);

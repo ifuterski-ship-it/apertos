@@ -24,7 +24,10 @@ export async function PATCH(
   }
 
   const { id } = await params;
-  await approveReview(id);
+  const result = await approveReview(id);
+  if (!result.ok) {
+    return NextResponse.json({ ok: false, message: result.message }, { status: 500 });
+  }
   return NextResponse.json({ ok: true });
 }
 
@@ -38,6 +41,9 @@ export async function DELETE(
   }
 
   const { id } = await params;
-  await rejectReview(id);
+  const result = await rejectReview(id);
+  if (!result.ok) {
+    return NextResponse.json({ ok: false, message: result.message }, { status: 500 });
+  }
   return NextResponse.json({ ok: true });
 }

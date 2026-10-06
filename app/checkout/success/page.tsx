@@ -9,6 +9,7 @@ import { decrementInventoryForOrder } from "@/lib/inventory";
 import { getProductById, isPodProduct } from "@/lib/products";
 import { buildOrderItemsPayload, getOrderForAdmin, recordOrder } from "@/lib/orders";
 import { hasSupabaseAdminEnv } from "@/lib/supabase/admin";
+import { resolveCartFromSession } from "@/lib/checkout-carts";
 import type Stripe from "stripe";
 
 type MetadataItem = {
@@ -42,7 +43,11 @@ export default async function CheckoutSuccessPage({
     try {
       const session = await stripe.checkout.sessions.retrieve(sessionId);
       const lineItems = await stripe.checkout.sessions.listLineItems(sessionId);
-      const metadataItems = JSON.parse(session.metadata?.items ?? "[]") as MetadataItem[];
+      // Same resolver the webhook uses, so both agree on the basket and on the
+      // shipping address written into orders.items. Falls back to the legacy
+      // inline metadata for sessions predating cart storage.
+      const resolved = await resolveCartFromSession(session.metadata);
+      const metadataItems = resolved.items as MetadataItem[];
       customerEmail = session.customer_details?.email ?? session.customer_email ?? null;
       purchaseValue = (session.amount_total ?? 0) / 100;
       purchaseCurrency = (session.currency ?? "gbp").toUpperCase();
@@ -89,36 +94,42 @@ export default async function CheckoutSuccessPage({
         } catch { /* ignore */ }
 
         const shippingAddress = {
-          name: shippingDetails?.name ?? metaAddress?.name ?? session.customer_details?.name ?? null,
+          name: shippingDetails?.name ?? resolved.shippingAddress?.name ?? metaAddress?.name ?? session.customer_details?.name ?? null,
           email: customerEmail,
-          phone: metaAddress?.phone ?? session.customer_details?.phone ?? null,
+          phone: resolved.shippingAddress?.phone ?? metaAddress?.phone ?? session.customer_details?.phone ?? null,
           address1:
             shippingDetails?.address?.line1 ??
+            resolved.shippingAddress?.address1 ??
             metaAddress?.address1 ??
             session.customer_details?.address?.line1 ??
             null,
           address2:
             shippingDetails?.address?.line2 ??
+            resolved.shippingAddress?.address2 ??
             metaAddress?.address2 ??
             session.customer_details?.address?.line2 ??
             null,
           city:
             shippingDetails?.address?.city ??
+            resolved.shippingAddress?.city ??
             metaAddress?.city ??
             session.customer_details?.address?.city ??
             null,
           state:
             shippingDetails?.address?.state ??
+            resolved.shippingAddress?.state ??
             metaAddress?.state ??
             session.customer_details?.address?.state ??
             null,
           postalCode:
             shippingDetails?.address?.postal_code ??
+            resolved.shippingAddress?.postalCode ??
             metaAddress?.postalCode ??
             session.customer_details?.address?.postal_code ??
             null,
           country:
             shippingDetails?.address?.country ??
+            resolved.shippingAddress?.country ??
             metaAddress?.country ??
             session.customer_details?.address?.country ??
             null

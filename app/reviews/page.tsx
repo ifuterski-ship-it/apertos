@@ -97,7 +97,7 @@ export default async function ReviewsPage() {
       </div>
 
       {reviews.length === 0 ? (
-        <div className="rounded-[1.75rem] border border-white/10 bg-panel p-10 text-center">
+        <div className="rounded-[1.75rem] border border-white/10 bg-charcoal p-10 text-center">
           <p className="text-sm uppercase leading-7 tracking-[0.25em] text-neutral-400">
             No reviews just yet. Review links go out with every order.
           </p>
@@ -105,7 +105,7 @@ export default async function ReviewsPage() {
       ) : (
         <>
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            <div className="rounded-[1.5rem] border border-white/10 bg-panel p-6">
+            <div className="rounded-[1.5rem] border border-white/10 bg-charcoal p-6">
               <p className="text-[10px] uppercase tracking-[0.35em] text-neutral-500">Average Rating</p>
               <p className="mt-2 font-display text-5xl">{average.toFixed(1)}</p>
               <div className="mt-3">
@@ -123,7 +123,7 @@ export default async function ReviewsPage() {
               return (
                 <div
                   key={review.id}
-                  className="flex flex-col space-y-4 rounded-[1.75rem] border border-white/10 bg-panel p-6"
+                  className="flex flex-col space-y-4 rounded-[1.75rem] border border-white/10 bg-charcoal p-6"
                 >
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex items-center gap-3">

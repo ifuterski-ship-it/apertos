@@ -244,14 +244,41 @@ export async function getPendingReviews(): Promise<PendingReview[]> {
   }));
 }
 
-export async function approveReview(id: string): Promise<void> {
-  if (!hasSupabaseAdminEnv) return;
+export type ReviewMutationResult = { ok: true } | { ok: false; message: string };
+
+export async function approveReview(id: string): Promise<ReviewMutationResult> {
+  if (!hasSupabaseAdminEnv) {
+    return { ok: false, message: "Supabase admin is not configured." };
+  }
   const supabase = createAdminClient();
-  await supabase.from("reviews").update({ approved: true }).eq("id", id);
+  // .select() forces PostgREST to return the affected row, so "no such review"
+  // is distinguishable from "updated". Without it a missing id looks identical
+  // to a success.
+  const { data, error } = await supabase
+    .from("reviews")
+    .update({ approved: true })
+    .eq("id", id)
+    .select("id")
+    .maybeSingle();
+  if (error) {
+    console.warn("Failed to approve review:", error.message);
+    return { ok: false, message: error.message };
+  }
+  if (!data) {
+    return { ok: false, message: "Review not found." };
+  }
+  return { ok: true };
 }
 
-export async function rejectReview(id: string): Promise<void> {
-  if (!hasSupabaseAdminEnv) return;
+export async function rejectReview(id: string): Promise<ReviewMutationResult> {
+  if (!hasSupabaseAdminEnv) {
+    return { ok: false, message: "Supabase admin is not configured." };
+  }
   const supabase = createAdminClient();
-  await supabase.from("reviews").delete().eq("id", id);
+  const { error } = await supabase.from("reviews").delete().eq("id", id);
+  if (error) {
+    console.warn("Failed to reject review:", error.message);
+    return { ok: false, message: error.message };
+  }
+  return { ok: true };
 }

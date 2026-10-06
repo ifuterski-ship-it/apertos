@@ -124,7 +124,7 @@ export function ProductReviews({
           {reviews.map((review) => (
             <div
               key={review.id}
-              className="space-y-3 rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-5 md:p-6"
+              className="space-y-3 rounded-[1.5rem] border border-white/10 bg-charcoal p-5 md:p-6"
             >
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="space-y-1">

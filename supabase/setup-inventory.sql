@@ -34,6 +34,18 @@ insert into public.inventory (product_id, size, stock) values
 on conflict (product_id, size)
 do update set stock = excluded.stock, updated_at = now();
 
+-- Sakura Dragon range (per-size physical stock)
+insert into public.inventory (product_id, size, stock) values
+  ('sakura-rashguard', 'XXS', 4),
+  ('sakura-rashguard', 'XS', 6),
+  ('sakura-rashguard', 'S', 10),
+  ('sakura-rashguard', 'M', 0),
+  ('sakura-rashguard', 'L', 1),
+  ('sakura-rashguard', 'XL', 2),
+  ('sakura-shorts', 'XS', 0)
+on conflict (product_id, size)
+do update set stock = excluded.stock, updated_at = now();
+
 -- Create a function to reduce inventory
 create or replace function public.reduce_inventory(
   p_product_id text,
