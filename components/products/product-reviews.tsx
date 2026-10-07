@@ -124,12 +124,12 @@ export function ProductReviews({
           {reviews.map((review) => (
             <div
               key={review.id}
-              className="space-y-3 rounded-[1.5rem] border border-white/10 bg-charcoal p-5 md:p-6"
+              className="space-y-3 rounded-[1.5rem] border border-black/10 bg-white p-5 text-black md:p-6"
             >
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="space-y-1">
                   <div className="flex items-center gap-3">
-                    <p className="text-xs uppercase tracking-[0.25em] text-white">{review.reviewer_name}</p>
+                    <p className="text-xs uppercase tracking-[0.25em] text-neutral-900">{review.reviewer_name}</p>
                     {review.verified_purchase ? (
                       <span className="border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[10px] uppercase tracking-[0.2em] text-emerald-400">
                         Verified
@@ -146,7 +146,7 @@ export function ProductReviews({
                 </div>
                 <Stars rating={review.rating} />
               </div>
-              <p className="text-sm leading-7 tracking-[0.15em] text-neutral-300">{review.comment}</p>
+              <p className="text-sm leading-7 tracking-[0.15em] text-neutral-800">{review.comment}</p>
               <MediaAttachments urls={review.media_urls ?? []} />
             </div>
           ))}

@@ -105,9 +105,9 @@ export default async function ReviewsPage() {
       ) : (
         <>
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            <div className="rounded-[1.5rem] border border-white/10 bg-charcoal p-6">
+            <div className="rounded-[1.5rem] border border-black/10 bg-white p-6 text-black">
               <p className="text-[10px] uppercase tracking-[0.35em] text-neutral-500">Average Rating</p>
-              <p className="mt-2 font-display text-5xl">{average.toFixed(1)}</p>
+              <p className="mt-2 font-display text-5xl text-neutral-900">{average.toFixed(1)}</p>
               <div className="mt-3">
                 <Stars rating={Math.round(average)} />
               </div>
@@ -123,11 +123,11 @@ export default async function ReviewsPage() {
               return (
                 <div
                   key={review.id}
-                  className="flex flex-col space-y-4 rounded-[1.75rem] border border-white/10 bg-charcoal p-6"
+                  className="flex flex-col space-y-4 rounded-[1.75rem] border border-black/10 bg-white p-6 text-black"
                 >
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex items-center gap-3">
-                      <p className="text-xs uppercase tracking-[0.25em] text-white">{review.reviewerName}</p>
+                      <p className="text-xs uppercase tracking-[0.25em] text-neutral-900">{review.reviewerName}</p>
                       {review.verifiedPurchase ? (
                         <span className="border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[10px] uppercase tracking-[0.2em] text-emerald-400">
                           Verified
@@ -140,7 +140,7 @@ export default async function ReviewsPage() {
                   {product ? (
                     <Link
                       href={`/product/${product.id}`}
-                      className="group flex items-center gap-4 rounded-[1.25rem] border border-white/10 bg-black/30 p-3 transition hover:border-white/25"
+                      className="group flex items-center gap-4 rounded-[1.25rem] border border-black/10 bg-black/5 p-3 transition hover:border-black/25"
                     >
                       {product.image ? (
                         <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-[0.75rem] bg-black/40">
@@ -168,7 +168,7 @@ export default async function ReviewsPage() {
                     </p>
                   )}
 
-                  <p className="text-sm leading-7 tracking-[0.12em] text-neutral-300">{review.comment}</p>
+                  <p className="text-sm leading-7 tracking-[0.12em] text-neutral-800">{review.comment}</p>
                   <MediaAttachments urls={review.mediaUrls} />
                   <p className="mt-auto text-[11px] uppercase tracking-[0.2em] text-neutral-500">
                     {new Date(review.createdAt).toLocaleDateString("en-GB", {
