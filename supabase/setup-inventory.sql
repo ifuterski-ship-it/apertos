@@ -17,32 +17,39 @@ create unique index if not exists inventory_product_id_size_idx on public.invent
 create index if not exists inventory_product_id_idx on public.inventory (product_id);
 
 -- Insert initial inventory for rashguard and shorts
-insert into public.inventory (product_id, stock) values ('rashguard', 9), ('shorts', 9)
+insert into public.inventory (product_id, stock) values ('rashguard', 8), ('shorts', 8)
 on conflict (product_id, size) do nothing;
 
 -- Hoodies are now fulfilled from physical stock (POD on hold)
 insert into public.inventory (product_id, size, stock) values
-  ('hoodie-adult', 'S', 3),
-  ('hoodie-adult', 'M', 0),
-  ('hoodie-adult', 'L', 0),
-  ('hoodie-adult', 'XL', 0),
-  ('hoodie-adult', '2XL', 0),
-  ('hoodie-kids', '150', 1),
-  ('hoodie-womens', 'S', 5),
-  ('hoodie-womens', 'M', 0),
-  ('hoodie-womens', 'L', 0)
+  ('hoodie-adult', 'S', 10),
+  ('hoodie-adult', 'M', 10),
+  ('hoodie-adult', 'L', 10),
+  ('hoodie-adult', 'XL', 10),
+  ('hoodie-adult', '2XL', 10),
+  ('hoodie-kids', '130', 10),
+  ('hoodie-kids', '140', 10),
+  ('hoodie-kids', '150', 10),
+  ('hoodie-kids', '160', 10),
+  ('hoodie-womens', 'S', 10),
+  ('hoodie-womens', 'M', 10),
+  ('hoodie-womens', 'L', 10)
 on conflict (product_id, size)
 do update set stock = excluded.stock, updated_at = now();
 
 -- Sakura Dragon range (per-size physical stock)
 insert into public.inventory (product_id, size, stock) values
-  ('sakura-rashguard', 'XXS', 4),
-  ('sakura-rashguard', 'XS', 6),
+  ('sakura-rashguard', 'XXS', 3),
+  ('sakura-rashguard', 'XS', 5),
   ('sakura-rashguard', 'S', 10),
   ('sakura-rashguard', 'M', 0),
   ('sakura-rashguard', 'L', 1),
   ('sakura-rashguard', 'XL', 2),
-  ('sakura-shorts', 'XS', 0)
+  ('sakura-shorts', 'XS', 0),
+  ('sakura-shorts', 'S', 1),
+  ('sakura-shorts', 'M', 2),
+  ('sakura-shorts', 'L', 1),
+  ('sakura-shorts', 'XL', 1)
 on conflict (product_id, size)
 do update set stock = excluded.stock, updated_at = now();
 

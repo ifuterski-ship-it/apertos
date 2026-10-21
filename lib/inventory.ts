@@ -36,21 +36,21 @@ export type ProductInventoryStatus = {
 export type ProductInventoryBySize = Record<string, ProductInventoryStatus>;
 
 const fallbackProductStock: Record<BaseInventoryProductId, number> = {
-  rashguard: 9,
-  shorts: 9,
+  rashguard: 8,
+  shorts: 8,
   "sakura-rashguard": 0,
   "sakura-shorts": 0,
-  "hoodie-adult": 3,
-  "hoodie-kids": 1,
-  "hoodie-womens": 5
+  "hoodie-adult": 10,
+  "hoodie-kids": 10,
+  "hoodie-womens": 10
 };
 
 const fallbackStockBySize: Partial<Record<BaseInventoryProductId, Record<string, number>>> = {
-  "sakura-rashguard": { XXS: 4, XS: 6, S: 10, M: 0, L: 1, XL: 2 },
-  "sakura-shorts": { XS: 0 },
-  "hoodie-adult": { S: 3, M: 0, L: 0, XL: 0, "2XL": 0 },
-  "hoodie-kids": { "150": 1 },
-  "hoodie-womens": { S: 5, M: 0, L: 0 }
+  "sakura-rashguard": { XXS: 3, XS: 5, S: 10, M: 0, L: 1, XL: 2 },
+  "sakura-shorts": { XS: 0, S: 1, M: 2, L: 1, XL: 1 },
+  "hoodie-adult": { S: 10, M: 10, L: 10, XL: 10, "2XL": 10 },
+  "hoodie-kids": { "130": 10, "140": 10, "150": 10, "160": 10 },
+  "hoodie-womens": { S: 10, M: 10, L: 10 }
 };
 
 function getBaseInventoryProductsForProduct(productId: string): BaseInventoryProductId[] {
