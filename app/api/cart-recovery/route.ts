@@ -13,11 +13,12 @@ export const maxDuration = 60;
 const olderThanMinutes = Number(process.env.CART_RECOVERY_MINUTES ?? "60");
 
 export async function GET(request: Request) {
-  if (process.env.CRON_SECRET) {
-    const auth = request.headers.get("authorization");
-    if (auth !== `Bearer ${process.env.CRON_SECRET}`) {
-      return NextResponse.json({ ok: false, message: "Unauthorized" }, { status: 401 });
-    }
+  const cronSecret = process.env.CRON_SECRET;
+  const authorized =
+    !cronSecret || request.headers.get("authorization") === `Bearer ${cronSecret}`;
+
+  if (!authorized) {
+    return NextResponse.json({ ok: false, message: "Unauthorized" }, { status: 401 });
   }
 
   let carts;
@@ -31,7 +32,7 @@ export async function GET(request: Request) {
     );
   }
 
-  const results: { cartId: string; email: string; ok: boolean }[] = [];
+  const results: { cartId: string; email: string; ok: boolean; error?: string }[] = [];
 
   for (const cart of carts) {
     const totalPrice = cart.items.reduce(
@@ -54,10 +55,34 @@ export async function GET(request: Request) {
 
     if (result.ok) {
       await markRecoveryEmailSent(cart.id);
+    } else {
+      console.error("Cart recovery email rejected", {
+        cartId: cart.id,
+        result,
+      });
     }
 
-    results.push({ cartId: cart.id, email: cart.email, ok: result.ok });
+    const detail =
+      !result.ok && "result" in result
+        ? JSON.stringify(result.result).slice(0, 500)
+        : undefined;
+
+    results.push({
+      cartId: cart.id,
+      email: cart.email,
+      ok: result.ok,
+      ...(detail ? { error: detail } : {}),
+    });
   }
 
-  return NextResponse.json({ ok: true, emailed: results.length, results });
+  if (cronSecret) {
+    return NextResponse.json({ ok: true, emailed: results.length, results });
+  }
+
+  return NextResponse.json({
+    ok: true,
+    emailed: results.length,
+    sent: results.filter((r) => r.ok).length,
+    failed: results.filter((r) => !r.ok).length,
+  });
 }
