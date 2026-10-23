@@ -56,6 +56,30 @@ export function wrapEmailHtml(content: string, eyebrow = siteName) {
   });
 }
 
+function escapeHtml(value: string) {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+export function renderCustomerMessageEmail({ message }: { message: string }) {
+  const paragraphs = escapeHtml(message)
+    .split(/\n{2,}/)
+    .map(
+      (paragraph) =>
+        `<p style="margin:0 0 18px;font-size:13px;line-height:1.9;letter-spacing:0.06em;white-space:pre-line">${paragraph.replace(/\n/g, "<br />")}</p>`
+    )
+    .join("");
+
+  return renderEmailShell({
+    eyebrow: siteName,
+    body: paragraphs
+  });
+}
+
 function renderOrderItemRows(items: OrderItem[]) {
   return items
     .map(

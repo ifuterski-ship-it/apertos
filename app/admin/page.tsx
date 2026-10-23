@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { AdminOverview } from "@/app/admin/admin-overview";
 import { DeleteOrderButton } from "@/app/admin/delete-order-button";
+import { EmailCustomerButton } from "@/app/admin/email-customer-button";
 import { GenerateLabelButton } from "@/app/admin/generate-label-button";
 import { PodHandoffButton } from "@/app/admin/pod-handoff-button";
 import { ProductLaunchControls } from "@/app/admin/product-launch-controls";
@@ -204,7 +205,13 @@ export default async function AdminPage() {
                     </div>
                   </div>
 
-                  <DeleteOrderButton sessionId={order.stripeCheckoutSessionId} />
+                  <div className="space-y-4">
+                    <EmailCustomerButton
+                      sessionId={order.stripeCheckoutSessionId}
+                      email={order.email ?? null}
+                    />
+                    <DeleteOrderButton sessionId={order.stripeCheckoutSessionId} />
+                  </div>
                 </div>
 
                 <div className="space-y-5 rounded-[1.5rem] border border-white/10 bg-black/20 p-5">
