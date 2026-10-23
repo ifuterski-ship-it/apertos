@@ -16,9 +16,20 @@ alter table public.inventory drop constraint if exists inventory_product_id_key;
 create unique index if not exists inventory_product_id_size_idx on public.inventory (product_id, size);
 create index if not exists inventory_product_id_idx on public.inventory (product_id);
 
--- Insert initial inventory for rashguard and shorts
-insert into public.inventory (product_id, stock) values ('rashguard', 8), ('shorts', 8)
-on conflict (product_id, size) do nothing;
+-- Original range is tracked per size (rashguard and shorts share the set stock)
+insert into public.inventory (product_id, size, stock) values
+  ('rashguard', 'S', 2),
+  ('rashguard', 'M', 1),
+  ('rashguard', 'L', 2),
+  ('rashguard', 'XL', 1),
+  ('rashguard', '2XL', 2),
+  ('shorts', 'S', 2),
+  ('shorts', 'M', 1),
+  ('shorts', 'L', 2),
+  ('shorts', 'XL', 1),
+  ('shorts', '2XL', 2)
+on conflict (product_id, size)
+do update set stock = excluded.stock, updated_at = now();
 
 -- Hoodies are now fulfilled from physical stock (POD on hold)
 insert into public.inventory (product_id, size, stock) values

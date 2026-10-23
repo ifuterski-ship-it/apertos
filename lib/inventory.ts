@@ -46,12 +46,24 @@ const fallbackProductStock: Record<BaseInventoryProductId, number> = {
 };
 
 const fallbackStockBySize: Partial<Record<BaseInventoryProductId, Record<string, number>>> = {
+  rashguard: { S: 2, M: 1, L: 2, XL: 1, "2XL": 2 },
+  shorts: { S: 2, M: 1, L: 2, XL: 1, "2XL": 2 },
   "sakura-rashguard": { XXS: 3, XS: 5, S: 10, M: 0, L: 1, XL: 2 },
   "sakura-shorts": { XS: 0, S: 1, M: 2, L: 1, XL: 1 },
   "hoodie-adult": { S: 10, M: 10, L: 10, XL: 10, "2XL": 10 },
   "hoodie-kids": { "130": 10, "140": 10, "150": 10, "160": 10 },
   "hoodie-womens": { S: 10, M: 10, L: 10 }
 };
+
+const madeToOrderProducts: BaseInventoryProductId[] = [
+  "hoodie-adult",
+  "hoodie-kids",
+  "hoodie-womens"
+];
+
+function isMadeToOrder(productId: BaseInventoryProductId) {
+  return madeToOrderProducts.includes(productId);
+}
 
 function getBaseInventoryProductsForProduct(productId: string): BaseInventoryProductId[] {
   if (productId === "apertos-the-original-rashguard") {
@@ -181,6 +193,20 @@ function createInventoryState(rows: InventoryRow[]): InventoryState {
     const productRows = groupedRows.get(productId) ?? [];
     const baseRows = productRows.filter((row) => !row.size);
     const sizeRows = productRows.filter((row) => !!row.size);
+
+    if (isMadeToOrder(productId) && fallbackStockBySize[productId]) {
+      const stockBySize = { ...fallbackStockBySize[productId]! };
+      state[productId] = {
+        totalStock: Math.max(
+          Object.values(stockBySize).reduce((a, b) => a + b, 0),
+          0
+        ),
+        hasBaseRow: false,
+        stockBySize,
+        hasSizeRows: true
+      };
+      continue;
+    }
 
     if (productRows.length === 0 && fallbackStockBySize[productId]) {
       const stockBySize = { ...fallbackStockBySize[productId]! };
